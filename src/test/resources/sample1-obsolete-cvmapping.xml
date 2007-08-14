@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CVMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://www.ebi.ac.uk/~skerrien/psi/CVMapping.xsd"
+           modelName="mzML.xsd" modelVersion="0.91" modelURI="NA">
+    <CVSourceList>
+        <CVSource uri="http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo" cvFormat="OBO" name="PSI-MS"
+                  cvIdentifier="MS" version="1.01"/>
+        <CVSource uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo" cvFormat="OBO"
+                  name="Phenotypic qualities (properties)" cvIdentifier="PATO" version="NA"/>
+    </CVSourceList>
+
+    <ModelElementMapList>
+        <ModelElementMap elementPath="a/b/c/d" requirementLevel="MAY">
+            <!-- obsolete term -->
+            <CVTerm termAccession="PSI:1000009" useTerm="true" termName="Ionization Mode" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <!-- non obsolete -->
+            <CVTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
+                    cvRef="PATO" isRepeatable="false"/>
+        </ModelElementMap>
+    </ModelElementMapList>
+</CVMapping>
+

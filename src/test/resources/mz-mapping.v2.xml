@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CVMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://www.ebi.ac.uk/~skerrien/psi/CvMapping.xsd"
+           modelName="mzML.xsd" modelVersion="0.91" modelURI="NA">
+    <CVSourceList>
+        <CVSource uri="http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo" cvFormat="OBO" name="PSI-MS"
+                  cvIdentifier="MS" version="1.01"/>
+        <!--<CVSource uri="newt.obo?" cvFormat="OBO" name="NEWT taxonomy" cvIdentifier="NEWT" version="18/06/07"/>-->
+        <CVSource uri="http://pride-proteome.cvs.sourceforge.net/*checkout*/pride-proteome/PRIDE/schema/pride_cv.obo"
+                  cvFormat="OBO" name="PRIDE Ontology" cvIdentifier="PRIDE" version="1.54"/>
+        <!--<CVSource uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/gene_ontology.obo"-->
+                  <!--cvFormat="OBO" name="Gene Ontology" cvIdentifier="GO" version="4.246"/>-->
+        <CVSource uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo" cvFormat="OBO"
+                  name="Phenotypic qualities (properties)" cvIdentifier="PATO" version="NA"/>
+    </CVSourceList>
+
+    
+    <!-- start of sample -->
+    <ModelElementMapList>
+        <ModelElementMap elementPath="/mzML/dx:sampleList/dx:sample/dx:cvParam@accession" requirementLevel="MAY">
+            <CVTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <CVTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
+                    cvRef="PATO" isRepeatable="false"/>
+            <!--<CVTerm termAccession="GO:0005575 " useTerm="false" termName="cellular_component" allowChildren="true"-->
+                    <!--cvRef="GO" isRepeatable="false"/>-->
+            <!--<CVTerm termAccession="1 " useTerm="false" termName="Root node of taxonomy" allowChildren="true"-->
+                    <!--cvRef="NEWT" isRepeatable="false"/>-->
+        </ModelElementMap>
+        <!-- end of sample -->
+
+        <!-- start of instrument  -->
+        <ModelElementMap elementPath="/mzML/dx:instrumentList/dx:instrument/analyzer/dx:cvParam@accession"
+                         requirementLevel="MUST">
+            <CVTerm termAccession="PSI:1000010" useTerm="false" termName="Analyzer Type" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <!-- these 2 parent CV terms should be merged -->
+            <CVTerm termAccession="PSI:1000443" useTerm="false" termName="Mass Analyzer" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+        </ModelElementMap>
+        <ModelElementMap elementPath="/mzML/dx:instrumentList/dx:instrument/detector/dx:cvParam@accession"
+                         requirementLevel="MUST">
+            <CVTerm termAccession="PSI:1000026" useTerm="false" termName="Detector Type" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <!-- WARNING detector type also used in run/spectrum/header ? -->
+        </ModelElementMap>
+        <ModelElementMap elementPath="/mzML/dx:instrumentList/dx:instrument/dx:cvParam@accession"
+                         requirementLevel="SHOULD">
+            <CVTerm termAccession="PSI:1000030" useTerm="false" termName="Vendor" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <CVTerm termAccession="PSI:1000031" useTerm="false" termName="Model" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+        </ModelElementMap>
+        <ModelElementMap elementPath="/mzML/dx:instrumentList/dx:instrument/source/dx:cvParam@accession"
+                         requirementLevel="MUST">
+            <CVTerm termAccession="PSI:1000007" useTerm="false" termName="Inlet Type" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <CVTerm termAccession="PSI:1000008" useTerm="false" termName="Ionization Type" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <!-- check this CV branch-->
+        </ModelElementMap>
+
+        <!-- end of instrument -->
+
+        <!-- MISSING terms in MS CVs for all the software branch of the schema -->
+        <ModelElementMap elementPath="/mzML/dx:softwareList/dx:software/dx:cvParam@accession" requirementLevel="SHOULD">
+            <CVTerm termAccession="PRIDE:0000044" useTerm="false" termName="Search algorithm" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+        </ModelElementMap>
+
+        <!-- start of  data processing -->
+        <ModelElementMap elementPath="/mzML/dx:dataProcessing/dx:dataProcessingMethod/dx:cvParam@accession"
+                         requirementLevel="MUST">
+            <CVTerm termAccession="PSI:1000452" useTerm="false" termName="Data Processing Method" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+        </ModelElementMap>
+        <!-- end of  data processing -->
+
+        <!-- start of run
+Cv Param on top level of run what's its use?
+<ModelElementMap elementPath="mzML/dx:runList/dx:run/dx:cvParam@accession" requirementLevel="">
+<CVTerm termAccession="" useTerm="false" termName="" allowChildren="true" cvRef="MS"/>
+</ModelElementMap>
+cv terms from detector type see Lennart example file, total ion current -->
+        <ModelElementMap
+                elementPath="/mzML/dx:runList/dx:run/dx:sperctrumList/dx:spectrum/dx:spectrumHeader/dx:cvParam@accession"
+                requirementLevel="MUST">
+            <CVTerm termAccession="PSI:1000026" useTerm="false" termName="Detector Type" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+        </ModelElementMap>
+        <ModelElementMap
+                elementPath="/mzML/dx:runList/dx:run/dx:sperctrumList/dx:spectrum/dx:spectrumHeader/dx:acquistionList/dx:aquisition/dx:cvParam@accession"
+                requirementLevel="MUST">
+            <CVTerm termAccession=" PSI:1000027" useTerm="false" termName="Detector Acquisition Mode"
+                    allowChildren="true" cvRef="MS" isRepeatable="false"/>
+        </ModelElementMap>
+        <ModelElementMap
+                elementPath="/mzML/dx:runList/dx:run/dx:sperctrumList/dx:spectrum/dx:spectrumHeader/dx:precursorList/dx:precursor/dx:ionSelection/dx:cvParam@accession"
+                requirementLevel="MUST">
+            <CVTerm termAccession="PSI:1000445" useTerm="false" termName="Sequential m/z Separation Method"
+                    allowChildren="true" cvRef="MS" isRepeatable="false"/>
+            <!-- check CVs for ion selection criteria-->
+        </ModelElementMap>
+        <ModelElementMap
+                elementPath="/mzML/dx:runList/dx:run/dx:sperctrumList/dx:spectrum/dx:spectrumHeader/dx:precursorList/dx:precursor/dx:activation/dx:cvParam@accession"
+                requirementLevel="MUST">
+            <CVTerm termAccession="PSI:1000044" useTerm="false" termName="Activation Method" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <!-- check CVs -->
+        </ModelElementMap>
+        <ModelElementMap
+                elementPath="/mzML/dx:runList/dx:run/dx:sperctrumList/dx:spectrum/dx:spectrumHeader/dx:instrumentSettings/dx:cvParam@accession"
+                requirementLevel="MUST">
+            <CVTerm termAccession="PSI:1000037" useTerm="false" termName="Polarity" allowChildren="true" cvRef="MS" isRepeatable="false"/>
+            <CVTerm termAccession="PSI:1000017" useTerm="false" termName="Scan Function" allowChildren="true"
+                    cvRef="MS" isRepeatable="false"/>
+            <CVTerm termAccession="PSI:1000441" useTerm="false" termName="Scan" allowChildren="true" cvRef="MS" isRepeatable="false"/>
+            <!-- check CVs -->
+        </ModelElementMap>
+
+        <!-- cv terms not found for binary data
+       <ModelElementMap elementPath="mzML/dx:runList/dx:run/dx:sperctrumList/dx:spectrum/dx:binaryData/dx:cvParam@accession" requirementLevel="">
+           <CVTerm termAccession="" useTerm="false" termName="" allowChildren="true" cvRef="MS"/>
+       </ModelElementMap> -->
+        <!-- spectrum/dataGroup/ branch missing CV? -->
+    </ModelElementMapList>
+
+    <!-- end of run-->
+</CVMapping>
+
