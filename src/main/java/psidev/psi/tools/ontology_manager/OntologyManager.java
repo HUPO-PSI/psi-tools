@@ -3,6 +3,8 @@ package psidev.psi.tools.ontology_manager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,8 +15,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 
 /**
  * Author: Florian Reisinger
@@ -31,7 +31,7 @@ public class OntologyManager {
         ontologies = new HashMap<String, OntologyAccess>();
     }
 
-    public OntologyManager( InputStream configFile ) {
+    public OntologyManager( InputStream configFile ) throws OntologyLoaderException {
         ontologies = new HashMap<String, OntologyAccess>();
         loadOntologies( configFile );
     }
@@ -52,7 +52,7 @@ public class OntologyManager {
     ////////////////////
     // Methods
 
-    private void loadOntologies(InputStream configFile) {
+    private void loadOntologies(InputStream configFile) throws OntologyLoaderException {
         // parse XML
         Document document = null;
         try {
@@ -96,8 +96,7 @@ public class OntologyManager {
                 oa.loadOntology(ontologyID, name, version, format, uri);
                 ontologies.put(ontologyID, oa);
             } catch (Exception e) {
-                //ToDo: Exception handling
-                e.printStackTrace();
+                throw new OntologyLoaderException( "Failed loading ontology loader: " + loaderClass, e );
             }
 
         }
@@ -137,18 +136,5 @@ public class OntologyManager {
         }
     }
     
-    // quick testing
-    public static void main(String[] args){
-        InputStream is = OntologyManager.class.getClassLoader().getResourceAsStream("ontologies.xml");
-        if ( is == null ) {
-            System.out.println("ERROR: OntologyManager config file not found.");
-        } else {
-            OntologyManager om = new OntologyManager(is);
-            Set<String> result = om.getValidIDs( "MI", "MI:0300", true, false );
-            for (String s : result) {
-                System.out.println("term: " + s);
-            }
-        }
-    }
 
 }
