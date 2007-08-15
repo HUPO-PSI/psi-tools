@@ -10,6 +10,7 @@ import psidev.psi.tools.validator.rules.cvmapping.CvRule;
 import psidev.psi.tools.validator.rules.cvmapping.house.HouseFactory;
 import psidev.psi.tools.validator.rules.cvmapping.house.House;
 import psidev.psi.tools.ontology_manager.OntologyManager;
+import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.validator.cvmapping.jaxb.CVMappingType;
 import psidev.psi.validator.cvmapping.CvMappingReader;
 
@@ -32,8 +33,16 @@ public class CvMappingRuleTest {
     // ToDo: make this more generic: all rules have the xpath starting form the root and the check(object, xpath) method is used
 
     static InputStream oMngrConfig = CvMappingRuleTest.class.getClassLoader().getResourceAsStream("flo/ontologies-test.xml");
-    static OntologyManager ontologyMngr = new OntologyManager(oMngrConfig);
-    
+    static OntologyManager ontologyMngr;
+
+    static {
+        try {
+            ontologyMngr = new OntologyManager(oMngrConfig);
+        } catch (OntologyLoaderException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static junit.framework.Test suite() {
         return new JUnit4TestAdapter( CvMappingRuleTest.class );
     }

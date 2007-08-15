@@ -8,6 +8,7 @@ import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
 import psidev.psi.tools.validator.rules.cvmapping.CvRule;
 import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
 import psidev.psi.tools.ontology_manager.OntologyManager;
+import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.validator.cvmapping.jaxb.CVMappingType;
 import psidev.psi.validator.cvmapping.CvMappingException;
 import psidev.psi.validator.cvmapping.CvMappingReader;
@@ -57,7 +58,7 @@ public abstract class Validator {
     //////////////////////
     // Constructor
 
-    public Validator( InputStream ontoConfig, InputStream cvRuleConfig, InputStream oRuleConfig ) throws ValidatorException {
+    public Validator( InputStream ontoConfig, InputStream cvRuleConfig, InputStream oRuleConfig ) throws ValidatorException, OntologyLoaderException {
         // load the ontologies
         ontologyMngr = new OntologyManager( ontoConfig );
 
@@ -76,7 +77,7 @@ public abstract class Validator {
         }
     }
 
-    public Validator( InputStream ontoConfig, InputStream cvRuleConfig ) throws ValidatorException {
+    public Validator( InputStream ontoConfig, InputStream cvRuleConfig ) throws ValidatorException, OntologyLoaderException {
         // load the ontologies
         ontologyMngr = new OntologyManager( ontoConfig );
 
@@ -90,7 +91,7 @@ public abstract class Validator {
         }
     }
 
-    public Validator( InputStream ontoConfig ) {
+    public Validator( InputStream ontoConfig ) throws OntologyLoaderException {
         // load the ontologies
         ontologyMngr = new OntologyManager( ontoConfig );
     }
@@ -118,7 +119,7 @@ public abstract class Validator {
         return ontologyMngr;
     }
 
-    public void setOntologyManager( InputStream ontoConfig ) throws ValidatorException {
+    public void setOntologyManager( InputStream ontoConfig ) throws ValidatorException, OntologyLoaderException {
         ontologyMngr = new OntologyManager( ontoConfig );
     }
 
