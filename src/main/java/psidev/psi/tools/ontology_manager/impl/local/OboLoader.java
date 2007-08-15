@@ -11,13 +11,13 @@ import org.apache.log4j.Logger;
 import psidev.psi.tools.ontology_manager.impl.local.model.OntologyTerm;
 import uk.ac.ebi.ook.loader.impl.AbstractLoader;
 import uk.ac.ebi.ook.loader.parser.OBOFormatParser;
-import uk.ac.ebi.ook.model.implementation.TermBean;
 import uk.ac.ebi.ook.model.interfaces.TermRelationship;
+import uk.ac.ebi.ook.model.ojb.TermBean;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.MalformedURLException;
 import java.util.*;
 
 /**
@@ -68,7 +68,6 @@ public class OboLoader extends AbstractLoader {
         ONTOLOGY_DEFINITION = "PSI MI";
         FULL_NAME = "PSI Molecular Interactions";
         SHORT_NAME = "PSI-MI";
-        FQCN = OboLoader.class.getName();
     }
 
     protected void parse( Object params ) {

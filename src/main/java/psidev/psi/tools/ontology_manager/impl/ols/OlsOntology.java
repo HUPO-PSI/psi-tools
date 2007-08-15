@@ -103,7 +103,7 @@ public class OlsOntology implements OntologyAccess {
     public String getTermNameByID(String id) {
         String result;
         try {
-            result =  query.getTermById( id );
+            result =  query.getTermById( id, ontologyID );
         } catch (RemoteException e) {
             throw new IllegalStateException("RemoteException while trying to connect to OLS.");
         }
