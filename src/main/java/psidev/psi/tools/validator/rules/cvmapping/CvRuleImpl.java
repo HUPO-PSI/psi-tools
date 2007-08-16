@@ -1,22 +1,21 @@
 package psidev.psi.tools.validator.rules.cvmapping;
 
-import psidev.psi.tools.validator.xpath.XPathResult;
-import psidev.psi.tools.validator.xpath.XPathHelper;
-import psidev.psi.tools.ontology_manager.OntologyManager;
-import psidev.psi.tools.validator.MessageLevel;
-import psidev.psi.tools.validator.ValidatorMessage;
-import psidev.psi.tools.validator.ValidatorException;
-import psidev.psi.tools.validator.Context;
-import psidev.psi.tools.validator.rules.Rule;
-import psidev.psi.tools.validator.rules.AbstractRule;
-import psidev.psi.validator.cvmapping.jaxb.ModelElementMap;
-import psidev.psi.validator.cvmapping.jaxb.CVSource;
-
-import java.util.*;
-
 import org.apache.commons.jxpath.JXPathException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRule;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
+import psidev.psi.tools.ontology_manager.OntologyManager;
+import psidev.psi.tools.validator.Context;
+import psidev.psi.tools.validator.MessageLevel;
+import psidev.psi.tools.validator.ValidatorException;
+import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.rules.AbstractRule;
+import psidev.psi.tools.validator.rules.Rule;
+import psidev.psi.tools.validator.xpath.XPathHelper;
+import psidev.psi.tools.validator.xpath.XPathResult;
+
+import java.util.*;
 
 /**
  * Author: florian
@@ -27,29 +26,29 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
     public static final Log log = LogFactory.getLog( CvRuleImpl.class );
 
-    private ModelElementMap modelElementMap;
+    private CvMappingRule modelElementMap;
 
-    private Map<ModelElementMap.CVTerm, Integer> nonRepeatableTerms = null;
+    private Map<CvTerm, Integer> nonRepeatableTerms = null;
 
     public CvRuleImpl(OntologyManager ontologyManager) {
         super(ontologyManager);
-        modelElementMap = new ModelElementMap();
+        modelElementMap = new CvMappingRule();
     }
 
 
     /////////////////
     // Getter + Setter
 
-    public ModelElementMap getModelElementMap() {
+    public CvMappingRule getCvMappingRule() {
         return modelElementMap;
     }
 
-    public void setModelElementMap(ModelElementMap modelElementMap) {
+    public void setCvMappingRule(CvMappingRule modelElementMap) {
         this.modelElementMap = modelElementMap;
     }
 
-    public List<ModelElementMap.CVTerm> getCVTerms() {
-        return modelElementMap.getCVTerm();
+    public List<CvTerm> getCVTerms() {
+        return modelElementMap.getCvTerm();
     }
 
     public String getElementPath() {
@@ -60,7 +59,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return modelElementMap.getRequirementLevel();
     }
 
-    public void setNonRepeatableTerms(Map<ModelElementMap.CVTerm, Integer> nonRepeatableTerms) {
+    public void setNonRepeatableTerms(Map<CvTerm, Integer> nonRepeatableTerms) {
         this.nonRepeatableTerms = nonRepeatableTerms;
     }
 
@@ -128,7 +127,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
             // TODO for each XPath, build a list of non repeatable CVs and keep track of it.
             // initialize the map
-            nonRepeatableTerms = new HashMap<ModelElementMap.CVTerm, Integer>();
+            nonRepeatableTerms = new HashMap<CvTerm, Integer>();
 
             // check that each match has at least one matching CV term amongst those specified.
             for ( XPathResult result : results ) {
@@ -138,14 +137,14 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                 boolean foundOne = false;
 
                 // check each specified CVTerm in this CvRule (and potential child terms)
-                Iterator<ModelElementMap.CVTerm> it = getCVTerms().iterator();
+                Iterator<CvTerm> it = getCVTerms().iterator();
                 while ( it.hasNext() ) {
-                    ModelElementMap.CVTerm cvTerm = it.next();
+                    CvTerm cvTerm = it.next();
 
                     try {
                         String accession = ( String ) result.getResult();
 // ToDo: can this be generified to a list of all allowed terms?
-// create a list of allowed terms first based on the CvRule (ModelElementMap) and then check all the terms
+// create a list of allowed terms first based on the CvRule (CvMappingRule) and then check all the terms
 // -> when creating the rule, is it possible create a list of all valid terms?
 // isRepeatable ?? scope?, per term?, per rule?
                         if ( isMatchingCv( cvTerm, accession, messages, level, xpath ) ) {
@@ -173,9 +172,9 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                     StringBuilder sb = new StringBuilder();
                     sb.append( "None of the given CvTerms matched the target (" + xpath + ") '" + result.getResult()
                                + "' :\n" );
-                    Iterator<ModelElementMap.CVTerm> iterator = getCVTerms().iterator();
+                    Iterator<CvTerm> iterator = getCVTerms().iterator();
                     while ( iterator.hasNext() ) {
-                        ModelElementMap.CVTerm cvTerm = iterator.next();
+                        CvTerm cvTerm = iterator.next();
                         sb.append( "  - " ).append( printCvTerm( cvTerm ) );
                         if ( iterator.hasNext() ) {
                             sb.append( "\n" );
@@ -187,8 +186,8 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             }
 
             // if any of the non repeatable element was defined more than once, create a message
-            for ( Map.Entry<ModelElementMap.CVTerm, Integer> entry : nonRepeatableTerms.entrySet() ) {
-                ModelElementMap.CVTerm cvTerm = entry.getKey();
+            for ( Map.Entry<CvTerm, Integer> entry : nonRepeatableTerms.entrySet() ) {
+                CvTerm cvTerm = entry.getKey();
                 Integer count = entry.getValue();
 
                 // Note: default value of an unspecified isRepeatable is false
@@ -239,7 +238,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         }
     }
 
-    protected String printCvTerm( ModelElementMap.CVTerm cv ) {
+    protected String printCvTerm( CvTerm cv ) {
         StringBuilder sb = new StringBuilder();
         sb.append( "CvTerm(" );
         sb.append( '\'' ).append( cv.getTermAccession() ).append( '\'' ).append( ',' ).append( ' ' );
@@ -251,14 +250,14 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return sb.toString();
     }
 
-    protected String printSimpleCvTerm( ModelElementMap.CVTerm cv ) {
+    protected String printSimpleCvTerm( CvTerm cv ) {
         StringBuilder sb = new StringBuilder();
         sb.append( '\'' ).append( cv.getTermName() ).append( '\'' ).append( ' ' );
         sb.append( '(' ).append( cv.getTermAccession() ).append( ')' );
         return sb.toString();
     }
 
-    private void incrementCvTermCount( ModelElementMap.CVTerm cvTerm ) {
+    private void incrementCvTermCount( CvTerm cvTerm ) {
         Integer count = nonRepeatableTerms.get( cvTerm );
         if ( count == null ) {
             count = 1;
@@ -268,12 +267,11 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         nonRepeatableTerms.put( cvTerm, count );
     }
 
-    protected boolean isMatchingCv( ModelElementMap.CVTerm cvTerm, String accession,
+    protected boolean isMatchingCv( CvTerm cvTerm, String accession,
                                     Collection<ValidatorMessage> messages, Recommendation level, String xpath ) throws ValidatorException {
         boolean result = false;
 
-        CVSource source = ( CVSource ) cvTerm.getCvRef();
-        String ontologyID = source.getCvIdentifier();
+        String ontologyID = cvTerm.getCvIdentifier();
         String ruleTermAcc = cvTerm.getTermAccession();
         boolean allowChildren = cvTerm.isAllowChildren();
         boolean useTerm = cvTerm.isUseTerm();

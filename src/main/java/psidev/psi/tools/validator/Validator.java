@@ -4,20 +4,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
-import psidev.psi.tools.validator.rules.cvmapping.CvRule;
-import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
+import psidev.psi.tools.cvrReader.CvRuleReader;
+import psidev.psi.tools.cvrReader.CvRuleReaderException;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
-import psidev.psi.validator.cvmapping.jaxb.CVMappingType;
-import psidev.psi.validator.cvmapping.CvMappingException;
-import psidev.psi.validator.cvmapping.CvMappingReader;
+import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
+import psidev.psi.tools.validator.rules.cvmapping.CvRule;
+import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <b>Semantic XML Validator</b>.
@@ -66,7 +68,7 @@ public abstract class Validator {
         if ( cvRuleConfig != null ) {
             try {
                 setCvMappingRules( cvRuleConfig );
-            } catch (CvMappingException e) {
+            } catch (CvRuleReaderException e) {
                 throw new ValidatorException( "CvMappingException while trying to load the CvRules.", e );
             }
         }
@@ -85,7 +87,7 @@ public abstract class Validator {
         if ( cvRuleConfig != null ) {
             try {
                 setCvMappingRules( cvRuleConfig );
-            } catch (CvMappingException e) {
+            } catch (CvRuleReaderException e) {
                 throw new ValidatorException( "CvMappingException while trying to load the CvRules.", e );
             }
         }
@@ -99,22 +101,6 @@ public abstract class Validator {
     ////////////////////////
     // Getters and Setters
 
-//    public UserPreferences getUserPreferences() {
-//        return userPreferences;
-//    }
-//
-//    public void setUserPreferences( UserPreferences userPreferences ) {
-//
-//        if ( userPreferences == null ) {
-//            log.info( "Reset user preferences to default values." );
-//            this.userPreferences = new UserPreferences(); // reset to default value
-//        } else {
-//            log.info( "Use users defined preferences." );
-//            this.userPreferences = userPreferences;
-//        }
-//    }
-
-
     public OntologyManager getOntologyMngr() {
         return ontologyMngr;
     }
@@ -124,8 +110,8 @@ public abstract class Validator {
     }
 
 
-    public CVMappingType getCvMapping() {
-        return cvRuleManager.getCvMapping();
+    public CvMappingRules getCvMapping() {
+        return cvRuleManager.getCvMappingRules();
     }
 
     public CvRuleManager getCvRuleManager() {
@@ -136,10 +122,10 @@ public abstract class Validator {
      * Set a cvMapping file and build the corresponding cvRuleManager.
      *
      * @param cvIs InputStream form the configuration file defining the CV Mapping to be applied as rule.
-     * @throws CvMappingException      if one cannot parse the given file.
+     * @throws CvRuleReaderException      if one cannot parse the given file.
      */
-    public void setCvMappingRules( InputStream cvIs ) throws CvMappingException {
-        CvMappingReader reader = new CvMappingReader();
+    public void setCvMappingRules( InputStream cvIs ) throws CvRuleReaderException {
+        CvRuleReader reader = new CvRuleReader();
         cvRuleManager = new CvRuleManager( ontologyMngr, reader.read( cvIs ) );
     }
 
@@ -229,17 +215,9 @@ public abstract class Validator {
     public Collection<ValidatorMessage> validate( Collection<?> col ) throws ValidatorException {
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
 
-        // do cv mapping check separately
-//        if ( enableCvMappingChecking ) {
-//            // ToDo: see whether checkCvMapping need to use generics
-//            messages.addAll(checkCvMapping( col ));
-//        }
-
         // Run the user defined rules
-        Iterator<ObjectRule> rulez = rules.iterator();
-        while ( rulez.hasNext() ) {
-            ObjectRule rule = rulez.next();
-            messages.addAll( validate( col, rule ) );
+        for (ObjectRule rule : rules) {
+            messages.addAll(validate(col, rule));
         }
 
         return messages;
@@ -255,11 +233,10 @@ public abstract class Validator {
      */
     private Collection<ValidatorMessage> validate( Collection<?> col, ObjectRule rule ) throws ValidatorException {
         List<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
-        Iterator objs = col.iterator();
-        while ( objs.hasNext() ) {
-            Object o = objs.next();
-            if ( rule.canCheck( o ) ) { // apply only if rule can handle this object
-                messages.addAll( rule.check( o ) );
+        for (Object aCol : col) {
+            if (rule.canCheck(aCol)) { // apply only if rule can handle this object
+                // ToDo: try to resolve unchecked assignment
+                messages.addAll(rule.check(aCol));
             } else {
                 // what to do if can not check?
                 // for now: just be quiet and do nothing, simply skip
@@ -289,11 +266,11 @@ public abstract class Validator {
      * Run a check on the CvMapping.
      *
      * @param col collection of objects to check on.
+     * @param xPath the xpath from the XML root to the object that is to be checked.
      * @return collection of validator messages.
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> checkCvMapping( Collection<?> col, String xPath ) throws ValidatorException {
-        // ToDo: wrap xpath together with to-check-object in holder -> object and xpath always match
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         // Run cv mapping check
         if ( cvRuleManager != null ) {

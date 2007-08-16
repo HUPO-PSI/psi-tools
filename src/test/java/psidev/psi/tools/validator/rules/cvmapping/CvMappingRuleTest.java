@@ -1,24 +1,21 @@
 package psidev.psi.tools.validator.rules.cvmapping;
 
+import junit.framework.JUnit4TestAdapter;
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.tools.validator.ValidatorMessage;
-import psidev.psi.tools.validator.ValidatorException;
-import psidev.psi.tools.validator.MessageLevel;
-import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
-import psidev.psi.tools.validator.rules.cvmapping.CvRule;
-import psidev.psi.tools.validator.rules.cvmapping.house.HouseFactory;
-import psidev.psi.tools.validator.rules.cvmapping.house.House;
+import psidev.psi.tools.cvrReader.CvRuleReader;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
-import psidev.psi.validator.cvmapping.jaxb.CVMappingType;
-import psidev.psi.validator.cvmapping.CvMappingReader;
+import psidev.psi.tools.validator.MessageLevel;
+import psidev.psi.tools.validator.ValidatorException;
+import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.rules.cvmapping.house.House;
+import psidev.psi.tools.validator.rules.cvmapping.house.HouseFactory;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
-
-import junit.framework.JUnit4TestAdapter;
 
 /**
  * CvMappingRule Tester.
@@ -57,8 +54,8 @@ public class CvMappingRuleTest {
         // check a fine mapping.
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample5-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
 //        CvRuleManager rule = CvMappingRuleFactory.getInstance().create( cvMapping );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
@@ -75,8 +72,8 @@ public class CvMappingRuleTest {
         // Yet the rule remains as it still has one valid cvTerm.
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-obsolete-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         CvRule rule = ruleMngr.getCvRules().iterator().next(); // only one rule here
@@ -99,8 +96,8 @@ public class CvMappingRuleTest {
         // checks that both cvTerm in the rule are obsolete and that the rule was removed.
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-obsolete2-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         int rulesBeforeCheck = ruleMngr.getCvRules().size();
@@ -123,8 +120,8 @@ public class CvMappingRuleTest {
         // and that the rule gets also removed.
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-obsolete3-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
@@ -144,8 +141,8 @@ public class CvMappingRuleTest {
         // and that the rule gets also removed.
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error1-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
@@ -164,8 +161,8 @@ public class CvMappingRuleTest {
         // checks that both cvTerm in the rule are removed (they don't exist in MS) and that the rule gets also removed.
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error2-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
@@ -186,8 +183,8 @@ public class CvMappingRuleTest {
         // TODO this is wrong ... it is possible that a term cannot be used ... update the CvMappingRule
         // ToDo: check that a specific term was NOT used?
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error3-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
@@ -207,8 +204,8 @@ public class CvMappingRuleTest {
 
         System.out.println("========== Test: check_noMessage");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -230,8 +227,8 @@ public class CvMappingRuleTest {
 
         System.out.println("========== Test: check_useTerm_is_false");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -259,8 +256,8 @@ public class CvMappingRuleTest {
         // more precisely, that PSI:1000084 is a child term of PSI:1000010
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -283,8 +280,8 @@ public class CvMappingRuleTest {
         // more precisely, that PSI:1000084 is a child term of PSI:1000010
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -311,8 +308,8 @@ public class CvMappingRuleTest {
 
         System.out.println("========== Test: check_term_not_found_may");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -339,8 +336,8 @@ public class CvMappingRuleTest {
 
         System.out.println("========== Test: check_term_not_found_should");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample3-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -367,8 +364,8 @@ public class CvMappingRuleTest {
 
         System.out.println("========== Test: check_term_not_found_must");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample4-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -395,8 +392,8 @@ public class CvMappingRuleTest {
 
         System.out.println("========== Test: check_bad_xpath");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample5-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -439,8 +436,8 @@ public class CvMappingRuleTest {
 
         System.out.println("========== Test: check_null");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
-        CvMappingReader reader = new CvMappingReader();
-        CVMappingType cvMapping = reader.read( input );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();

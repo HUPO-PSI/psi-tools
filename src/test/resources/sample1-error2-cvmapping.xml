@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CVMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:noNamespaceSchemaLocation="http://www.ebi.ac.uk/~skerrien/psi/CVMapping.xsd"
-           modelName="mzML.xsd" modelVersion="0.91" modelURI="NA">
-    <CVSourceList>
-        <CVSource uri="http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo" cvFormat="OBO" name="PSI-MS"
-                  cvIdentifier="MS" version="1.01"/>
-    </CVSourceList>
+<CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
 
-    <ModelElementMapList>
-        <ModelElementMap elementPath="a/b/c/d" requirementLevel="MAY">
-            <!-- fake term -->
-            <CVTerm termAccession="PSI:xxxx" useTerm="false" termName="fake term 1" allowChildren="true" cvRef="MS" isRepeatable="false"/>
-            <!-- fake term -->
-            <CVTerm termAccession="PSI:yyyy" useTerm="true" termName="fake term 2" allowChildren="false" cvRef="MS" isRepeatable="false"/>
-            <!-- fake term -->
-            <CVTerm termAccession="PSI:zzzz" useTerm="true" termName="fake term 3" allowChildren="true" cvRef="MS" isRepeatable="false"/>
-            <!-- fake term -->
-            <CVTerm termAccession="PSI:zzzz" useTerm="false" termName="fake term 3" allowChildren="false" cvRef="MS" isRepeatable="false"/>
-        </ModelElementMap>
-    </ModelElementMapList>
-</CVMapping>
+    <CvMappingRule elementPath="a/b/c/d" requirementLevel="MAY">
+        <!-- fake term -->
+        <CvTerm termAccession="PSI:xxxx" useTerm="false" termName="fake term 1" allowChildren="true" cvIdentifier="MS" isRepeatable="false"/>
+        <!-- fake term -->
+        <CvTerm termAccession="PSI:yyyy" useTerm="true" termName="fake term 2" allowChildren="false" cvIdentifier="MS" isRepeatable="false"/>
+        <!-- fake term -->
+        <CvTerm termAccession="PSI:zzzz" useTerm="true" termName="fake term 3" allowChildren="true" cvIdentifier="MS" isRepeatable="false"/>
+        <!-- fake term -->
+        <CvTerm termAccession="PSI:zzzz" useTerm="false" termName="fake term 3" allowChildren="false" cvIdentifier="MS" isRepeatable="false"/>
+    </CvMappingRule>
+</CvMappingRules>
 

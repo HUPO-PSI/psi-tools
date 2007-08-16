@@ -4,7 +4,7 @@ import psidev.psi.tools.validator.ValidatorMessage;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.rules.Rule;
 import psidev.psi.tools.validator.MessageLevel;
-import psidev.psi.validator.cvmapping.jaxb.ModelElementMap;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,11 +24,11 @@ public interface CvRule extends Rule {
     
     public String getElementPath();
 
-    public List<ModelElementMap.CVTerm> getCVTerms();
+    public List<CvTerm> getCVTerms();
 
     public String getRequirementLevel();
 
-    public void setNonRepeatableTerms(Map<ModelElementMap.CVTerm, Integer> nonRepeatableTerms);
+    public void setNonRepeatableTerms(Map<CvTerm, Integer> nonRepeatableTerms);
 
     public MessageLevel convertCvMappingLevel( Recommendation level );
 

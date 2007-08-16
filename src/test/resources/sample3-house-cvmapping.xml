@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CVMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:noNamespaceSchemaLocation="http://www.ebi.ac.uk/~skerrien/psi/CVMapping.xsd"
-           modelName="mzML.xsd" modelVersion="0.91" modelURI="NA">
-    <CVSourceList>
-        <CVSource uri="http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo" cvFormat="OBO" name="PSI-MS"
-                  cvIdentifier="MS" version="1.01"/>
-        <CVSource uri="http://pride-proteome.cvs.sourceforge.net/*checkout*/pride-proteome/PRIDE/schema/pride_cv.obo"
-                  cvFormat="OBO" name="PRIDE Ontology" cvIdentifier="PRIDE" version="1.54"/>
-        <CVSource uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo" cvFormat="OBO"
-                  name="Phenotypic qualities (properties)" cvIdentifier="PATO" version="NA"/>
-    </CVSourceList>
+<CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
 
-    <ModelElementMapList>
-        <ModelElementMap elementPath="kitchen/note" requirementLevel="SHOULD">
-            <CVTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
-                    cvRef="MS" isRepeatable="false"/>
-            <CVTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
-                    cvRef="PATO" isRepeatable="false"/>
-        </ModelElementMap>
-    </ModelElementMapList>
-</CVMapping>
+    <CvMappingRule elementPath="kitchen/note" requirementLevel="SHOULD">
+        <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
+                cvIdentifier="MS" isRepeatable="false"/>
+        <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
+                cvIdentifier="PATO" isRepeatable="false"/>
+    </CvMappingRule>
+</CvMappingRules>
 

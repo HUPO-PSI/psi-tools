@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CVMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:noNamespaceSchemaLocation="http://www.ebi.ac.uk/~skerrien/psi/CVMapping.xsd"
-           modelName="mzML.xsd" modelVersion="0.91" modelURI="NA">
-    <CVSourceList>
-        <CVSource uri="http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo" cvFormat="OBO" name="PSI-MS"
-                  cvIdentifier="MS" version="1.01"/>
-    </CVSourceList>
+<CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
 
-    <ModelElementMapList>
-        <ModelElementMap elementPath="a/b/c/d" requirementLevel="MAY">
-            <!-- fine term -->
-            <CVTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
-                    cvRef="MS"/>
-            <!-- term not allowing itself to be used or any of its children -->
-            <CVTerm termAccession="PSI:1000264" useTerm="false" termName="Ion Trap" allowChildren="false" cvRef="MS" isRepeatable="false"/>
-        </ModelElementMap>
-    </ModelElementMapList>
-</CVMapping>
+    <CvMappingRule elementPath="a/b/c/d" requirementLevel="MAY">
+        <!-- fine term -->
+        <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
+                cvIdentifier="MS"/>
+        <!-- term not allowing itself to be used or any of its children -->
+        <CvTerm termAccession="PSI:1000264" useTerm="false" termName="Ion Trap" allowChildren="false" cvIdentifier="MS" isRepeatable="false"/>
+    </CvMappingRule>
+</CvMappingRules>
 
