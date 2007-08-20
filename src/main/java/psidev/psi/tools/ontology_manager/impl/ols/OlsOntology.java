@@ -19,8 +19,6 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
  */
 public class OlsOntology implements OntologyAccess {
 
-    // ToDo: check if different ontologies use same query (olsClient) but still have correct id
-
     static Query query;
     String ontologyID;
 
@@ -105,7 +103,8 @@ public class OlsOntology implements OntologyAccess {
         try {
             result =  query.getTermById( id, ontologyID );
         } catch (RemoteException e) {
-            throw new IllegalStateException("RemoteException while trying to connect to OLS.");
+            throw new IllegalStateException("RemoteException while trying to query OLS for: "
+                    + id + " in ontology: " + ontologyID);
         }
         return result;
     }

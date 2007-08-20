@@ -136,5 +136,11 @@ public class OntologyManager {
         }
     }
     
-
+    public String getTermNameByID( String ontologyID, String id ) {
+        if ( ontologies.containsKey(ontologyID) ) {
+            return ontologies.get(ontologyID).getTermNameByID( id );
+        } else {
+            throw new IllegalArgumentException("No ontology with the ID '" + ontologyID + "' exists.");
+        }
+    }
 }
