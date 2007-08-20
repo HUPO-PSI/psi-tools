@@ -273,8 +273,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         String ontologyID = cvTerm.getCvIdentifier();
         String ruleTermAcc = cvTerm.getTermAccession();
+        String ruleTerm = cvTerm.getTermName();
         boolean allowChildren = cvTerm.isAllowChildren();
         boolean useTerm = cvTerm.isUseTerm();
+        boolean useTermName = cvTerm.isUseTermName();
 
         if ( !ontologyManager.containsKey( ontologyID ) ) {
             throw new ValidatorException( "The requested ontology was not found: " + ontologyID );
@@ -282,18 +284,26 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
 //        System.out.println("Using: ontologyID:" + ontologyID + " ruleTermAcc: " + ruleTermAcc + " allowChildren: " + allowChildren + " useTerm: " + useTerm + " on accession: " + accession);
         Set<String> allowedAccs = ontologyManager.getValidIDs( ontologyID, ruleTermAcc, allowChildren, useTerm );
-//        System.out.println("allowed Accessions: " + allowedAccs.size());
-//        System.out.println("contains accession: " + allowedAccs.contains(accession));
-
-        if ( allowedAccs.contains( accession ) ) {
-            // rule passed, no validation message
-            incrementCvTermCount( cvTerm );  // ToDo: check this!
-            result = true;
-        } else {
-            // no message since even if the accession is not allowed in these terms, it could be allowed in a different ontology
-//            messages.add(buildMessage( xpath, level, "The accession '" + accession + "' is not part of the allowed accessions." ));
+        if (useTermName) { // check on term names rather that accession
+            Set<String> allowedNames = new HashSet<String>();
+            // get term names for allowed accessions
+            for ( String allowedAcc : allowedAccs ) {
+                allowedNames.add( ontologyManager.getTermNameByID( ontologyID, allowedAcc ) );
+            }
+            if ( allowedNames.contains(accession) ) {
+                // rule passed
+                incrementCvTermCount( cvTerm );  // ToDo: check this! for repeatable terms...
+                result = true;
+            }
+        } else { // check on cv accession (regardless of the actual name)
+            if ( allowedAccs.contains( accession ) ) {
+                // rule passed, no validation message
+                incrementCvTermCount( cvTerm );  // ToDo: check this! for repeatable terms...
+                result = true;
+            } else {
+                // no message since even if the accession is not allowed in these terms, it could be allowed in a different ontology
+            }
         }
-
 
         return result;
     }

@@ -1,4 +1,7 @@
 <CVSourceList>
+    <CVSource loader="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+        uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mi.obo"
+        cvFormat="OBO" name="PSI-MI" cvIdentifier="MI" version="1.154"/>
     <CVSource loader="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
         uri="http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo" 
         cvFormat="OBO" name="PSI-MS" cvIdentifier="MS" version="1.01"/>

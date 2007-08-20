@@ -25,7 +25,16 @@ public class HouseFactory {
         house.addBedroom( new BedRoom( "blue" ) );
         house.addBedroom( new BedRoom( "pink" ) );
         house.addBedroom( new BedRoom( "white" ) );
-        
+
+
+        // create a new element to test the useTermName flag
+        Garage garage = new Garage( 10f, 10f );
+        garage.getBikes().add( new Bike( "alias type") ); // root of rule, not allowed (only children allowed
+        garage.getBikes().add( new Bike( "gene name" ) ); // correct child term name
+        garage.getBikes().add( new Bike( "bike" ) ); // not existing term name (in this ontology)
+
+        house.setGarage( garage );
+
         return house;
     }
 }

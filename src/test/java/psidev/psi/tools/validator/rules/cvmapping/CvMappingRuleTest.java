@@ -210,7 +210,7 @@ public class CvMappingRuleTest {
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages0 );
-        Assert.assertEquals("Ther should not be any messages from the cv rule self check.", 0, messages0.size() );
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages0.size() );
 
         House house = HouseFactory.buildSimpleHouse();
         Collection<ValidatorMessage> messages = ruleMngr.check( house );
@@ -427,6 +427,29 @@ public class CvMappingRuleTest {
 
     @Test
     public void check_not_a_child_of() {
+    }
+
+    @Test
+    public void check_useTermName() throws Exception {
+
+        System.out.println("========== Test: check_useTermName");
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample7-house-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages0 );
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages0.size() );
+
+        House house = HouseFactory.buildSimpleHouse();
+        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+
+        Assert.assertNotNull( messages );
+        for ( ValidatorMessage message : messages ) {
+            System.out.println( message );
+        }
+        Assert.assertEquals( 2, messages.size() );
     }
 
 
