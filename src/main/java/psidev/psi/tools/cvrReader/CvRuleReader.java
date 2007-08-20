@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;

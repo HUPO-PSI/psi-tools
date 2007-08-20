@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRule;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
 
 /**
  * CvMappingReader Tester.
@@ -45,7 +46,7 @@ public class CvMappingReaderTest {
                                        "<CvMappingRules xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
                                        "xsi:noNamespaceSchemaLocation=\"CvRules.xsd\" >\n" +
                                        "\t<CvMappingRule elementPath=\"/mzML/dx:sampleList/dx:sample/dx:cvParam@accession\" requirementLevel=\"MAY\">\n" +
-                                       "\t\t<CvTerm termAccession=\"PSI:1000010\" useTerm=\"false\" termName=\"Sample Description\" allowChildren=\"true\" cvIdentifier=\"MS\"/>\n" +
+                                       "\t\t<CvTerm termAccession=\"PSI:1000010\" useTermName=\"true\" useTerm=\"false\" termName=\"Sample Description\" allowChildren=\"true\" cvIdentifier=\"MS\"/>\n" +
                                        "\t\t<CvTerm termAccession=\"PATO:0001241\" useTerm=\"false\" termName=\"quality of an object\" allowChildren=\"true\" cvIdentifier=\"PATO\"/>\n" +
                                        "\t\t<CvTerm termAccession=\"GO:0005575 \" useTerm=\"false\" termName=\"cellular_component\" allowChildren=\"true\" cvIdentifier=\"GO\"/>\n" +
                                        "\t\t<CvTerm termAccession=\"1 \" useTerm=\"false\" termName=\"Root node of taxonomy\" allowChildren=\"true\" cvIdentifier=\"NEWT\"/>\n" +
@@ -59,5 +60,9 @@ public class CvMappingReaderTest {
         Assert.assertEquals( "Expected number of CvRules is 1!", 1, cvrs.getCvMappingRule().size() );
         CvMappingRule rule = cvrs.getCvMappingRule().iterator().next();
         Assert.assertEquals( "Expected number of CvTerms is 4!", 4, rule.getCvTerm().size() );
+
+        // get second CvTerm and check the default setting for useTermName
+        CvTerm cvterm = cvrs.getCvMappingRule().get(0).getCvTerm().get(1);
+        Assert.assertEquals( "Default value for attribute 'useTermName' should be 'false'!", false, cvterm.isUseTermName() );
     }
 }
