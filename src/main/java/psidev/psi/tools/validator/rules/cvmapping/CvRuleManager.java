@@ -155,7 +155,7 @@ public class CvRuleManager {
         String ontologyID = cvTerm.getCvIdentifier();
         System.out.println("##### DEBUG: Checking cvTerm " + cvTerm.getTermName() + " for ontology: " + ontologyID );
 
-        if ( !ontologyMngr.containsKey( ontologyID ) ) {
+        if ( !ontologyMngr.containsOntology( ontologyID ) ) {
             String msg = "The requested ontology wasn't defined: " + ontologyID + ". The CvTerm will be removed.";
             messages.add( rule.buildMessage( rule.getElementPath(),
                                         Recommendation.forName( rule.getRequirementLevel() ),

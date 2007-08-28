@@ -278,7 +278,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         boolean useTerm = cvTerm.isUseTerm();
         boolean useTermName = cvTerm.isUseTermName();
 
-        if ( !ontologyManager.containsKey( ontologyID ) ) {
+        if ( !ontologyManager.containsOntology( ontologyID ) ) {
             throw new ValidatorException( "The requested ontology was not found: " + ontologyID );
         }
 

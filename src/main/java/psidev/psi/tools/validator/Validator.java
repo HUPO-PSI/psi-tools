@@ -154,23 +154,6 @@ public abstract class Validator {
             throw new ValidatorException( "Error while parsing configuration file", e );
         }
 
-        // read all ontologies and store in the validator to be accessible for all rules
-//        OntologyLoader loader = OntologyLoader.getInstance();
-//        loader.setUserPreferences( userPreferences );
-
-//        NodeList ontos = document.getElementsByTagName( "ontology" );
-//        for ( int i = 0; i < ontos.getLength(); i++ ) {
-//            NodeList urls = ontos.item( i ).getChildNodes();
-//            String url = urls.item( 0 ).getNodeValue();
-//            String id = ( ( Element ) ontos.item( i ) ).getAttribute( "id" );
-//            try {
-//                ontologies.put( id, loader.load( new URL( url ) ) );
-//                log.info( "Reading ontology: " + url );
-//            } catch ( MalformedURLException e ) {
-//                throw new ValidatorException( "Malformed URL in configuration file: " + url, e );
-//            }
-//        }
-
         // instantiate rules with ontologies
         NodeList rs = document.getElementsByTagName( "rule" );
         for ( int i = 0; i < rs.getLength(); i++ ) {
@@ -178,8 +161,6 @@ public abstract class Validator {
             String className = texts.item( 0 ).getNodeValue();
             try {
                 Class rule = Class.forName( className );
-//                Constructor c = rule.getConstructor( new Class[]{java.util.Map.class} );
-//                ObjectRule r = ( ObjectRule ) c.newInstance( new Object[]{ontologies} );
                 Constructor c = rule.getConstructor( OntologyManager.class );
                 ObjectRule r = (ObjectRule) c.newInstance( ontologyMngr );
                 rules.add( r );
