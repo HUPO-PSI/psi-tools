@@ -10,24 +10,28 @@ import java.net.URI;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Author: Florian Reisinger
  * Date: 07-Aug-2007
  */
 public class LocalOntology implements OntologyAccess {
 
+    public static final Log log = LogFactory.getLog( LocalOntology.class );
+
     private Ontology ontology;
     String ontologyID;
 
     public LocalOntology() {
+        log.info( "Creating new LocalOntology..." );
         ontology = null;
     }
 
 
     public void loadOntology( String ontologyID, String name, String version, String format, URI uri) throws OntologyLoaderException {
         this.ontologyID = ontologyID;
-        System.out.print("##### DEBUG: Building a LocalOntology from values: ");
-        System.out.println("name: " + name + " version: " + version + " format: " + format + " location: " + uri);
 
         // first check the format
         if ( "OBO".equals( format ) ) {
@@ -52,6 +56,10 @@ public class LocalOntology implements OntologyAccess {
         } else {
             throw new OntologyLoaderException( "Unsupported ontology format: " + format );
         }
+
+        log.info("Successfully created LocalOntology from values: ontology="
+                + ontologyID + " name=" + name + " version=" + version + " format=" + format + " location=" + uri);
+
     }
 
     public Set<String> getValidIDs( String id, boolean allowChildren, boolean useTerm) {
@@ -70,10 +78,10 @@ public class LocalOntology implements OntologyAccess {
                 }
             }
         } else {
-            System.out.println("##### DEBUG: No matching entries in local ontology '" + ontologyID
-                    + "' for term: " + id + " returning empty set of valid terms.");
+            log.warn("No matching entries in local ontology '" + ontologyID
+                    + "' for term '" + id + "'. Returning empty set of valid terms.");
         }
-
+        log.debug( "Returning " + terms.size() + " valid IDs for ontology= " + ontologyID + " id=" + id + " allowChilrden=" + allowChildren + " useTerm=" + useTerm );
         return terms;
     }
 
@@ -82,6 +90,7 @@ public class LocalOntology implements OntologyAccess {
         if ( term == null ) {
             throw new IllegalStateException("Checking obsolete on non existing term!");
         }
+        log.debug( "Term '" + id + "' obsolete? " + term.isObsolete() );
         return term.isObsolete();
     }
 
@@ -92,6 +101,7 @@ public class LocalOntology implements OntologyAccess {
         if ( term != null ) {
             result = term.getShortName();
         }
+        log.debug( "Name for term '" + id + "' is: " + term.getShortName() );
         return result;
     }
 
@@ -101,6 +111,7 @@ public class LocalOntology implements OntologyAccess {
         for (OntologyTerm term : terms) {
             result.add( term.getId() );
         }
+        log.debug( "Term '" + id + "' has " + result.size() + " parent terms." );
         return result;
     }
 

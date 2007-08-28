@@ -29,6 +29,6 @@ public interface OntologyAccess {
 
     Set<String> getDirectParentsIDs( String id );
 
-    // ToDo: isParent, getParents, is Child, getChildren(term, level),
+    // ToDo: isParent, is Child, getChildren(term, level),
 
 }
