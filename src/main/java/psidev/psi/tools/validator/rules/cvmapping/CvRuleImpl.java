@@ -116,7 +116,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         if ( results.isEmpty() ) {
 
             // We agreed with Luisa that we don't need to display this one.
-            messages.add( buildMessage( xpath, level, "The given XPath(" + xpath + ") didn't match any data." ) );
+            //messages.add( buildMessage( xpath, level, "The given XPath(" + xpath + ") didn't match any data." ) );
 
         } else {
 
