@@ -31,10 +31,6 @@ public class CvRuleManager {
 
     private OntologyManager ontologyMngr;
 
-    // ToDo: used on this level? does it make sense?
-    // not used in PSI-MI, was meant for MS data but can/should be handled by ObjectRules, should work on element level only
-    private Map<CvTerm, Integer> nonRepeatableTerms = null;
-
     private Collection<CvRule> rules;
 
     //////////////////
@@ -230,7 +226,6 @@ public class CvRuleManager {
         for (CvMappingRule cvMappingRule : cvMappingRules) {
             CvRuleImpl rule = new CvRuleImpl(ontologyMngr);
             rule.setCvMappingRule(cvMappingRule);
-            rule.setNonRepeatableTerms(nonRepeatableTerms);
             rules.add(rule);
         }
 

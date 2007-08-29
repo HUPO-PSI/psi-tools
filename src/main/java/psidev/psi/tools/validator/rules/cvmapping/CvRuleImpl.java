@@ -28,8 +28,6 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
     private CvMappingRule modelElementMap;
 
-    private Map<CvTerm, Integer> nonRepeatableTerms = null;
-
     public CvRuleImpl(OntologyManager ontologyManager) {
         super(ontologyManager);
         modelElementMap = new CvMappingRule();
@@ -59,10 +57,6 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return modelElementMap.getRequirementLevel();
     }
 
-    public void setNonRepeatableTerms(Map<CvTerm, Integer> nonRepeatableTerms) {
-        this.nonRepeatableTerms = nonRepeatableTerms;
-    }
-
     //////////////////
     // Rule
 
@@ -79,10 +73,6 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         if ( object == null ) {
             throw new ValidatorException( "Cannot validate a null object." );
-        }
-        if ( nonRepeatableTerms != null ) {
-            throw new IllegalStateException( "This rule instance is being run already! " +
-                                             "Looks like you're having some multithreading issues." );
         }
 
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
@@ -120,14 +110,9 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         } else {
 
-            if ( nonRepeatableTerms != null ) {
-                throw new IllegalStateException( "This rule instance is being run already! " +
-                                                 "Looks like you're having some multithreading issues." );
-            }
-
             // TODO for each XPath, build a list of non repeatable CVs and keep track of it.
             // initialize the map
-            nonRepeatableTerms = new HashMap<CvTerm, Integer>();
+            HashMap<CvTerm, Integer>  nonRepeatableTerms = new HashMap<CvTerm, Integer>();
 
             // check that each match has at least one matching CV term amongst those specified.
             for ( XPathResult result : results ) {
@@ -143,13 +128,11 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
                     try {
                         String accession = ( String ) result.getResult();
-// ToDo: can this be generified to a list of all allowed terms?
-// create a list of allowed terms first based on the CvRule (CvMappingRule) and then check all the terms
-// -> when creating the rule, is it possible create a list of all valid terms?
-// isRepeatable ?? scope?, per term?, per rule?
-                        if ( isMatchingCv( cvTerm, accession, messages, level, xpath ) ) {
+                        if ( isMatchingCv( cvTerm, accession, messages, level, xpath, nonRepeatableTerms ) ) {
                             foundOne = true;
-                            // TODO break ??
+                            // Note that we can not break here as soon as we found one match,
+                            // since we need to check for potentially unwanted repeats of terms
+                            // ('isRepeatable' on term is 'false' in those cases).
                         } else {
                             if ( log.isDebugEnabled() ) {
 //                                System.out.println("No match between '" + accession + "' and " + printCvTerm( cvTerm ));
@@ -200,10 +183,6 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                                                 " times in elements pointed out by the XPath expression: " + xpath ) );
                 }
             }
-
-            // reset the map
-            nonRepeatableTerms.clear();
-            nonRepeatableTerms = null;
         }
 
 
@@ -257,7 +236,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return sb.toString();
     }
 
-    private void incrementCvTermCount( CvTerm cvTerm ) {
+    private void incrementCvTermCount( CvTerm cvTerm, HashMap<CvTerm, Integer> nonRepeatableTerms ) {
         Integer count = nonRepeatableTerms.get( cvTerm );
         if ( count == null ) {
             count = 1;
@@ -268,9 +247,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
     }
 
     protected boolean isMatchingCv( CvTerm cvTerm, String accession,
-                                    Collection<ValidatorMessage> messages, Recommendation level, String xpath ) throws ValidatorException {
+                                    Collection<ValidatorMessage> messages, Recommendation level, String xpath, HashMap<CvTerm, Integer> nonRepeatableTerms) throws ValidatorException {
         boolean result = false;
 
+        // Get all information from the CV term.
         String ontologyID = cvTerm.getCvIdentifier();
         String ruleTermAcc = cvTerm.getTermAccession();
         String ruleTerm = cvTerm.getTermName();
@@ -278,31 +258,39 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         boolean useTerm = cvTerm.isUseTerm();
         boolean useTermName = cvTerm.isUseTermName();
 
+        // Ask the ontologymanager for the required ontology
         if ( !ontologyManager.containsOntology( ontologyID ) ) {
+            // Yikes, ontology not found! Major configuration issue, throw Exception!
             throw new ValidatorException( "The requested ontology was not found: " + ontologyID );
         }
 
-//        System.out.println("Using: ontologyID:" + ontologyID + " ruleTermAcc: " + ruleTermAcc + " allowChildren: " + allowChildren + " useTerm: " + useTerm + " on accession: " + accession);
+        // Get the accession numbers that are valid for this cvTerm.
         Set<String> allowedAccs = ontologyManager.getValidIDs( ontologyID, ruleTermAcc, allowChildren, useTerm );
-        if (useTermName) { // check on term names rather that accession
-            Set<String> allowedNames = new HashSet<String>();
-            // get term names for allowed accessions
+
+        // Now we'll see whether we should be checking CV accessions or CV preferred names.
+        Set<String> allowedValues = null;
+        if (useTermName) {
+            // We should check on term names rather that accessions, apparently.
+            allowedValues = new HashSet<String>();
+            // So get the term names for the allowed accessions.
             for ( String allowedAcc : allowedAccs ) {
-                allowedNames.add( ontologyManager.getTermNameByID( ontologyID, allowedAcc ) );
+                // For each allowed accession, find the preferred term name and use this.
+                allowedValues.add( ontologyManager.getTermNameByID( ontologyID, allowedAcc ) );
             }
-            if ( allowedNames.contains(accession) ) {
-                // rule passed
-                incrementCvTermCount( cvTerm );  // ToDo: check this! for repeatable terms...
-                result = true;
-            }
-        } else { // check on cv accession (regardless of the actual name)
-            if ( allowedAccs.contains( accession ) ) {
-                // rule passed, no validation message
-                incrementCvTermCount( cvTerm );  // ToDo: check this! for repeatable terms...
-                result = true;
-            } else {
-                // no message since even if the accession is not allowed in these terms, it could be allowed in a different ontology
-            }
+        } else {
+            // The allowed values in this case are the actual accession numbers.
+            // Note that the names are ignored now. Accession has precedence.
+            allowedValues = allowedAccs;
+        }
+
+        // Check whether the value found is in the allowed values (be they terms or accessions).
+        if ( allowedValues.contains( accession ) ) {
+            // Term found, everybody happy, no validation message necessary.
+            // We do however need to populate the Map that checks for repeats of
+            // potentially non-repeatable terms.
+            incrementCvTermCount( cvTerm , nonRepeatableTerms);
+            // Flag succesful validation for this term.
+            result = true;
         }
 
         return result;

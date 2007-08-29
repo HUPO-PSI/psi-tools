@@ -28,8 +28,6 @@ public interface CvRule extends Rule {
 
     public String getRequirementLevel();
 
-    public void setNonRepeatableTerms(Map<CvTerm, Integer> nonRepeatableTerms);
-
     public MessageLevel convertCvMappingLevel( Recommendation level );
 
     public ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Rule rule );

@@ -244,11 +244,11 @@ public abstract class Validator {
     }
 
     /**
-     * Run a check on the CvMapping.
+     * Run a check on the CvMapping for a given Collection of Objects.
      *
      * @param col collection of objects to check on.
      * @param xPath the xpath from the XML root to the object that is to be checked.
-     * @return collection of validator messages.
+     * @return collection of validator messages describing the validation results.
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> checkCvMapping( Collection<?> col, String xPath ) throws ValidatorException {
@@ -264,7 +264,31 @@ public abstract class Validator {
                 }
             }
         } else {
-            log.warn( "The CvRuleManager has not been set up yet." );
+            log.error( "The CvRuleManager has not been set up yet." );
+        }
+        return messages;
+    }
+
+    /**
+     * Run a check on the CvMapping for a given Object.
+     *
+     * @param o Object to check.
+     * @param xPath the xpath from the XML root to the object that is to be checked.
+     * @return collection of validator messages describing the validation results.
+     * @throws ValidatorException Exception while trying to validate the input.
+     */
+    public Collection<ValidatorMessage> checkCvMapping(Object o, String xPath) throws ValidatorException {
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        // Run cv mapping check
+        if (cvRuleManager != null) {
+            for (CvRule rule : cvRuleManager.getCvRules()) {
+                if (rule.canCheck(xPath)) {
+                    messages.addAll(rule.check(o, xPath));
+                }
+                // else: rule does not apply
+            }
+        } else {
+            log.error("The CvRuleManager has not been set up yet.");
         }
         return messages;
     }
