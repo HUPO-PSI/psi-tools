@@ -2,7 +2,7 @@
 <CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
 
     <CvMappingRule elementPath="garage/bikes/@color" requirementLevel="MUST">
-        <CvTerm termAccession="MI:0300" useTermName="true" useTerm="false" termName="alias type" allowChildren="true"
-                cvIdentifier="MI" isRepeatable="true"/>
+        <CvTerm termAccession="MI:0300" useTermName="true" useTerm="true" termName="alias type" allowChildren="true"
+                cvIdentifier="MI" isRepeatable="false" scope="garage"/>
     </CvMappingRule>
 </CvMappingRules>

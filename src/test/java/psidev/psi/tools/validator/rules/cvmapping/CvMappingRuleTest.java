@@ -4,6 +4,7 @@ import junit.framework.JUnit4TestAdapter;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.tools.cvrReader.CvRuleReader;
+import psidev.psi.tools.cvrReader.CvRuleReaderException;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
@@ -422,7 +423,27 @@ public class CvMappingRuleTest {
     }
 
     @Test
-    public void check_nonRepeatable() {
+    public void check_nonRepeatable() throws CvRuleReaderException, ValidatorException {
+        System.out.println("========== Test: check_useTermName");
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample8-house-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMappingRules cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages0 );
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages0.size() );
+
+        House house = HouseFactory.buildSimpleHouse();
+        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+
+        Assert.assertNotNull( messages );
+        for ( ValidatorMessage message : messages ) {
+            System.out.println( message );
+        }
+        // expect 2 messages: term 'bike' not in ontology and
+        // term 'alias type' appears two times although it is specified as not repeatable
+        Assert.assertEquals( 2, messages.size() );
     }
 
     @Test
@@ -449,7 +470,8 @@ public class CvMappingRuleTest {
         for ( ValidatorMessage message : messages ) {
             System.out.println( message );
         }
-        Assert.assertEquals( 2, messages.size() );
+        // expect 3 message: two 'alias type' (useTerm="false") + one 'bike' (not in ontology) are not in the valid terms
+        Assert.assertEquals( 3, messages.size() );
     }
 
 

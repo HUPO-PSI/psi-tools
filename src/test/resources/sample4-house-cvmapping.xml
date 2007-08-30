@@ -3,9 +3,9 @@
 
         <CvMappingRule elementPath="kitchen/note" requirementLevel="MUST">
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
-                    cvIdentifier="MS" isRepeatable="false"/>
+                    cvIdentifier="MS" isRepeatable="false" scope="kitchen"/>
             <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
-                    cvIdentifier="PATO" isRepeatable="false"/>
+                    cvIdentifier="PATO" isRepeatable="false" scope="kitchen"/>
         </CvMappingRule>
 </CvMappingRules>
 

@@ -3,8 +3,8 @@
 
     <CvMappingRule elementPath="a/b/c/d" requirementLevel="MAY">
         <!-- term without children for which we advise to use children -->
-        <CvTerm termAccession="PSI:1000232" useTerm="false" termName="Peak Intensity" allowChildren="true" cvIdentifier="MS" isRepeatable="false"/>
+        <CvTerm termAccession="PSI:1000232" useTerm="false" termName="Peak Intensity" allowChildren="true" cvIdentifier="MS" isRepeatable="false" scope="a"/>
         <!-- fine term -->
-        <CvTerm termAccession="PSI:1000264" useTerm="true" termName="Ion Trap" allowChildren="true" cvIdentifier="MS" isRepeatable="false"/>
+        <CvTerm termAccession="PSI:1000264" useTerm="true" termName="Ion Trap" allowChildren="true" cvIdentifier="MS" isRepeatable="false" scope="a"/>
     </CvMappingRule>
 </CvMappingRules>

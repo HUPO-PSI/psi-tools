@@ -103,13 +103,13 @@ public class CvRuleManager {
                 while ( it_cv.hasNext() ) {
                     CvTerm cvTerm = it_cv.next();
                     if ( !isValidCvTerm( cvTerm, rule, messages ) ) {
-                        //ToDo: add message that rule has been removed
-                        it_cv.remove(); // remove the rule from the cvMappingRules
+                        //ToDo: add message that TERM has been removed
+                        it_cv.remove(); // remove the term from the cvMappingRule
                     }
                 } // cvTerms
 
+                // If no cv terms remaining, remove the rule
                 if ( rule.getCVTerms().isEmpty() ) {
-                    // no cvterms available, remove the rule
                     it_rule.remove();
                     String msg = "All CvTerm" + ( cvTermCount > 1 ? "s" : "" ) + " (" + cvTermCount + ") of this rule " +
                                  ( cvTermCount > 1 ? "were" : "was" ) + " removed due " +
@@ -151,6 +151,7 @@ public class CvRuleManager {
         String ontologyID = cvTerm.getCvIdentifier();
         System.out.println("##### DEBUG: Checking cvTerm " + cvTerm.getTermName() + " for ontology: " + ontologyID );
 
+        // before anything else, check if the specified ontology was loaded in the ontology manager
         if ( !ontologyMngr.containsOntology( ontologyID ) ) {
             String msg = "The requested ontology wasn't defined: " + ontologyID + ". The CvTerm will be removed.";
             messages.add( rule.buildMessage( rule.getElementPath(),
@@ -159,9 +160,7 @@ public class CvRuleManager {
             return false;
         }
 
-
-
-//        OntologyTerm ruleTerm = ontology.search( cvTerm.getTermAccession() );
+        // check if the specified term is valid in the given ontology
         String ruleTermAcc = cvTerm.getTermAccession();
         Set<String> validAccs = ontologyMngr.getValidIDs( ontologyID, ruleTermAcc, false, true );
         if ( validAccs.size() == 1 && validAccs.contains( ruleTermAcc ) ) {
@@ -175,7 +174,7 @@ public class CvRuleManager {
             return false;
         }
 
-//        if ( ruleTerm.isObsolete() ) {
+        // check if the used term is obsolete
         if ( ontologyMngr.isObsoleteID( ontologyID, ruleTermAcc )) {
             // this term should not be in use here
             String msg = "The term " + printSimpleCvTerm( cvTerm ) + " is obsolote in the ontology " +
@@ -186,6 +185,8 @@ public class CvRuleManager {
             return false;
         }
 
+        // ToDo: restructure this
+        // check if the specified term has children if it was specified to use children and not the term itself
         validAccs = ontologyMngr.getValidIDs( ontologyID, ruleTermAcc, true, false );
         // if validAccs == 0, then there were no children
         if ( (validAccs.size() == 0) && !cvTerm.isUseTerm() && cvTerm.isAllowChildren() ) {
@@ -199,6 +200,7 @@ public class CvRuleManager {
             return false;
         }
 
+        // check the use 'useTerm' and 'allowChildren'
         if ( !cvTerm.isUseTerm() && !cvTerm.isAllowChildren() ) {
             // TODO check with Luisa if this makes sense ...
             // don't use the term and also don't use child terms -> doesn't make sense
@@ -210,6 +212,44 @@ public class CvRuleManager {
             return false;
         }
 
+        // ToDo: add check for 'useTermName'?
+
+
+        // check the use of 'isRepeatable' and 'scope'
+        if ( !cvTerm.isIsRepeatable() ) {
+            // first check if a scope is defined
+            String scope = cvTerm.getScope();
+            if ( scope == null ) {
+                // not allowed, if the term is not repeatable, there MUST be a scope defined
+                // create error message
+                String msg = "The CvTerm " + printSimpleCvTerm( cvTerm ) + " defines that the term is NOT repeatable, " +
+                             "but there was no scope defined. The CvTerm will be removed.";
+                messages.add( rule.buildMessage( rule.getElementPath(),
+                                            Recommendation.forName( rule.getRequirementLevel() ),
+                                            msg, rule ) );
+                return false;
+            }
+            // then check if the specified scope matches the rule xpath
+            String xpath = rule.getElementPath();
+            if ( xpath.indexOf(scope) != 0 ) {
+                // The scope has to be a substring of the rule xpath and start at the root
+                String msg = "The CvTerm " + printSimpleCvTerm( cvTerm ) + " defines that the term is NOT repeatable, " +
+                             "but the specified scope is not valid. The CvTerm will be removed.";
+                messages.add( rule.buildMessage( rule.getElementPath(),
+                                            Recommendation.forName( rule.getRequirementLevel() ),
+                                            msg, rule ) );
+                return false;
+            }
+        } else {
+            // check if a scope was specified although the term is repeatable
+            // in case of repeatable terms, a scope does not apply
+            if ( cvTerm.getScope() != null ) {
+                // create warn message, stating the useless specification of the scope attribute
+                String msg = "The CvTerm " + printSimpleCvTerm( cvTerm ) + " defines that the term IS repeatable, " +
+                             "but a scope was specified.";
+                messages.add( rule.buildMessage( rule.getElementPath(), Recommendation.SHOULD, msg, rule ) );
+            }
+        }
 
         return true;
     }

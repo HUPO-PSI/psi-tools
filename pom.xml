@@ -81,7 +81,7 @@
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>cv-rule-reader</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
