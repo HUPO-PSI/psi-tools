@@ -20,7 +20,8 @@
     <xs:complexType>
       <xs:attribute name="allowChildren" use="required" type="xs:boolean"/>
       <xs:attribute name="cvIdentifier" use="required" type="xs:string"/>
-      <xs:attribute name="isRepeatable" use="optional" type="xs:boolean"/>
+      <xs:attribute name="isRepeatable" use="optional" type="xs:boolean" default="true"/>
+      <xs:attribute name="scope" use="optional" type="xs:string"/>  
       <xs:attribute name="termAccession" use="required" type="xs:string"/>
       <xs:attribute name="useTermName" use="optional" type="xs:boolean" default="false"/>  
       <xs:attribute name="termName" use="required" type="xs:string"/>

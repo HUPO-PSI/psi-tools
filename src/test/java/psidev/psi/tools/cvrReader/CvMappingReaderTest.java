@@ -48,7 +48,7 @@ public class CvMappingReaderTest {
                                        "\t<CvMappingRule elementPath=\"/mzML/dx:sampleList/dx:sample/dx:cvParam@accession\" requirementLevel=\"MAY\">\n" +
                                        "\t\t<CvTerm termAccession=\"PSI:1000010\" useTermName=\"true\" useTerm=\"false\" termName=\"Sample Description\" allowChildren=\"true\" cvIdentifier=\"MS\"/>\n" +
                                        "\t\t<CvTerm termAccession=\"PATO:0001241\" useTerm=\"false\" termName=\"quality of an object\" allowChildren=\"true\" cvIdentifier=\"PATO\"/>\n" +
-                                       "\t\t<CvTerm termAccession=\"GO:0005575 \" useTerm=\"false\" termName=\"cellular_component\" allowChildren=\"true\" cvIdentifier=\"GO\"/>\n" +
+                                       "\t\t<CvTerm termAccession=\"GO:0005575 \" useTerm=\"false\" termName=\"cellular_component\" allowChildren=\"true\" cvIdentifier=\"GO\" isRepeatable=\"true\" scope=\"/mzML/dx:sampleList/dx:sample\\\"/>\n" +
                                        "\t\t<CvTerm termAccession=\"1 \" useTerm=\"false\" termName=\"Root node of taxonomy\" allowChildren=\"true\" cvIdentifier=\"NEWT\"/>\n" +
                                        "\t</CvMappingRule>" +
                                        "</CvMappingRules>";
@@ -61,8 +61,18 @@ public class CvMappingReaderTest {
         CvMappingRule rule = cvrs.getCvMappingRule().iterator().next();
         Assert.assertEquals( "Expected number of CvTerms is 4!", 4, rule.getCvTerm().size() );
 
+        // get first CvTerm and check the setting for useTermName
+        CvTerm cvterm = cvrs.getCvMappingRule().get(0).getCvTerm().get(0);
+        Assert.assertEquals( "Value for attribute 'useTermName' should be 'true'!", true, cvterm.isUseTermName() );
+
         // get second CvTerm and check the default setting for useTermName
-        CvTerm cvterm = cvrs.getCvMappingRule().get(0).getCvTerm().get(1);
+        cvterm = cvrs.getCvMappingRule().get(0).getCvTerm().get(1);
         Assert.assertEquals( "Default value for attribute 'useTermName' should be 'false'!", false, cvterm.isUseTermName() );
+
+        // get third CvTerm and check the setting for isRepeatable
+        cvterm = cvrs.getCvMappingRule().get(0).getCvTerm().get(2);
+        Assert.assertEquals( "Value for attribute 'isRepeatable' should be 'false'!", false, cvterm.isUseTermName() );
+        Assert.assertEquals( "Value for attribute 'scope' should be '/mzML/dx:sampleList/dx:sample\\'!", "/mzML/dx:sampleList/dx:sample\\", cvterm.getScope());
+
     }
 }
