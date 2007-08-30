@@ -26,9 +26,6 @@ public class CvRuleManager {
     // should be CvMappingRuleList
     public static final Log log = LogFactory.getLog( CvRuleManager.class );
 
-    // is this ever used? -> nowhere else stored
-    private CvMappingRules cvMappingRules;
-
     private OntologyManager ontologyMngr;
 
     private Collection<CvRule> rules;
@@ -38,19 +35,13 @@ public class CvRuleManager {
 
     public CvRuleManager( OntologyManager ontoMngr, CvMappingRules cvMappingRules ) {
         this.ontologyMngr = ontoMngr;
-        this.cvMappingRules = cvMappingRules;
         addRules(cvMappingRules.getCvMappingRule());
     }
 
     ////////////////////////
     // Getters and Setters
 
-    public CvMappingRules getCvMappingRules() {
-        return cvMappingRules;
-    }
-
     public void setCvMappingRules( CvMappingRules cvMappingRules) {
-        this.cvMappingRules = cvMappingRules;
         addRules(cvMappingRules.getCvMappingRule());
     }
 

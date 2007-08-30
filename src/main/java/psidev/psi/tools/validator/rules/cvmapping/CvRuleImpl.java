@@ -84,7 +84,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         String xpath= getElementPath();
         if (objectXpath != null) { // if a xpath for this object was specified, generate the xpath to use for the rule
             xpath = getXpathToUse(getElementPath(), objectXpath);
-        } // otherwise assume the object is at the root level of the rule and use the xpath specified in the rule
+        } else {
+            // otherwise assume the object is at the root level of the rule and use the xpath specified in the rule
+            objectXpath = getElementPath();
+        }
 
         if ( log.isDebugEnabled() ) {
             log.debug( "xpath = '" + xpath + "'" );
@@ -110,9 +113,8 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         } else {
 
-            // TODO for each XPath, build a list of non repeatable CVs and keep track of it.
             // initialize the map
-            HashMap<CvTerm, Integer>  nonRepeatableTerms = new HashMap<CvTerm, Integer>();
+            HashMap<CvTerm, HashMap<String, Integer>>  nonRepeatableTerms = new HashMap<CvTerm, HashMap<String, Integer>>();
 
             // check that each match has at least one matching CV term amongst those specified.
             for ( XPathResult result : results ) {
@@ -126,27 +128,15 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                 while ( it.hasNext() ) {
                     CvTerm cvTerm = it.next();
 
-                    try {
-                        String accession = ( String ) result.getResult();
-                        if ( isMatchingCv( cvTerm, accession, messages, level, xpath, nonRepeatableTerms ) ) {
-                            foundOne = true;
-                            // Note that we can not break here as soon as we found one match,
-                            // since we need to check for potentially unwanted repeats of terms
-                            // ('isRepeatable' on term is 'false' in those cases).
-                        } else {
-                            if ( log.isDebugEnabled() ) {
-//                                System.out.println("No match between '" + accession + "' and " + printCvTerm( cvTerm ));
-                                log.debug( "No match between '" + accession + "' and " + printCvTerm( cvTerm ) );
-                            }
+                   if ( isMatchingCv( cvTerm, result, messages, level, objectXpath, nonRepeatableTerms ) ) {
+                        foundOne = true;
+                        // Note that we can not break here as soon as we found one match,
+                        // since we need to check for potentially unwanted repeats of terms
+                        // ('isRepeatable' on term is 'false' in those cases).
+                    } else {
+                        if ( log.isDebugEnabled() ) {
+                            log.debug( "No match between '" + result.getResult() + "' and " + printCvTerm( cvTerm ) );
                         }
-
-                    } catch ( ClassCastException cce ) {
-                        // Message explaining that the xpath doesn't describe a CV term accession
-                        cce.printStackTrace();
-                        messages.add( buildMessage( xpath, level, "The object pointed to by the XPath(" + xpath +
-                                                                  ") was not a CV term accession (String) as " +
-                                                                  "expected, instead: " +
-                                                                  result.getResult().getClass().getName() ) );
                     }
                 }
 
@@ -169,18 +159,23 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             }
 
             // if any of the non repeatable element was defined more than once, create a message
-            for ( Map.Entry<CvTerm, Integer> entry : nonRepeatableTerms.entrySet() ) {
+            for ( Map.Entry<CvTerm, HashMap<String, Integer>> entry : nonRepeatableTerms.entrySet() ) {
                 CvTerm cvTerm = entry.getKey();
-                Integer count = entry.getValue();
+                HashMap<String, Integer> termCounts = entry.getValue();
 
-                // Note: default value of an unspecified isRepeatable is false
-                boolean isRepeatable = cvTerm.isIsRepeatable();
-                if ( count > 1 && !isRepeatable ) {
-                    messages.add( buildMessage( xpath,
-                                                level,
-                                                "According to the CvMapping, the term '" + cvTerm.getTermAccession() +
-                                                "' wasn't meant to be repeated, yet it appeared " + count +
-                                                " times in elements pointed out by the XPath expression: " + xpath ) );
+                for ( Map.Entry<String, Integer> innerEntry : termCounts.entrySet() ) {
+                    String index = innerEntry.getKey();
+                    Integer count = innerEntry.getValue();
+                    
+                    // Note: default value of an unspecified isRepeatable is false
+                    boolean isRepeatable = cvTerm.isIsRepeatable();
+                    if ( !isRepeatable && count > 1 ) {
+                        messages.add( buildMessage( getElementPath(),
+                                                    level,
+                                                    "According to the CvMapping, the term '" + cvTerm.getTermAccession() +
+                                                    "' wasn't meant to be repeated, yet it appeared " + count +
+                                                    " times in elements pointed out by the XPath expression: " + getElementPath() ) );
+                    }
                 }
             }
         }
@@ -236,19 +231,39 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return sb.toString();
     }
 
-    private void incrementCvTermCount( CvTerm cvTerm, HashMap<CvTerm, Integer> nonRepeatableTerms ) {
-        Integer count = nonRepeatableTerms.get( cvTerm );
+    /**
+     *
+     * @param cvTerm
+     * @param scopeIndex
+     * @param nonRepeatableTerms
+     */
+    private void incrementCvTermCount( CvTerm cvTerm, String scopeIndex, HashMap<CvTerm, HashMap<String, Integer>> nonRepeatableTerms ) {
+        HashMap<String, Integer> counts = nonRepeatableTerms.get( cvTerm );
+        if(counts == null) {
+            counts = new HashMap<String, Integer>();
+        }
+        Integer count = counts.get(scopeIndex);
         if ( count == null ) {
             count = 1;
         } else {
             count++;
         }
-        nonRepeatableTerms.put( cvTerm, count );
+        counts.put(scopeIndex, count);
+        nonRepeatableTerms.put( cvTerm, counts );
     }
 
-    protected boolean isMatchingCv( CvTerm cvTerm, String accession,
-                                    Collection<ValidatorMessage> messages, Recommendation level, String xpath, HashMap<CvTerm, Integer> nonRepeatableTerms) throws ValidatorException {
+    protected boolean isMatchingCv( CvTerm cvTerm, XPathResult xpResult,
+                                    Collection<ValidatorMessage> messages, Recommendation level, String objectXPath, HashMap<CvTerm, HashMap<String, Integer>> nonRepeatableTerms) throws ValidatorException {
         boolean result = false;
+
+        String accession = null;
+        try {
+            accession = (String)xpResult.getResult();
+        } catch ( ClassCastException cce ) {
+            // Message explaining that the xpath doesn't describe a CV term accession
+            cce.printStackTrace();
+            messages.add( buildMessage( getElementPath(), level, "The object pointed to by the XPath(" + getElementPath() + ") was not a CV term accession (String) as " + "expected, instead: " + xpResult.getResult().getClass().getName() ) );
+        }
 
         // Get all information from the CV term.
         String ontologyID = cvTerm.getCvIdentifier();
@@ -257,6 +272,24 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         boolean allowChildren = cvTerm.isAllowChildren();
         boolean useTerm = cvTerm.isUseTerm();
         boolean useTermName = cvTerm.isUseTermName();
+        boolean repeatable = cvTerm.isIsRepeatable();
+        // The following variables and complicated processing is only necessary for
+        // non-repeatable elements.
+        String relativeScope = null;
+        if(!repeatable) {
+            // Find the scope for the repeat. Anything repeated within this
+            // xpath scope will flag an error, everything repeated outside will not.
+
+            String scope = cvTerm.getScope();
+
+            // Transform the scope into a relative scope, based on the objects original
+            // xpath.
+            String tempObjectXpath = objectXPath;
+            if(!scope.endsWith("/") && objectXPath.endsWith("/")) {
+                tempObjectXpath = tempObjectXpath.substring(0, tempObjectXpath.length()-1);
+            }
+            relativeScope = getXpathToUse(scope, tempObjectXpath);
+        }
 
         // Ask the ontologymanager for the required ontology
         if ( !ontologyManager.containsOntology( ontologyID ) ) {
@@ -287,10 +320,109 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         if ( allowedValues.contains( accession ) ) {
             // Term found, everybody happy, no validation message necessary.
             // We do however need to populate the Map that checks for repeats of
-            // potentially non-repeatable terms.
-            incrementCvTermCount( cvTerm , nonRepeatableTerms);
+            // non-repeatable terms.
+            if(!repeatable) {
+                // OK, find out the element index for this particular occurrence.
+                String asPath = xpResult.asPath();
+
+                // The asPath can look like this:
+                //
+                //      /elementNameA[2]/elementNameB[1]/accession
+                //
+                // while our relativeScope looks like:
+                //
+                //      elementNameA/
+                //
+                // So we need to go through the asPath, allowing for absence or presence
+                // of the '[]' at each point, to retrieve the actual value between the
+                // '[]' for our relative scope, keeping in mind that it can turn out to be 'null'!
+                String scopeIndex = parseIndex(asPath, relativeScope);
+
+                // Increment the count for this term, using the appropriate scope index.
+                incrementCvTermCount( cvTerm , scopeIndex, nonRepeatableTerms);
+            }
             // Flag succesful validation for this term.
             result = true;
+        }
+
+        return result;
+    }
+
+    /**
+     * The asPath can look like this:
+     *
+     *      /elementNameA[2]/elementNameB[1]/accession
+     *
+     * while our relativeScope looks like:
+     *
+     *      elementNameA/
+     *
+     * So we need to go through the asPath, allowing for absence or presence
+     * of the '[]' at each point, to retrieve the actual value of the
+     * asPath for our relative scope.
+     *
+     * @param asPath    String with the 'asPath', something like:
+     *                  '/elementNameA[2]/elementNameB[1]/accession'.
+     * @param relativeScope String with the 'relative scope', something like:
+     *                  'elementNameA/'
+     * @return  String  with the asPath for our relative scope.
+     */
+    private String parseIndex(String asPath, String relativeScope) {
+        StringBuffer sb = new StringBuffer("");
+
+        // If the current relative scope is empty, it means that
+        // the object we're validating is exactly the scope.
+        // So always just return '1' in that case. In any other case,
+        // processing is required.
+        if(!relativeScope.equals("")) {
+            // Removing leading '/' on asPath.
+            if(asPath.startsWith("/")) {
+                // Removing leading '/' on asPath.
+                asPath = asPath.substring(1);
+            }
+            // Removing leading '/' on relativeScope.
+            if(relativeScope.startsWith("/")) {
+                // Removing leading '/' on relativeScope.
+                relativeScope = relativeScope.substring(1);
+            }
+
+            // Split asPath and relativescope on '/'.
+            String[] asPathArray = asPath.split("/");
+            String[] relScopeArray = relativeScope.split("/");
+
+            // Try each asPath entry, removing the potential '[]'
+            // until we have exhausted the elements of our relative scope array.
+            for (int i = 0; i < asPathArray.length; i++) {
+                String asPathPart = asPathArray[i];
+                String count = null;
+                int startSqBracket = -1;
+                if((startSqBracket = asPathPart.indexOf("[")) > 0) {
+                    count = asPathPart.substring(startSqBracket+1, asPathPart.lastIndexOf("]"));
+                    asPathPart = asPathPart.substring(0, startSqBracket);
+                }
+                // See if we have this asPathPart in our relative scope array at this index.
+                if(!asPathPart.equals(relScopeArray[i])) {
+                    throw new IllegalArgumentException("The relative scope you specified ('" + relativeScope + "') was not contained in the asPath you specified ('" + asPath + "')!");
+                }
+                // See if we have now exhausted our relative scope array.
+                if(relScopeArray.length >= (i+1)) {
+                    // All done. This is the count we need, though it could be 'null'.
+                    sb.append(asPathPart);
+                    if(count != null) {
+                        sb.append("[" + count + "]");
+                    }
+                    sb.append("/");
+                    if(relScopeArray.length == (i+1)) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Sanity check. Our constructed String must be a substring of the asPath.
+        String result = sb.toString();
+        if(!result.equals("") && asPath.indexOf(result) != 0) {
+            throw new IllegalStateException("The obtained context for this scope '" + result + "' does not match with the start of the asPath '" + asPath + "'!");
         }
 
         return result;
@@ -307,6 +439,4 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
        //ToDo: more detailed checking of xpath (e.g. starts with '/', ...)
        return ruleXpath.substring(objectXpath.length());
     }
-
-
 }

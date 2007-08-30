@@ -61,4 +61,8 @@ public class XPathResult {
         sb.append( '}' );
         return sb.toString();
     }
+
+    public String asPath() {
+        return this.pointer.asPath();
+    }
 }

@@ -17,6 +17,8 @@ import psidev.psi.tools.validator.rules.cvmapping.house.HouseFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 /**
  * CvMappingRule Tester.
@@ -26,9 +28,6 @@ import java.util.Collection;
  * @since 1.0
  */
 public class CvMappingRuleTest {
-
-    // ToDo: all rules are designed for the object to test -> no xpath definition necessary
-    // ToDo: make this more generic: all rules have the xpath starting form the root and the check(object, xpath) method is used
 
     static InputStream oMngrConfig = CvMappingRuleTest.class.getClassLoader().getResourceAsStream("flo/ontologies-test.xml");
     static OntologyManager ontologyMngr;
@@ -181,8 +180,6 @@ public class CvMappingRuleTest {
     public void checkCvMapping_unusable_term() throws Exception {
 
         System.out.println("========== Test: checkCvMapping_unusable_term");
-        // TODO this is wrong ... it is possible that a term cannot be used ... update the CvMappingRule
-        // ToDo: check that a specific term was NOT used?
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error3-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
         CvMappingRules cvMapping = reader.read( input );
@@ -214,7 +211,12 @@ public class CvMappingRuleTest {
         Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages0.size() );
 
         House house = HouseFactory.buildSimpleHouse();
-        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
+            CvRule cvRule = lIterator.next();
+            messages.addAll(cvRule.check(house, "/house"));
+        }
 
         Assert.assertNotNull( messages );
         for ( ValidatorMessage message : messages ) {
@@ -237,15 +239,17 @@ public class CvMappingRuleTest {
         Assert.assertEquals("Ther should not be any messages from the cv rule self check.", 0, messages0.size() );
 
         House house = HouseFactory.buildSimpleHouse();
-        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
+            CvRule cvRule = lIterator.next();
+            messages.addAll(cvRule.check(house, "/house"));
+        }      
 
         Assert.assertNotNull( messages );
         for ( ValidatorMessage message : messages ) {
             System.out.println( message );
         }
-        // ToDo: check!
-        // expect 2 messages:
-//        Assert.assertEquals( 2, messages.size() );
         Assert.assertEquals( 1, messages.size() );
     }
 
@@ -291,15 +295,17 @@ public class CvMappingRuleTest {
 
         House house = HouseFactory.buildSimpleHouse();
         house.getKitchen().setNote( "PSI:1000292" ); // Mass Spectrograph: different branch than PSI:1000010 (analyser)
-        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
+            CvRule cvRule = lIterator.next();
+            messages.addAll(cvRule.check(house, "/house"));
+        }
 
         Assert.assertNotNull( messages );
         for ( ValidatorMessage message : messages ) {
             System.out.println( message );
         }
-        // ToDo: check!
-        //expect 2 messages:
-//        Assert.assertEquals( 2, messages.size() );
         Assert.assertEquals( 1, messages.size() );
 
     }
@@ -319,7 +325,12 @@ public class CvMappingRuleTest {
 
         House house = HouseFactory.buildSimpleHouse();
         house.getKitchen().setNote( "FAKE:00000" ); // that id is not in any given ontology
-        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
+            CvRule cvRule = lIterator.next();
+            messages.addAll(cvRule.check(house, "/house"));
+        }
 
         Assert.assertNotNull( messages );
         for ( ValidatorMessage message : messages ) {
@@ -347,7 +358,12 @@ public class CvMappingRuleTest {
 
         House house = HouseFactory.buildSimpleHouse();
         house.getKitchen().setNote( "FAKE:00000" ); // that id is not in any given ontology
-        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
+            CvRule cvRule = lIterator.next();
+            messages.addAll(cvRule.check(house, "/house"));
+        }
 
         Assert.assertNotNull( messages );
         for ( ValidatorMessage message : messages ) {
@@ -375,7 +391,12 @@ public class CvMappingRuleTest {
 
         House house = HouseFactory.buildSimpleHouse();
         house.getKitchen().setNote( "FAKE:00000" ); // that id is not in any given ontology
-        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
+            CvRule cvRule = lIterator.next();
+            messages.addAll(cvRule.check(house, "/house"));
+        }
 
         Assert.assertNotNull( messages );
         for ( ValidatorMessage message : messages ) {
@@ -403,7 +424,12 @@ public class CvMappingRuleTest {
 
         House house = HouseFactory.buildSimpleHouse();
         house.getKitchen().setNote( "FAKE:00000" ); // that id is not in any given ontology
-        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
+            CvRule cvRule = lIterator.next();
+            messages.addAll(cvRule.check(house, "/house"));
+        }
 
         Assert.assertNotNull( messages );
         for ( ValidatorMessage message : messages ) {
@@ -435,7 +461,12 @@ public class CvMappingRuleTest {
         Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages0.size() );
 
         House house = HouseFactory.buildSimpleHouse();
-        Collection<ValidatorMessage> messages = ruleMngr.check( house );
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
+            CvRule cvRule = lIterator.next();
+            messages.addAll(cvRule.check(house, "/house"));
+        }
 
         Assert.assertNotNull( messages );
         for ( ValidatorMessage message : messages ) {

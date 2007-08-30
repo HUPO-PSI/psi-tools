@@ -110,10 +110,6 @@ public abstract class Validator {
     }
 
 
-    public CvMappingRules getCvMapping() {
-        return cvRuleManager.getCvMappingRules();
-    }
-
     public CvRuleManager getCvRuleManager() {
         return cvRuleManager;
     }

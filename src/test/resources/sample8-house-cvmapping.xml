@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
 
-    <CvMappingRule elementPath="garage/bikes/@color" requirementLevel="MUST">
+    <CvMappingRule elementPath="/house/garage/bikes/@color" requirementLevel="MUST">
         <CvTerm termAccession="MI:0300" useTermName="true" useTerm="true" termName="alias type" allowChildren="true"
-                cvIdentifier="MI" isRepeatable="false" scope="garage"/>
+                cvIdentifier="MI" isRepeatable="false" scope="/house/garage"/>
     </CvMappingRule>
 </CvMappingRules>

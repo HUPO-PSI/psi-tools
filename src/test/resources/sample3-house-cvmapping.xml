@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
 
-    <CvMappingRule elementPath="kitchen/note" requirementLevel="SHOULD">
+    <CvMappingRule elementPath="/house/kitchen/note" requirementLevel="SHOULD">
         <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
-                cvIdentifier="MS" isRepeatable="false" scope="kitchen"/>
+                cvIdentifier="MS" isRepeatable="false" scope="/house/kitchen"/>
         <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
-                cvIdentifier="PATO" isRepeatable="false" scope="kitchen"/>
+                cvIdentifier="PATO" isRepeatable="false" scope="/house/kitchen"/>
     </CvMappingRule>
 </CvMappingRules>
 
