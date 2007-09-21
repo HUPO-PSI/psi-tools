@@ -171,7 +171,8 @@ public class OlsOntology implements OntologyAccess {
             boolean updated = false;
             try {
                 // result of this query not in cache, get it from the un-cached method
-                terms = this.getValidIDs2( queryTerm, allowChildren, useTerm );
+                //terms = this.getValidIDs2( queryTerm, allowChildren, useTerm );
+                terms = this.getValidIDsOld(queryTerm, allowChildren, useTerm );
                 log.debug( "Storing uncached terms with key: " + myKey );
                 // store in the cache
                 admin.putInCache(myKey, terms, groups);
