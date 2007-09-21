@@ -85,7 +85,10 @@ public class OlsOntologyTest {
         String id = "MI:0300";
         Set<String> resultA1 = mi_ols.getValidIDs( id, true, false ); // not yet cached
         Set<String> resultA2 = mi_ols.getValidIDs( id, true, false ); // now cached
-        Set<String> resultA3 = mi_ols.getValidIDs2( id, true, false ); // result without using cache
+//        // retrieval of child terms through recursive OLS queries from client: takes too long
+//        Set<String> resultA3 = mi_ols.getValidIDs2( id, true, false ); // result without using cache
+        // retrieval of child terms on OLS server side: much faster
+        Set<String> resultA3 = mi_ols.getValidIDsOld( id, true, false ); // result without using cache
         Assert.assertEquals( "Cached and uncached results have to be the same!", resultA1, resultA2 );
         Assert.assertEquals( "Cached and uncached results have to be the same!", resultA2, resultA3 );
         Assert.assertEquals( "This set should contain 9 result terms!", 9, resultA1.size() ); // on: 20. Aug. 2007
@@ -96,7 +99,10 @@ public class OlsOntologyTest {
         String id = "GO:0055044";
         Set<String> resultB1 = go_ols.getValidIDs( id, true, false ); // not yet cached
         Set<String> resultB2 = go_ols.getValidIDs( id, true, false ); // now cached
-        Set<String> resultB3 = go_ols.getValidIDs2( id, true, false ); // result without using cache
+//        // retrieval of child terms through recursive OLS queries from client: takes too long
+//        Set<String> resultB3 = go_ols.getValidIDs2( id, true, false ); // result without using cache
+        // retrieval of child terms on OLS server side: much faster
+        Set<String> resultB3 = go_ols.getValidIDsOld( id, true, false ); // result without using cache
         Assert.assertEquals( "Cached and uncached results have to be the same!", resultB1, resultB2 );
         Assert.assertEquals( "Cached and uncached results have to be the same!", resultB2, resultB3 );
         Assert.assertEquals( "This set should contain 7 result terms!", 7, resultB1.size() ); // on: 20. Aug. 2007
