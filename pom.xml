@@ -1,17 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>psidev.psi.tools</groupId>
     <artifactId>cv-rule-reader</artifactId>
     <packaging>jar</packaging>
     <version>0.3-SNAPSHOT</version>
-    <name>PSI :: Tools :: CV Rule Reader</name> 
+
+    <name>PSI :: Tools :: CV Rule Reader</name>
 
     <description>
         The library provides a cv rule reader for the cv rule configuration XML file that is used with the validator.
     </description>
-    
+
+    <scm>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/cv-rule-reader/trunk</connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/cv-rule-reader/trunk</developerConnection>
+        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/cv-rule-reader/trunk</url>
+    </scm>
+
     <build>
         <plugins>
             <!-- To compile with JDK5.0 -->
@@ -54,7 +63,6 @@
             </plugin>
         </plugins>
     </build>
-
 
     <dependencies>
 
