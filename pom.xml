@@ -15,6 +15,12 @@
         both at the syntactic and semantic level.
     </description>
 
+    <scm>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/trunk</connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/trunk</developerConnection>
+        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/trunk</url>
+    </scm>
+
     <build>
         <plugins>
             <!-- To compile with JDK5.0 -->
