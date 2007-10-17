@@ -148,7 +148,7 @@
         <repository>
             <id>ebi-repo</id>
             <name>EBI Repository</name>
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo</url>
+            <url>scp://holbein.ebi.ac.uk/homes/maven/public_html/m2repo</url>
         </repository>
 
         <snapshotRepository>
