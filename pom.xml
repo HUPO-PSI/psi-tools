@@ -5,7 +5,7 @@
     <groupId>psidev.psi.tools</groupId>
     <artifactId>cv-rule-reader</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
 
     <name>PSI :: Tools :: CV Rule Reader</name>
 
@@ -148,7 +148,7 @@
         <repository>
             <id>ebi-repo</id>
             <name>EBI Repository</name>
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo</url>
+            <url>scp://holbein.ebi.ac.uk/homes/maven/public_html/m2repo</url>
         </repository>
 
         <snapshotRepository>
