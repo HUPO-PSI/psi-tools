@@ -22,8 +22,11 @@ public class OlsOntologyTest {
     public static void setup() throws OntologyLoaderException {
         mi_ols = new OlsOntology();
         mi_ols.loadOntology( "MI", null, null, null, null );
+        Assert.assertNotNull(mi_ols);
+        
         go_ols = new OlsOntology();
         go_ols.loadOntology( "GO", null, null, null, null );
+        Assert.assertNotNull(go_ols);
     }
 
     @Test

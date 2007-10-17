@@ -28,6 +28,7 @@ public class OntologyManagerTest {
         Assert.assertNotNull( "Could not read ontology configuration file: " + ontoConfig, is );
         om = new OntologyManager(is);
         is.close();
+        Assert.assertNotNull( om );
     }
 
     @Test
