@@ -155,7 +155,7 @@
             <uniqueVersion>false</uniqueVersion>
             <id>ebi-repo-snapshots</id>
             <name>EBI Snapshots Repository</name>
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo_snapshots</url>
+            <url>scp://holbein.ebi.ac.uk/homes/maven/public_html/m2repo_snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
