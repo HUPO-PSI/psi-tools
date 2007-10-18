@@ -1,7 +1,7 @@
 package psidev.psi.tools.ontology_manager;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import psidev.psi.tools.ontology_manager.impl.local.LocalOntology;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
@@ -14,25 +14,30 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
+ * OntologyManager tester.
+ *
  * Author: Florian Reisinger
  * Date: 15-Aug-2007
  */
 public class OntologyManagerTest {
 
-    static OntologyManager om;
+    private OntologyManager om;
 
-    @BeforeClass
-    public static void setup() throws OntologyLoaderException, IOException {
+    @Before
+    public void setup() throws OntologyLoaderException, IOException {
         String ontoConfig = "ontologies.xml";
         InputStream is = OntologyManager.class.getClassLoader().getResourceAsStream( ontoConfig );
         Assert.assertNotNull( "Could not read ontology configuration file: " + ontoConfig, is );
         om = new OntologyManager(is);
         is.close();
         Assert.assertNotNull( om );
+        for ( String id : om.getOntologyIDs() ) {
+            System.out.println( id );
+        }
     }
 
     @Test
-    public void testOntologyLoading() {
+    public void ontologyLoading() {
         Collection<String> ontologyIDs = om.getOntologyIDs();
         Assert.assertEquals( "ontologies.xml specifies only 2 ontologies.", 2, ontologyIDs.size() );
         Assert.assertTrue( ontologyIDs.contains( "MI" ) );
@@ -83,7 +88,4 @@ public class OntologyManagerTest {
         Assert.assertEquals( "There should be no child terms for MOD:00198!", 0, result.size() );
 
     }
-
-
-    
 }

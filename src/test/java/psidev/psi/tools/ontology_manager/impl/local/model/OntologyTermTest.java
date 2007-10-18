@@ -94,21 +94,21 @@ public class OntologyTermTest {
     }
 
     @Test
-    public void testGetShortName() {
+    public void getShortName() {
         OntologyTerm term = new OntologyTerm( "MI" );
         term.setShortName( "short" );
         assertEquals( "short", term.getShortName() );
     }
 
     @Test
-    public void testGetFullName() {
+    public void getFullName() {
         OntologyTerm term = new OntologyTerm( "MI" );
         term.setFullName( "long" );
         assertEquals( "long", term.getFullName() );
     }
 
     @Test
-    public void testGetParents() {
+    public void getParents() {
         Collection parents = mi4.getParents();
         assertEquals( 2, parents.size() );
         assertTrue( parents.contains( mi1 ) );
@@ -119,7 +119,7 @@ public class OntologyTermTest {
     }
 
     @Test
-    public void testGetChildren() {
+    public void getChildren() {
         Collection children = mi0.getChildren();
         assertEquals( 3, children.size() );
         assertTrue( children.contains( mi1 ) );
@@ -131,7 +131,7 @@ public class OntologyTermTest {
     }
 
     @Test
-    public void testIsObsolete() {
+    public void isObsolete() {
         OntologyTerm term = new OntologyTerm( "MI" );
         assertFalse( term.isObsolete() );
 
@@ -173,13 +173,13 @@ public class OntologyTermTest {
 //    }
 
     @Test
-    public void testEquals() {
+    public void equals() {
         assertEquals( mi1, mi1 );
         assertNotSame( mi0, mi1 );
     }
 
     @Test
-    public void testToString() {
+    public void tostring() {
         OntologyTerm term = new OntologyTerm( "MI" );
         assertNotNull( term.toString() );
 
@@ -192,7 +192,7 @@ public class OntologyTermTest {
     }
 
     @Test
-    public void testGetAllChildren() {
+    public void getAllChildren() {
         Collection childrenOfMi0 = mi0.getAllChildren();
         assertEquals( 6, childrenOfMi0.size() );
 
@@ -207,7 +207,7 @@ public class OntologyTermTest {
     }
 
     @Test
-    public void testIsChildOf() {
+    public void isChildOf() {
 
         assertTrue( mi0.isChildOf( mi0 ) );
         assertTrue( mi1.isChildOf( mi0 ) );
@@ -236,7 +236,7 @@ public class OntologyTermTest {
     }
 
     @Test
-    public void testIsParentOf() {
+    public void isParentOf() {
         assertTrue( mi0.isParentOf( mi0 ) );
         assertTrue( mi0.isParentOf( mi1 ) );
         assertTrue( mi0.isParentOf( mi2 ) );
@@ -265,13 +265,13 @@ public class OntologyTermTest {
     }
 
     @Test
-    public void testHasParent() {
+    public void hasParent() {
         assertTrue( mi1.hasParent() );
         assertFalse( mi0.hasParent() );
     }
 
     @Test
-    public void testHasChildren() {
+    public void hasChildren() {
         assertTrue( mi0.hasChildren() );
         assertFalse( mi6.hasChildren() );
     }

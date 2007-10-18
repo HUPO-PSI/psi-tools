@@ -30,7 +30,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testEmptyStringQuery() {
+    public void emptyStringQuery() {
         String id = ""; // check on empty string as id
 
         // check getValidIDs
@@ -59,7 +59,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testCacheSpeed() {
+    public void cacheSpeed() {
         // get child terms of 'alias type' (MI:0300) from the MI ontology
         String id = "MI:0300";
         // run first time -> uncached
@@ -84,7 +84,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testGetValidIDsWithMI() {
+    public void getValidIDsWithMI() {
         String id = "MI:0300";
         Set<String> resultA1 = mi_ols.getValidIDs( id, true, false ); // not yet cached
         Set<String> resultA2 = mi_ols.getValidIDs( id, true, false ); // now cached
@@ -98,7 +98,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testGetValidIDsWithGO() {
+    public void getValidIDsWithGO() {
         String id = "GO:0055044";
         Set<String> resultB1 = go_ols.getValidIDs( id, true, false ); // not yet cached
         Set<String> resultB2 = go_ols.getValidIDs( id, true, false ); // now cached
@@ -112,7 +112,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testIsObsoleteWithMI() {
+    public void isObsoleteWithMI() {
         String idA = "MI:0021"; // obsolete
         boolean resultA1 = mi_ols.isObsoleteID( idA );
         boolean resultA2 = mi_ols.isObsoleteID( idA );
@@ -131,7 +131,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testIsObsoleteWithGO() {
+    public void isObsoleteWithGO() {
         String idA = "GO:0015428"; // obsolete term: GO:0015428 : type I protein secretor activity
         boolean resultA1 = go_ols.isObsoleteID( idA );
         boolean resultA2 = go_ols.isObsoleteID( idA );
@@ -150,7 +150,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testGetTermNameByIDWithMI() {
+    public void getTermNameByIDWithMI() {
         String idA = "MI:0616"; // MI accession for term: example
         String resultA1 = mi_ols.getTermNameByID( idA );
         String resultA2 = mi_ols.getTermNameByID( idA );
@@ -169,7 +169,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testGetTermNameByIDWithGO() {
+    public void getTermNameByIDWithGO() {
         String resultA1 = go_ols.getTermNameByID( "GO:0005623" ); // GO accession for term: cell
         String resultA2 = go_ols.getTermNameByID( "GO:0005623" );
         String resultA3 = go_ols.getTermNameByIDUncached( "GO:0005623" );
@@ -186,7 +186,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testGetDirectParentsIDsWithMI() {
+    public void getDirectParentsIDsWithMI() {
         String idA = "MI:0362"; // MI:0362 = 'inference' has 3 direct parents
         Set<String> result1 = mi_ols.getDirectParentsIDs( idA ); // not yet cached
         Set<String> result2 = mi_ols.getDirectParentsIDs( idA ); // now cached
@@ -197,7 +197,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testGetDirectParentsIDsWithGO() {
+    public void getDirectParentsIDsWithGO() {
         String idB = "GO:0044464"; // GO:0044464 = 'cell part' has 2 direct parents
         Set<String> result1 = go_ols.getDirectParentsIDs( idB ); // not yet cached
         Set<String> result2 = go_ols.getDirectParentsIDs( idB ); // now cached
@@ -208,7 +208,7 @@ public class OlsOntologyTest {
     }
 
     @Test
-    public void testUnknownIDQuery() {
+    public void unknownIDQuery() {
         String id = "GO:0055044"; // check on empty string as id
 
         // check getValidIDs
@@ -236,5 +236,4 @@ public class OlsOntologyTest {
         Assert.assertEquals( "The result set must be empty, since we don't expect any " +
                 "results from empty queries!", 0, result4.size() );
     }
-
 }
