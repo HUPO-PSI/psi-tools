@@ -6,10 +6,13 @@
 
 package psidev.psi.tools.ontology_manager.impl.local.model;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import psidev.psi.tools.ontology_manager.impl.local.model.OntologyTerm;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNotNull;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.Collection;
 
@@ -20,37 +23,24 @@ import java.util.Collection;
  * @version $Id: OntologyTermTest.java 656 2007-06-29 11:18:19 +0100 (Fri, 29 Jun 2007) skerrien $
  * @since <pre>01/04/2006</pre>
  */
-public class OntologyTermTest extends TestCase {
+public class OntologyTermTest {
 
-    public OntologyTermTest( String name ) {
-        super( name );
-    }
-
-    public void setUp() throws Exception {
-        super.setUp();
-
+    @BeforeClass
+    public static void setUp() throws Exception {
         buildSimpleDag();
-    }
-
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public static Test suite() {
-        return new TestSuite( OntologyTermTest.class );
     }
 
     // Utility
 
-    OntologyTerm mi0;
-    OntologyTerm mi1;
-    OntologyTerm mi2;
-    OntologyTerm mi3;
-    OntologyTerm mi4;
-    OntologyTerm mi5;
-    OntologyTerm mi6;
+    private static OntologyTerm mi0;
+    private static OntologyTerm mi1;
+    private static OntologyTerm mi2;
+    private static OntologyTerm mi3;
+    private static OntologyTerm mi4;
+    private static OntologyTerm mi5;
+    private static OntologyTerm mi6;
 
-    private void buildSimpleDag() {
+    private static void buildSimpleDag() {
 
         /*
          *                  MI:0000
@@ -97,23 +87,27 @@ public class OntologyTermTest extends TestCase {
     /////////////////////
     // Tests
 
-    public void testGetId() {
+    @Test
+    public void getId() {
         OntologyTerm term = new OntologyTerm( "MI" );
         assertEquals( "MI", term.getId() );
     }
 
+    @Test
     public void testGetShortName() {
         OntologyTerm term = new OntologyTerm( "MI" );
         term.setShortName( "short" );
         assertEquals( "short", term.getShortName() );
     }
 
+    @Test
     public void testGetFullName() {
         OntologyTerm term = new OntologyTerm( "MI" );
         term.setFullName( "long" );
         assertEquals( "long", term.getFullName() );
     }
 
+    @Test
     public void testGetParents() {
         Collection parents = mi4.getParents();
         assertEquals( 2, parents.size() );
@@ -124,6 +118,7 @@ public class OntologyTermTest extends TestCase {
         assertTrue( parents.isEmpty() );
     }
 
+    @Test
     public void testGetChildren() {
         Collection children = mi0.getChildren();
         assertEquals( 3, children.size() );
@@ -135,6 +130,7 @@ public class OntologyTermTest extends TestCase {
         assertTrue( children.isEmpty() );
     }
 
+    @Test
     public void testIsObsolete() {
         OntologyTerm term = new OntologyTerm( "MI" );
         assertFalse( term.isObsolete() );
@@ -143,6 +139,7 @@ public class OntologyTermTest extends TestCase {
         assertTrue( term.isObsolete() );
     }
 
+    @Test
     public void testGetObsoleteMessage() {
         //TODO: Test of getObsoleteMessage should go here...
     }
@@ -175,11 +172,13 @@ public class OntologyTermTest extends TestCase {
 //        //TODO: Test of setObsoleteMessage should go here...
 //    }
 
+    @Test
     public void testEquals() {
         assertEquals( mi1, mi1 );
         assertNotSame( mi0, mi1 );
     }
 
+    @Test
     public void testToString() {
         OntologyTerm term = new OntologyTerm( "MI" );
         assertNotNull( term.toString() );
@@ -192,6 +191,7 @@ public class OntologyTermTest extends TestCase {
         assertNotNull( term.toString() );
     }
 
+    @Test
     public void testGetAllChildren() {
         Collection childrenOfMi0 = mi0.getAllChildren();
         assertEquals( 6, childrenOfMi0.size() );
@@ -206,6 +206,7 @@ public class OntologyTermTest extends TestCase {
         assertTrue( childrenOfMi0.contains( mi6 ) );
     }
 
+    @Test
     public void testIsChildOf() {
 
         assertTrue( mi0.isChildOf( mi0 ) );
@@ -234,6 +235,7 @@ public class OntologyTermTest extends TestCase {
         assertFalse( mi0.isChildOf( mi6 ) );
     }
 
+    @Test
     public void testIsParentOf() {
         assertTrue( mi0.isParentOf( mi0 ) );
         assertTrue( mi0.isParentOf( mi1 ) );
@@ -262,11 +264,13 @@ public class OntologyTermTest extends TestCase {
         assertFalse( mi6.isParentOf( mi0 ) );
     }
 
+    @Test
     public void testHasParent() {
         assertTrue( mi1.hasParent() );
         assertFalse( mi0.hasParent() );
     }
 
+    @Test
     public void testHasChildren() {
         assertTrue( mi0.hasChildren() );
         assertFalse( mi6.hasChildren() );
