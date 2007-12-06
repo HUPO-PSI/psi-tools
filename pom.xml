@@ -5,7 +5,7 @@
     <groupId>psidev.psi.tools</groupId>
     <artifactId>ontology-manager</artifactId>
     <packaging>jar</packaging>
-    <version>0.3</version>
+    <version>0.4-SNAPSHOT</version>
 
     <name>PSI :: Ontology Manager</name>
 
@@ -14,9 +14,9 @@
     </description>
 
     <scm>
-        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/tags/ontology-manager-0.3</connection>
-        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/tags/ontology-manager-0.3</developerConnection>
-        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/tags/ontology-manager-0.3</url>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk</connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk</developerConnection>
+        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk</url>
     </scm>
 
     <build>
