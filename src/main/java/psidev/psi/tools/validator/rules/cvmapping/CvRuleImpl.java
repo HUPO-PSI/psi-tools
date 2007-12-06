@@ -108,9 +108,27 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         if ( results.isEmpty() ) {
 
+            // In this case, we generate a message of the appropriate level for
+            // each term that the rule was expecting here.
+            // If there are no known terms, then obvisouly do not generate a message.
+            if(getCVTerms() != null && getCVTerms().size() > 0) {
+                StringBuilder sb = new StringBuilder();
+                sb.append( "None of the given CvTerms were found at '" + xpath + "' because no annotation was found here :\n" );
+                Iterator<CvTerm> iterator = getCVTerms().iterator();
+                while ( iterator.hasNext() ) {
+                    CvTerm cvTerm = iterator.next();
+                    sb.append( "  - " ).append( printCvTerm( cvTerm ) );
+                    if ( iterator.hasNext() ) {
+                        sb.append( "\n" );
+                    }
+                }
+
+                messages.add( buildMessage( xpath, level, sb.toString() ) );
+            }
+
+            // This was much too 'insider funny' to delete. Sorry.
             // We agreed with Luisa that we don't need to display this one.
             //messages.add( buildMessage( xpath, level, "The given XPath(" + xpath + ") didn't match any data." ) );
-
         } else {
 
             // initialize the map

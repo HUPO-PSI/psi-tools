@@ -274,7 +274,7 @@ public class CvMappingRuleTest {
         Collection<ValidatorMessage> messages = ruleMngr.check( house );
 
         Assert.assertNotNull( messages );
-        Assert.assertEquals( 0, messages.size() );
+        Assert.assertEquals( 1, messages.size() );
     }
 
     @Test
@@ -435,7 +435,7 @@ public class CvMappingRuleTest {
         for ( ValidatorMessage message : messages ) {
             System.out.println( "message = " + message );
         }
-        Assert.assertEquals( 1, messages.size() );
+        Assert.assertEquals( 2, messages.size() );
 
 //        ValidatorMessage m = messages.iterator().next();
 //        Assert.assertEquals( MessageLevel.ERROR, m.getLevel() );
