@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
+<CvMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="CvMapping.xsd" modelName="MIF.xsd"
+           modelVersion="2.53" modelURI="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+    
+    <CvReferenceList CvSourceVersion="0.9">
+        <CvReference cvName="PSI-MI" cvIdentifier="MI"/>
+        <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
+        <CvReference cvName="PATO" cvIdentifier="PATO"/>
+        <CvReference cvName="Gene Ontology" cvIdentifier="GO"/>
+    </CvReferenceList>
 
-        <CvMappingRule elementPath="/house/kitchen/note" requirementLevel="MUST">
+    <CvMappingRuleList>
+        <CvMappingRule cvElementPath="/house/kitchen/note" requirementLevel="MUST"
+                       scopePath="/house/kitchen" cvTermsCombinationLogic="OR" >
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
-                    cvIdentifier="MS" isRepeatable="false" scope="/house/kitchen"/>
+                    cvIdentifierRef="MS" isRepeatable="false"/>
             <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
-                    cvIdentifier="PATO" isRepeatable="false" scope="/house/kitchen"/>
+                    cvIdentifierRef="PATO" isRepeatable="false" />
         </CvMappingRule>
-</CvMappingRules>
+    </CvMappingRuleList>
+</CvMapping>
 

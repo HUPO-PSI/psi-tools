@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
+<CvMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="CvMapping.xsd" modelName="MIF.xsd"
+           modelVersion="2.53" modelURI="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+    
+    <CvReferenceList CvSourceVersion="0.9">
+        <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
+        <CvReference cvName="PATO" cvIdentifier="PATO"/>
+    </CvReferenceList>
 
     <!-- There is NO cupboard in the kitchen ! -->
-    <CvMappingRule elementPath="kitchen/cupboard" requirementLevel="MUST">
-        <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
-                cvIdentifier="MS" isRepeatable="false"/>
-        <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
-                cvIdentifier="PATO" isRepeatable="false"/>
-    </CvMappingRule>
-</CvMappingRules>
+    <CvMappingRuleList>
+        <CvMappingRule cvElementPath="kitchen/cupboard" requirementLevel="MUST" cvTermsCombinationLogic="OR"
+                scopePath="kitchen">
+            <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
+                    cvIdentifierRef="MS" />
+            <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
+                    cvIdentifierRef="PATO" />
+        </CvMappingRule>
+    </CvMappingRuleList>
+</CvMapping>
 

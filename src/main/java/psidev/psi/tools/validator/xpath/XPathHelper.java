@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <b> -- TODO Short Description -- </b>.
+ * <b> XPath Helper utilities </b>.
  * <p/>
  *
  * @author Matthias Oesterheld
@@ -54,5 +54,20 @@ public class XPathHelper {
             }
         }
         return results;
+    }
+
+    public static boolean hasTrailingSlash( String xpath ) {
+        return xpath.trim().endsWith( "/" );
+    }
+
+    public static boolean hasLeadingSlash( String xpath ) {
+        return xpath.trim().startsWith( "/" );
+    }
+
+    public static String removeTrailingSlash( String xpath ) {
+        if( hasTrailingSlash( xpath )) {
+            xpath = xpath.substring(0, xpath.length()-1);
+        }
+        return xpath;
     }
 }

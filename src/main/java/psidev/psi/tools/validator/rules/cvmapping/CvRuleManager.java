@@ -3,8 +3,9 @@ package psidev.psi.tools.validator.rules.cvmapping;
 import org.apache.commons.jxpath.JXPathException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRule;
-import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvReference;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.validator.ValidatorException;
@@ -23,7 +24,7 @@ import java.util.*;
  * @since 1.0
  */
 public class CvRuleManager {
-    // should be CvMappingRuleList
+
     public static final Log log = LogFactory.getLog( CvRuleManager.class );
 
     private OntologyManager ontologyMngr;
@@ -33,16 +34,16 @@ public class CvRuleManager {
     //////////////////
     // Constructors
 
-    public CvRuleManager( OntologyManager ontoMngr, CvMappingRules cvMappingRules ) {
+    public CvRuleManager( OntologyManager ontoMngr, CvMapping cvMappingRules ) {
         this.ontologyMngr = ontoMngr;
-        addRules(cvMappingRules.getCvMappingRule());
+        addRules(cvMappingRules.getCvMappingRuleList().getCvMappingRule());
     }
 
     ////////////////////////
     // Getters and Setters
 
-    public void setCvMappingRules( CvMappingRules cvMappingRules) {
-        addRules(cvMappingRules.getCvMappingRule());
+    public void setCvMappingRules( CvMapping cvMappingRules) {
+        addRules(cvMappingRules.getCvMappingRuleList().getCvMappingRule());
     }
 
     public Collection<CvRule> getCvRules() {
@@ -52,8 +53,6 @@ public class CvRuleManager {
     //////////////////////
     // Rule
 
-    // ToDo: remove this method or keep for convenience?
-    // replacement of the check(object, null) method with check(object, xpath_from_root) ?
     public Collection<ValidatorMessage> check( Object o ) throws ValidatorException {
 
         if ( o == null ) {
@@ -63,6 +62,19 @@ public class CvRuleManager {
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         for (CvRule rule : rules) {
             messages.addAll(rule.check(o, null));
+        }
+        return messages;
+    }
+
+    public Collection<ValidatorMessage> check( Object o, String contextXpath ) throws ValidatorException {
+
+        if ( o == null ) {
+            throw new ValidatorException( "Cannot validate a null object." );
+        }
+
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        for (CvRule rule : rules) {
+            messages.addAll(rule.check(o, contextXpath));
         }
         return messages;
     }
@@ -121,7 +133,6 @@ public class CvRuleManager {
             }
         } // rules
 
-
         return messages;
     }
 
@@ -139,7 +150,7 @@ public class CvRuleManager {
                                    CvRule rule,
                                    Collection<ValidatorMessage> messages ) throws ValidatorException {
 
-        String ontologyID = cvTerm.getCvIdentifier();
+        String ontologyID = (( CvReference ) cvTerm.getCvIdentifierRef()).getCvIdentifier();
         System.out.println("##### DEBUG: Checking cvTerm " + cvTerm.getTermName() + " for ontology: " + ontologyID );
 
         // before anything else, check if the specified ontology was loaded in the ontology manager
@@ -207,9 +218,9 @@ public class CvRuleManager {
 
 
         // check the use of 'isRepeatable' and 'scope'
-        if ( !cvTerm.isIsRepeatable() ) {
+        if ( ! cvTerm.isIsRepeatable() ) {
             // first check if a scope is defined
-            String scope = cvTerm.getScope();
+            String scope = rule.getScopePath();
             if ( scope == null ) {
                 // not allowed, if the term is not repeatable, there MUST be a scope defined
                 // create error message
@@ -231,20 +242,10 @@ public class CvRuleManager {
                                             msg, rule ) );
                 return false;
             }
-        } else {
-            // check if a scope was specified although the term is repeatable
-            // in case of repeatable terms, a scope does not apply
-            if ( cvTerm.getScope() != null ) {
-                // create warn message, stating the useless specification of the scope attribute
-                String msg = "The CvTerm " + printSimpleCvTerm( cvTerm ) + " defines that the term IS repeatable, " +
-                             "but a scope was specified.";
-                messages.add( rule.buildMessage( rule.getElementPath(), Recommendation.SHOULD, msg, rule ) );
-            }
-        }
+        } 
 
         return true;
     }
-
 
 
     ///////////////
@@ -259,15 +260,12 @@ public class CvRuleManager {
             rule.setCvMappingRule(cvMappingRule);
             rules.add(rule);
         }
-
     }
 
     protected String printSimpleCvTerm( CvTerm cv ) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder( 64 );
         sb.append( '\'' ).append( cv.getTermName() ).append( '\'' ).append( ' ' );
         sb.append( '(' ).append( cv.getTermAccession() ).append( ')' );
         return sb.toString();
     }
-
-
 }

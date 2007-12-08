@@ -1,11 +1,10 @@
 package psidev.psi.tools.validator.rules.cvmapping;
 
-import junit.framework.JUnit4TestAdapter;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.tools.cvrReader.CvRuleReader;
 import psidev.psi.tools.cvrReader.CvRuleReaderException;
-import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.validator.MessageLevel;
@@ -13,12 +12,14 @@ import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
 import psidev.psi.tools.validator.rules.cvmapping.house.House;
 import psidev.psi.tools.validator.rules.cvmapping.house.HouseFactory;
+import psidev.psi.tools.validator.rules.cvmapping.protein.Modification;
+import psidev.psi.tools.validator.rules.cvmapping.protein.Protein;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.ArrayList;
 
 /**
  * CvMappingRule Tester.
@@ -40,27 +41,26 @@ public class CvMappingRuleTest {
         }
     }
 
-    public static junit.framework.Test suite() {
-        return new JUnit4TestAdapter( CvMappingRuleTest.class );
+    private void print( Collection<ValidatorMessage> messages ) {
+        for ( ValidatorMessage message : messages ) {
+            System.out.println( message );
+        }
     }
 
     //////////////////////////
     // Tests checkCvMapping
 
     @Test
-    public void checkCvMapping() throws Exception {
-        System.out.println("========== Test: checkCvMapping");
-
+    public void checkCvMapping_noError() throws Exception {
         // check a fine mapping.
-
-        File input = new File( CvMappingRuleTest.class.getResource( "/sample5-house-cvmapping.xml" ).getFile() );
+        File input = new File( CvMappingRuleTest.class.getResource( "/fine-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
-//        CvRuleManager rule = CvMappingRuleFactory.getInstance().create( cvMapping );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages );
+        print( messages );
         Assert.assertEquals( 0, messages.size() );
     }
 
@@ -73,7 +73,7 @@ public class CvMappingRuleTest {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-obsolete-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         CvRule rule = ruleMngr.getCvRules().iterator().next(); // only one rule here
@@ -81,9 +81,7 @@ public class CvMappingRuleTest {
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
         int termsAfterCheck = rule.getCVTerms().size();
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         Assert.assertEquals( 1, messages.size() );
         // test the removal of one CVTerm
         Assert.assertEquals( "One CVTerm should have been removed due to it being obsolete.", termsBeforeCheck -1, termsAfterCheck );
@@ -97,16 +95,14 @@ public class CvMappingRuleTest {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-obsolete2-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         int rulesBeforeCheck = ruleMngr.getCvRules().size();
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
         int rulesAfterCheck = ruleMngr.getCvRules().size();
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         // one error for each cvTerm and one for the rule
         Assert.assertEquals( 3, messages.size() );
         // test removal of one complete rule
@@ -121,14 +117,12 @@ public class CvMappingRuleTest {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-obsolete3-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         // one error for each cvTerm and one for the rule
         Assert.assertEquals( 3, messages.size() );
     }
@@ -142,15 +136,13 @@ public class CvMappingRuleTest {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error1-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
-        // expect 1 message: 
+        print( messages );
+        // expect 1 message:
         Assert.assertEquals( 1, messages.size() );
     }
 
@@ -162,14 +154,12 @@ public class CvMappingRuleTest {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error2-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         // one error for each cvTerm and one for the rule
         // expect 5 messages: one error for each term
         // + one message that the rule has been removed doe to no longer containing terms
@@ -182,14 +172,12 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: checkCvMapping_unusable_term");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error3-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         // expect 1 message: CvTerm has been removed due to: neither the term nor any of its children can be used
         Assert.assertEquals( 1, messages.size() );
     }
@@ -203,7 +191,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_noMessage");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -219,9 +207,7 @@ public class CvMappingRuleTest {
         }
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         Assert.assertEquals( 0, messages.size() );
     }
 
@@ -231,7 +217,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_useTerm_is_false");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -247,9 +233,7 @@ public class CvMappingRuleTest {
         }      
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         Assert.assertEquals( 1, messages.size() );
     }
 
@@ -262,7 +246,7 @@ public class CvMappingRuleTest {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -286,7 +270,7 @@ public class CvMappingRuleTest {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -303,11 +287,8 @@ public class CvMappingRuleTest {
         }
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         Assert.assertEquals( 1, messages.size() );
-
     }
 
     @Test
@@ -316,7 +297,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_term_not_found_may");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -333,14 +314,11 @@ public class CvMappingRuleTest {
         }
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         Assert.assertEquals( 1, messages.size() );
 
         ValidatorMessage m = messages.iterator().next();
         Assert.assertEquals( MessageLevel.INFO, m.getLevel() );
-
     }
 
     @Test
@@ -349,7 +327,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_term_not_found_should");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample3-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -366,14 +344,11 @@ public class CvMappingRuleTest {
         }
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         Assert.assertEquals( 1, messages.size() );
 
         ValidatorMessage m = messages.iterator().next();
         Assert.assertEquals( MessageLevel.WARN, m.getLevel() );
-
     }
 
     @Test
@@ -382,7 +357,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_term_not_found_must");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample4-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -399,14 +374,11 @@ public class CvMappingRuleTest {
         }
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         Assert.assertEquals( 1, messages.size() );
 
         ValidatorMessage m = messages.iterator().next();
         Assert.assertEquals( MessageLevel.ERROR, m.getLevel() );
-
     }
 
     @Test
@@ -415,7 +387,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_bad_xpath");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample5-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -432,14 +404,8 @@ public class CvMappingRuleTest {
         }
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( "message = " + message );
-        }
+        print( messages );
         Assert.assertEquals( 2, messages.size() );
-
-//        ValidatorMessage m = messages.iterator().next();
-//        Assert.assertEquals( MessageLevel.ERROR, m.getLevel() );
-
     }
 
     @Test
@@ -453,7 +419,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_useTermName");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample8-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -463,15 +429,13 @@ public class CvMappingRuleTest {
         House house = HouseFactory.buildSimpleHouse();
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
-        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
-            CvRule cvRule = lIterator.next();
+        Assert.assertEquals( 1, cvRules.size() );
+        for ( CvRule cvRule : cvRules ) {
             messages.addAll(cvRule.check(house, "/house"));
         }
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         // expect 2 messages: term 'bike' not in ontology and
         // term 'alias type' appears two times although it is specified as not repeatable
         Assert.assertEquals( 2, messages.size() );
@@ -487,7 +451,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_useTermName");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample7-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -498,14 +462,30 @@ public class CvMappingRuleTest {
         Collection<ValidatorMessage> messages = ruleMngr.check( house );
 
         Assert.assertNotNull( messages );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
+        print( messages );
         // expect 3 message: two 'alias type' (useTerm="false") + one 'bike' (not in ontology) are not in the valid terms
         Assert.assertEquals( 3, messages.size() );
     }
 
+    @Test
+    public void check_and_operator() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample9-house-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages.size() );
+
+        House house = HouseFactory.buildSimpleHouse();
+        messages = ruleMngr.check( house, "/house/" );
+
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+    }
 
     @Test( expected = ValidatorException.class )
     public void check_null() throws Exception {
@@ -513,7 +493,7 @@ public class CvMappingRuleTest {
         System.out.println("========== Test: check_null");
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
-        CvMappingRules cvMapping = reader.read( input );
+        CvMapping cvMapping = reader.read( input );
         CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
@@ -521,5 +501,156 @@ public class CvMappingRuleTest {
         Assert.assertEquals("Ther should not be any messages from the cv rule self check.", 0, messages0.size() );
 
         ruleMngr.check( null );
+    }
+
+    ///////////////////////////////
+    // Protein model based tests
+
+    @Test
+    public void check_or_operator_protein() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample1-protein-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        for ( ValidatorMessage message : messages ) {
+            System.out.println( message );
+        }
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages.size() );
+
+        // building model to apply checks on
+        Protein protein = new Protein( "prot1", new Modification( "MOD:00001" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+    }
+
+    @Test
+    public void check_or_operator2_protein() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample2-protein-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        for ( ValidatorMessage message : messages ) {
+            System.out.println( message );
+        }
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages.size() );
+
+        // building model to apply checks on
+        Protein protein = new Protein( "prot1",
+                                       new Modification( "MOD:00001" ),
+                                       new Modification( "MOD:00400" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+        protein = new Protein( "prot1",
+                               new Modification( "MOD:00001" ),
+                               new Modification( "MOD:00400" ),  
+                               new Modification( "MOD:00649" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+    }
+
+    @Test
+    public void check_and_operator1_protein() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample3-protein-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        for ( ValidatorMessage message : messages ) {
+            System.out.println( message );
+        }
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages.size() );
+
+        // building model to apply checks on
+        Protein protein = new Protein( "prot1",
+                                       new Modification( "MOD:00001" ),
+                                       new Modification( "MOD:00649" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+        protein = new Protein( "prot1",
+                               new Modification( "MOD:00649" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        // message should be about having only 2 CV terms instead of the 3 required (operator is AND)
+        print( messages );
+        Assert.assertEquals( 1, messages.size() );
+    }
+
+    @Test
+    public void check_xor_operator1_protein() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample4-protein-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages.size() );
+
+        // building model to apply checks on
+        Protein protein = new Protein( "prot1",
+                               new Modification( "MOD:00649" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+        protein = new Protein( "prot1",
+                               new Modification( "MOD:00001" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+        protein = new Protein( "prot1",
+                               new Modification( "MOD:00400" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+        protein = new Protein( "prot1",
+                               new Modification( "MOD:00001" ),
+                               new Modification( "MOD:00400" ),
+                               new Modification( "MOD:00649" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        // message should be about not exactly 1 term in the protein when we specific the operator XOR
+        print( messages );
+        Assert.assertEquals( 1, messages.size() );
+    }
+
+    @Test
+    public void check_xor_failing() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample4-protein-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages.size() );
+
+        // building model to apply checks on - one term from the list and 2 others not expected
+        Protein protein = new Protein( "prot1",
+                               new Modification( "MOD:00003" ),
+                               new Modification( "MOD:00004" ),
+                               new Modification( "MOD:00649" ) );
+        messages = ruleMngr.check( protein, "/protein/" );
+        // message should be about not exactly 1 term in the protein when we specific the operator XOR
+        print( messages );
+        Assert.assertEquals( 1, messages.size() );
     }
 }

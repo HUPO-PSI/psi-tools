@@ -24,6 +24,8 @@ public interface CvRule extends Rule {
     
     public String getElementPath();
 
+    public String getScopePath();
+
     public List<CvTerm> getCVTerms();
 
     public String getRequirementLevel();

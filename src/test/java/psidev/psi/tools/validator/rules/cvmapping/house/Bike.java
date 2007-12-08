@@ -28,4 +28,14 @@ public class Bike {
     public void setColor( String color ) {
         this.color = color;
     }
+
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append( "Bike" );
+        sb.append( "{color='" ).append( color ).append( '\'' );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

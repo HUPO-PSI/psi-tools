@@ -6,9 +6,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import psidev.psi.tools.cvrReader.CvRuleReader;
 import psidev.psi.tools.cvrReader.CvRuleReaderException;
-import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
+import psidev.psi.tools.validator.preferences.UserPreferences;
 import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Matthias Oesterheld & Samuel Kerrien
  * @version $Id: Validator.java 668 2007-06-29 16:44:18 +0100 (Fri, 29 Jun 2007) skerrien $
- * @since 04.01.2006; 15:37:20
+ * @since 1.0
  */
 public abstract class Validator {
 
@@ -42,7 +42,7 @@ public abstract class Validator {
      * <p/>
      * Initialise to the default values.
      */
-//    protected UserPreferences userPreferences = new UserPreferences();
+    protected UserPreferences userPreferences = new UserPreferences();
 
     protected OntologyManager ontologyMngr;
 
@@ -62,13 +62,15 @@ public abstract class Validator {
 
     public Validator( InputStream ontoConfig, InputStream cvRuleConfig, InputStream oRuleConfig ) throws ValidatorException, OntologyLoaderException {
         // load the ontologies
+        // TODO handle null !!
         ontologyMngr = new OntologyManager( ontoConfig );
 
         // if specified, load cvRules
         if ( cvRuleConfig != null ) {
             try {
                 setCvMappingRules( cvRuleConfig );
-            } catch (CvRuleReaderException e) {
+            } catch ( CvRuleReaderException e ) {
+                // TODO This is a nice behaviour for the API, we should extend that to the how class !!
                 throw new ValidatorException( "CvMappingException while trying to load the CvRules.", e );
             }
         }
@@ -87,7 +89,7 @@ public abstract class Validator {
         if ( cvRuleConfig != null ) {
             try {
                 setCvMappingRules( cvRuleConfig );
-            } catch (CvRuleReaderException e) {
+            } catch ( CvRuleReaderException e ) {
                 throw new ValidatorException( "CvMappingException while trying to load the CvRules.", e );
             }
         }
@@ -109,7 +111,6 @@ public abstract class Validator {
         ontologyMngr = new OntologyManager( ontoConfig );
     }
 
-
     public CvRuleManager getCvRuleManager() {
         return cvRuleManager;
     }
@@ -118,13 +119,12 @@ public abstract class Validator {
      * Set a cvMapping file and build the corresponding cvRuleManager.
      *
      * @param cvIs InputStream form the configuration file defining the CV Mapping to be applied as rule.
-     * @throws CvRuleReaderException      if one cannot parse the given file.
+     * @throws CvRuleReaderException if one cannot parse the given file.
      */
     public void setCvMappingRules( InputStream cvIs ) throws CvRuleReaderException {
         CvRuleReader reader = new CvRuleReader();
         cvRuleManager = new CvRuleManager( ontologyMngr, reader.read( cvIs ) );
     }
-
 
     public List<ObjectRule> getObjectRules() {
         return rules;
@@ -158,15 +158,24 @@ public abstract class Validator {
             try {
                 Class rule = Class.forName( className );
                 Constructor c = rule.getConstructor( OntologyManager.class );
-                ObjectRule r = (ObjectRule) c.newInstance( ontologyMngr );
+                ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
                 rules.add( r );
-                log.info( "Added rule: " + r.getClass() );
+                if ( log.isInfoEnabled() ) {
+                    log.info( "Added rule: " + r.getClass() );
+                }
             } catch ( Exception e ) {
                 throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
             }
         }
     }
 
+    public UserPreferences getUserPreferences() {
+        return userPreferences;
+    }
+
+    public void setUserPreferences( UserPreferences userPreferences ) {
+        this.userPreferences = userPreferences;
+    }
 
     //////////////////////
     // Validation
@@ -191,43 +200,69 @@ public abstract class Validator {
      */
     public Collection<ValidatorMessage> validate( Collection<?> col ) throws ValidatorException {
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
-
-        // Run the user defined rules
-        for (ObjectRule rule : rules) {
-            messages.addAll(validate(col, rule));
+        for ( ObjectRule rule : rules ) {
+            messages.addAll( validate( col, rule ) );
         }
+        return messages;
+    }
 
+    /**
+     * Validates a single object against all the (object) rules.
+     *
+     * @param objectToCheck objects to check on.
+     * @return collection of validator messages.
+     * @throws ValidatorException Exception while trying to validate the input.
+     */
+    public Collection<ValidatorMessage> validate( Object objectToCheck ) throws ValidatorException {
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        for ( ObjectRule rule : rules ) {
+            if ( rule.canCheck( objectToCheck ) ) { // apply only if rule can handle this object
+                messages.addAll( rule.check( objectToCheck ) );
+            }
+        }
+        return messages;
+    }
+
+    /**
+     * Validates a single object against a given (object) rules.
+     *
+     * @param objectToCheck objects to check on.
+     * @return collection of validator messages.
+     * @throws ValidatorException Exception while trying to validate the input.
+     */
+    public Collection<ValidatorMessage> validate( Object objectToCheck, ObjectRule rule ) throws ValidatorException {
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        if ( rule.canCheck( objectToCheck ) ) { // apply only if rule can handle this object
+            messages.addAll( rule.check( objectToCheck ) );
+        }
         return messages;
     }
 
     /**
      * Validates a collection of objects against a single (object) rule.
      *
-     * @param col collection of objects to check on.
-     * @return collection of validator messages.
+     * @param col  collection of objects to check on.
      * @param rule the Rule to check on
+     * @return collection of validator messages.
      * @throws ValidatorException Exception while trying to validate the input.
      */
     private Collection<ValidatorMessage> validate( Collection<?> col, ObjectRule rule ) throws ValidatorException {
-        List<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
-        for (Object aCol : col) {
-            if (rule.canCheck(aCol)) { // apply only if rule can handle this object
-                // ToDo: try to resolve unchecked assignment
-                messages.addAll(rule.check(aCol));
-            } else {
-                // what to do if can not check?
-                // for now: just be quiet and do nothing, simply skip
-                // maybe log debug statement
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        for ( Object aCol : col ) {
+            if ( rule.canCheck( aCol ) ) { // apply only if rule can handle this object
+                messages.addAll( rule.check( aCol ) );
             }
         }
         return messages;
     }
 
+    //////////////////////////
+    // CvMapping validation
 
     /**
      * Run a check on the CvMappingRules to ensure syntactically correct rules will be used for the CvMapping check.
      *
-     * @return  collection of validator messages.
+     * @return collection of validator messages.
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> checkCvMappingRules() throws ValidatorException {
@@ -242,7 +277,7 @@ public abstract class Validator {
     /**
      * Run a check on the CvMapping for a given Collection of Objects.
      *
-     * @param col collection of objects to check on.
+     * @param col   collection of objects to check on.
      * @param xPath the xpath from the XML root to the object that is to be checked.
      * @return collection of validator messages describing the validation results.
      * @throws ValidatorException Exception while trying to validate the input.
@@ -251,10 +286,10 @@ public abstract class Validator {
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         // Run cv mapping check
         if ( cvRuleManager != null ) {
-            for (CvRule rule : cvRuleManager.getCvRules()) {
+            for ( CvRule rule : cvRuleManager.getCvRules() ) {
                 for ( Object o : col ) {
-                    if ( rule.canCheck(xPath) ) {
-                        messages.addAll(rule.check(o, xPath));
+                    if ( rule.canCheck( xPath ) ) {
+                        messages.addAll( rule.check( o, xPath ) );
                     }
                     // else: rule does not apply
                 }
@@ -268,29 +303,24 @@ public abstract class Validator {
     /**
      * Run a check on the CvMapping for a given Object.
      *
-     * @param o Object to check.
+     * @param o     Object to check.
      * @param xPath the xpath from the XML root to the object that is to be checked.
      * @return collection of validator messages describing the validation results.
      * @throws ValidatorException Exception while trying to validate the input.
      */
-    public Collection<ValidatorMessage> checkCvMapping(Object o, String xPath) throws ValidatorException {
+    public Collection<ValidatorMessage> checkCvMapping( Object o, String xPath ) throws ValidatorException {
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         // Run cv mapping check
-        if (cvRuleManager != null) {
-            for (CvRule rule : cvRuleManager.getCvRules()) {
-                if (rule.canCheck(xPath)) {
-                    messages.addAll(rule.check(o, xPath));
+        if ( cvRuleManager != null ) {
+            for ( CvRule rule : cvRuleManager.getCvRules() ) {
+                if ( rule.canCheck( xPath ) ) {
+                    messages.addAll( rule.check( o, xPath ) );
                 }
                 // else: rule does not apply
             }
         } else {
-            log.error("The CvRuleManager has not been set up yet.");
+            log.error( "The CvRuleManager has not been set up yet." );
         }
         return messages;
     }
-
-    ///////////////////
-    // Uitlities
-
-
 }

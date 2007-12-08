@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CvMappingRules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CvRules.xsd" >
+<CvMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="CvMapping.xsd" modelName="MIF.xsd"
+           modelVersion="2.53"
+           modelURI="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
 
-    <CvMappingRule elementPath="a/b/c/d" requirementLevel="MAY">
-        <!-- fine term -->
-        <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
-                cvIdentifier="MS"/>
-        <!-- term not allowing itself to be used or any of its children -->
-        <CvTerm termAccession="PSI:1000264" useTerm="false" termName="Ion Trap" allowChildren="false"
-                cvIdentifier="MS" isRepeatable="false" scope="a"/>
-    </CvMappingRule>
-</CvMappingRules>
+    <CvReferenceList CvSourceVersion="0.9">
+        <CvReference cvName="PSI-MI" cvIdentifier="MI"/>
+        <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
+        <CvReference cvName="PSI-MOD" cvIdentifier="MOD"/>
+        <CvReference cvName="Gene Ontology" cvIdentifier="GO"/>
+    </CvReferenceList>
+
+    <CvMappingRuleList>
+        <CvMappingRule cvElementPath="a/b/c/d" requirementLevel="MAY"
+                       scopePath="/a"
+                       cvTermsCombinationLogic="OR">
+            <!-- fine term -->
+            <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
+                    cvIdentifierRef="MS"/>
+            <!-- term not allowing itself to be used or any of its children -->
+            <CvTerm termAccession="PSI:1000264" useTerm="false" termName="Ion Trap" allowChildren="false"
+                    cvIdentifierRef="MS" isRepeatable="false" />
+        </CvMappingRule>
+    </CvMappingRuleList>
+</CvMapping>
 

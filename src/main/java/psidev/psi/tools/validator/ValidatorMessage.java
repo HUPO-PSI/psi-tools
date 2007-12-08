@@ -1,6 +1,7 @@
 package psidev.psi.tools.validator;
 
 import psidev.psi.tools.validator.rules.Rule;
+import psidev.psi.tools.validator.schema.SaxMessage;
 
 /**
  * The definition of a Validator message.
@@ -61,6 +62,27 @@ public class ValidatorMessage<T extends Object> {
         }
         this.rule = rule;
     }
+
+    public ValidatorMessage( SaxMessage saxMessage, MessageLevel level ) {
+
+        if ( level == null ) {
+            throw new IllegalArgumentException( "A message level must not be null when creating a ValidatorMessage." );
+        }
+        this.level = level;
+
+        if( saxMessage == null ) {
+            throw new IllegalArgumentException( "SAX Message must not be null" );
+        }
+
+        StringBuilder sb = new StringBuilder( 100 );
+
+        sb.append( "L" ).append( saxMessage.getLineNumber() );
+        sb.append( " C" ).append( saxMessage.getColumnNumber() );
+        sb.append( ":" ).append( saxMessage.getMessage() );
+
+        message = sb.toString();
+    }
+
 
     //////////////////////////////
     // Getters

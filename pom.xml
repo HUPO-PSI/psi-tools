@@ -5,8 +5,8 @@
     <groupId>psidev.psi.tools</groupId>
     <artifactId>validator</artifactId>
     <packaging>jar</packaging>
-    <version>1.04-SNAPSHOT</version>
-    
+    <version>2.0.0-SNAPSHOT</version>
+
     <name>PSI :: Schema Validator :: Generic Framework</name>
     <description>
         The library intends to provide a generic framework for validating XML Schema
@@ -85,13 +85,13 @@
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>cv-rule-reader</artifactId>
-            <version>0.3</version>
+            <version>2.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>ontology-manager</artifactId>
-            <version>0.3</version>
+            <version>2.0.0-SNAPSHOT</version>
         </dependency>
         
         <!-- Tests -->
@@ -107,8 +107,8 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1</version>
-        </dependency>
-        <dependency>
+            </dependency>
+            <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.3</version>

@@ -48,4 +48,15 @@ public class Car {
     public void setFast( boolean fast ) {
         isFast = fast;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append( "Car" );
+        sb.append( "{color='" ).append( color ).append( '\'' );
+        sb.append( ", Make='" ).append( Make ).append( '\'' );
+        sb.append( ", isFast=" ).append( isFast );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

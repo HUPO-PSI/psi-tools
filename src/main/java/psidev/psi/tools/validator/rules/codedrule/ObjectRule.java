@@ -1,20 +1,27 @@
 package psidev.psi.tools.validator.rules.codedrule;
 
-import psidev.psi.tools.validator.ValidatorMessage;
 import psidev.psi.tools.validator.ValidatorException;
-import psidev.psi.tools.validator.rules.Rule;
+import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.rules.AbstractRule;
+import psidev.psi.tools.ontology_manager.OntologyManager;
 
 import java.util.Collection;
 
 /**
- * Author: florian
- * Date: 18-Jul-2007
- * Time: 11:57:39
+ * Rule intended to perform custom check on a object of type T.
+ * Author: florian, Samuel Kerrien (skerrien@ebi.ac.uk)
+ * 
+ * @since 1.03
+ * @version $Id$
  */
-public interface ObjectRule<T> extends Rule {
+public abstract class ObjectRule<T> extends AbstractRule {
 
-    boolean canCheck( Object object );
+    public ObjectRule( OntologyManager ontologyManager ) {
+        super( ontologyManager );
+    }
 
-    Collection<ValidatorMessage> check(T t ) throws ValidatorException;
+    public abstract boolean canCheck( Object object );
+
+    public abstract Collection<ValidatorMessage> check(T t ) throws ValidatorException;
     
 }

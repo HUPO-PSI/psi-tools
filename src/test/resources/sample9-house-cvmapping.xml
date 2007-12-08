@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CvMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="CvMapping.xsd"
+           modelName="MIF.xsd"
+           modelVersion="2.53"
+           modelURI="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+
+    <CvReferenceList CvSourceVersion="0.9">
+        <CvReference cvName="PSI-MI" cvIdentifier="MI"/>
+    </CvReferenceList>
+
+    <CvMappingRuleList>
+
+        <!--<CvMappingRule cvElementPath="/house/kitchen/@note" cvTermsCombinationLogic="AND"-->
+                       <!--scopePath="/house/kitchen" requirementLevel="MUST" >-->
+            <!--<CvTerm termAccession="MI:0300" useTermName="false" useTerm="true" termName="xyz" allowChildren="false" cvIdentifierRef="MI" isRepeatable="false" />-->
+        <!--</CvMappingRule>-->
+
+        <!--
+             it fetches 6 colors from 'garage/bikes/@color' where it should retreive
+             6 bikes and check on their individual color
+          -->        
+
+        <CvMappingRule cvElementPath="/house/garage/bikes/@color" cvTermsCombinationLogic="AND"
+                       scopePath="/house/garage/bikes" requirementLevel="MUST" >
+            <CvTerm termAccession="MI:0300" useTermName="true" useTerm="true" termName="alias type" allowChildren="false" cvIdentifierRef="MI" isRepeatable="false" />
+            <CvTerm termAccession="MI:0400" useTermName="true" useTerm="true" termName="affinity techniques" allowChildren="false" cvIdentifierRef="MI" isRepeatable="false" />
+        </CvMappingRule>
+    </CvMappingRuleList>
+</CvMapping>

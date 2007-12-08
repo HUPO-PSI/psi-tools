@@ -47,4 +47,15 @@ public class Kitchen {
     public void setBin( Bin bin ) {
         this.bin = bin;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append( "Kitchen" );
+        sb.append( "{note='" ).append( note ).append( '\'' );
+        sb.append( ", sink=" ).append( sink );
+        sb.append( ", bin=" ).append( bin );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }
