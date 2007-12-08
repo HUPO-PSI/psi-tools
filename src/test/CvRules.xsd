@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="CvMappingRules">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="CvMappingRule"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CvMappingRule">
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+                <xs:element ref="CvTerm"/>
+            </xs:sequence>
+            <xs:attribute name="elementPath" use="required"/>
+            <xs:attribute name="requirementLevel" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CvTerm">
+        <xs:complexType>
+            <xs:attribute name="allowChildren" use="required" type="xs:boolean"/>
+            <xs:attribute name="cvIdentifier" use="required" type="xs:string"/>
+            <xs:attribute name="isRepeatable" use="optional" type="xs:boolean"/>
+            <xs:attribute name="scope" use="optional" type="xs:string"/>
+            <xs:attribute name="termAccession" use="required" type="xs:string"/>
+            <xs:attribute name="useTermName" use="optional" type="xs:boolean" default="false"/>
+            <xs:attribute name="termName" use="required" type="xs:string"/>
+            <xs:attribute name="useTerm" use="required" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
