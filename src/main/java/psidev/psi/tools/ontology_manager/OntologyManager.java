@@ -1,7 +1,5 @@
 package psidev.psi.tools.ontology_manager;
 
-import com.opensymphony.oscache.base.NeedsRefreshException;
-import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -143,10 +141,7 @@ public class OntologyManager {
             } catch (Exception e) {
                 throw new OntologyLoaderException( "Failed loading ontology loader: " + loaderClass, e );
             }
-
         }
-
-
     }
 
     ////////////////////
@@ -219,6 +214,4 @@ public class OntologyManager {
 
     // ToDo: add isValidOntologyAccession( String acc )
     // otherwise: call getValidIDs(ontologyID, acc, false, true) should return only the acc
-
-
 }
