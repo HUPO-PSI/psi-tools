@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
     <version>2.0.0-SNAPSHOT</version>
 
-    <name>PSI :: Ontology Manager</name>
+    <name>PSI :: Tools :: Ontology Manager</name>
 
     <description>
         The library intends to provide a generic framework for Ontology access and handling.
