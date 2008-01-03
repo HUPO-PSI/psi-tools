@@ -2,7 +2,7 @@ package psidev.psi.tools.cvrReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRules;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -36,7 +36,7 @@ public class CvRuleReader {
         return jc.createUnmarshaller();
     }
 
-    private CvMappingRules unmarshall( URL url ) throws JAXBException, FileNotFoundException {
+    private CvMapping unmarshall( URL url ) throws JAXBException, FileNotFoundException {
 
         if ( url == null ) {
             throw new IllegalArgumentException( "You must give a non null URL." );
@@ -46,10 +46,10 @@ public class CvRuleReader {
         Unmarshaller u = getUnmarshaller();
 
         // unmarshal an entrySet instance document into a tree of Java content objects composed of classes from the jaxb package.
-        return ( CvMappingRules ) u.unmarshal( url );
+        return ( CvMapping ) u.unmarshal( url );
     }
 
-    private CvMappingRules unmarshall( File file ) throws JAXBException, FileNotFoundException {
+    private CvMapping unmarshall( File file ) throws JAXBException, FileNotFoundException {
 
         if ( file == null ) {
             throw new IllegalArgumentException( "You must give a non null file." );
@@ -67,10 +67,10 @@ public class CvRuleReader {
         Unmarshaller u = getUnmarshaller();
 
         // unmarshal an entrySet instance document into a tree of Java content objects composed of classes from the jaxb package.
-        return ( CvMappingRules ) u.unmarshal( new FileInputStream( file ) );
+        return ( CvMapping ) u.unmarshal( new FileInputStream( file ) );
     }
 
-    private CvMappingRules unmarshall( InputStream is ) throws JAXBException {
+    private CvMapping unmarshall( InputStream is ) throws JAXBException {
 
         if ( is == null ) {
             throw new IllegalArgumentException( "You must give a non null input stream." );
@@ -80,10 +80,10 @@ public class CvRuleReader {
         Unmarshaller u = getUnmarshaller();
 
         // unmarshal an entrySet instance document into a tree of Java content objects composed of classes from the jaxb package.
-        return ( CvMappingRules ) u.unmarshal( is );
+        return ( CvMapping ) u.unmarshal( is );
     }
 
-    private CvMappingRules unmarshall( String s ) throws JAXBException {
+    private CvMapping unmarshall( String s ) throws JAXBException {
 
         if ( s == null ) {
             throw new IllegalArgumentException( "You must give a non null String." );
@@ -93,13 +93,13 @@ public class CvRuleReader {
         Unmarshaller u = getUnmarshaller();
 
         // unmarshal an entrySet instance document into a tree of Java content objects composed of classes from the jaxb package.
-        return ( CvMappingRules ) u.unmarshal( new StringReader( s ) );
+        return ( CvMapping ) u.unmarshal( new StringReader( s ) );
     }
 
     //////////////////////////
     // Public methods
 
-    public CvMappingRules read( String s ) throws CvRuleReaderException {
+    public CvMapping read( String s ) throws CvRuleReaderException {
         try {
             return unmarshall( s );
         } catch ( JAXBException e ) {
@@ -107,7 +107,7 @@ public class CvRuleReader {
         }
     }
 
-    public CvMappingRules read( File file ) throws CvRuleReaderException {
+    public CvMapping read( File file ) throws CvRuleReaderException {
         try {
             return unmarshall( file );
         } catch ( JAXBException e ) {
@@ -117,7 +117,7 @@ public class CvRuleReader {
         }
     }
 
-    public CvMappingRules read( InputStream is ) throws CvRuleReaderException {
+    public CvMapping read( InputStream is ) throws CvRuleReaderException {
         try {
             return unmarshall( is );
         } catch ( JAXBException e ) {
@@ -125,7 +125,7 @@ public class CvRuleReader {
         }
     }
 
-    public CvMappingRules read( URL url ) throws CvRuleReaderException {
+    public CvMapping read( URL url ) throws CvRuleReaderException {
         try {
             return unmarshall( url );
         } catch ( JAXBException e ) {
