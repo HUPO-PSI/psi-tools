@@ -9,7 +9,7 @@
     <artifactId>psi-tools-build</artifactId>
     <packaging>pom</packaging>
     <version>1.0</version>
-    <name>PSI Tools</name>
+    <name>PSI :: Tools</name>
     <url>http://www.psidev.info</url>
     <description>Base build file</description>
 
