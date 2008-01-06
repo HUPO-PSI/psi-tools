@@ -68,7 +68,7 @@ public class OntologyManagerTest {
         // get child terms of 'stereoisomerized residue' (MOD:00664) form the MOD ontology
         Set<String> result = om.getValidIDs( "MOD", "MOD:00664", true, false );
         // should be  terms (August 2007)
-        Assert.assertEquals( "There should be 12 child terms for MOD:00664!", 12, result.size() );
+        Assert.assertEquals( 10, result.size() );
     }
 
     @Test
