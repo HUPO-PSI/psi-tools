@@ -11,7 +11,7 @@
 
     <CvMappingRuleList>
         <CvMappingRule cvElementPath="/house/garage/bikes/@color" cvTermsCombinationLogic="OR" requirementLevel="MUST"
-                       scopePath="/house/garage">
+                       scopePath="/house/garage/bikes">
             <CvTerm termAccession="MI:0300" useTermName="true" useTerm="true" termName="alias type" allowChildren="true"
                     cvIdentifierRef="MI" isRepeatable="false" />
         </CvMappingRule>

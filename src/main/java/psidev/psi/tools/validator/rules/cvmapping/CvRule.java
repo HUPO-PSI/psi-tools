@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * CV Mapping Rule that is configured via XML.
+ *
+ * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * Author: florian
  * Date: 18-Jul-2007
  * Time: 12:02:05
@@ -21,7 +24,6 @@ public interface CvRule extends Rule {
 
     public Collection<ValidatorMessage> check( Object object, String xPath ) throws ValidatorException;
 
-    
     public String getElementPath();
 
     public String getScopePath();

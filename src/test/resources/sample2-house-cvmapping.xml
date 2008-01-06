@@ -4,17 +4,17 @@
            modelVersion="2.53" modelURI="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
     
     <CvReferenceList CvSourceVersion="0.9">
-        <CvReference cvName="PSI-MI" cvIdentifier="MI"/>
         <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
         <CvReference cvName="PATO" cvIdentifier="PATO"/>
-        <CvReference cvName="Gene Ontology" cvIdentifier="GO"/>
     </CvReferenceList>
 
     <CvMappingRuleList>
         <CvMappingRule cvElementPath="/house/kitchen/note" requirementLevel="MAY"
                        scopePath="/house/kitchen" cvTermsCombinationLogic="OR">
+
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
                     cvIdentifierRef="MS" isRepeatable="false" />
+
             <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
                     cvIdentifierRef="PATO" isRepeatable="false" />
         </CvMappingRule>
