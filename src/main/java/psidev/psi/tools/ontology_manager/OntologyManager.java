@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -93,6 +94,8 @@ public class OntologyManager {
     ////////////////////
     // Utilities
 
+    public static final String CLASSPATH_PREFIX = "classpath:";
+
     /**
      * Method to load the ontologies from the configuration file.
      * @param configFile a InputStream of the config file that lists the ontologies to manage.
@@ -123,7 +126,25 @@ public class OntologyManager {
 
             URI uri;
             try {
-                uri = new URI(loc);
+
+                if( loc != null && loc.toLowerCase().startsWith( CLASSPATH_PREFIX )) {
+                    loc = loc.substring( CLASSPATH_PREFIX.length() );
+                    if ( log.isDebugEnabled() ) {
+                        log.debug( "Loading ontology from classpath: " + loc );
+                    }
+                    final URL url = OntologyManager.class.getClassLoader().getResource( loc );
+                    if( url == null ) {
+                        throw new OntologyLoaderException( "Unable to load from classpath: " + loc );
+                    }
+                    uri = url.toURI();
+                    if ( log.isDebugEnabled() ) {
+                        log.debug( "URI="+uri.toASCIIString() );
+                    }
+
+                } else {
+                    uri = new URI(loc);
+                }
+
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException( "The specified uri '" + loc + "' " +
                         "for ontology '" + ontologyID + "' has a invalid syntax.", e );

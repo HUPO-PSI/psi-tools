@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Set;
+import java.net.URL;
 
 /**
  * OntologyManager tester.
@@ -39,9 +40,10 @@ public class OntologyManagerTest {
     @Test
     public void ontologyLoading() {
         Collection<String> ontologyIDs = om.getOntologyIDs();
-        Assert.assertEquals( "ontologies.xml specifies only 2 ontologies.", 2, ontologyIDs.size() );
+        Assert.assertEquals( "ontologies.xml specifies only 2 ontologies.", 3, ontologyIDs.size() );
         Assert.assertTrue( ontologyIDs.contains( "MI" ) );
         Assert.assertTrue( ontologyIDs.contains( "MOD" ) );
+        Assert.assertTrue( ontologyIDs.contains( "MS" ) );
 
         OntologyAccess oa1 = om.getOntologyAccess( "MI" );
         Assert.assertNotNull( oa1 );
@@ -53,6 +55,10 @@ public class OntologyManagerTest {
         // ontologies.xml defines a LocalOntology for 'MOD'
         Assert.assertTrue( oa2 instanceof LocalOntology);
 
+        OntologyAccess oa3 = om.getOntologyAccess( "MS" );
+        Assert.assertNotNull( oa3 );
+        // ontologies.xml defines a LocalOntology for 'MOD'
+        Assert.assertTrue( oa3 instanceof LocalOntology);
     }
 
     @Test

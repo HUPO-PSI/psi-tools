@@ -5,4 +5,7 @@
     <CVSource loader="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
         uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mod.obo"
         cvFormat="OBO" name="PSI-MOD" cvIdentifier="MOD" version="1.260"/>
+    <CVSource loader="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+        uri="classpath:psi-ms.obo"
+        cvFormat="OBO" name="PSI-MS" cvIdentifier="MS" version="1.123"/>
 </CVSourceList>
