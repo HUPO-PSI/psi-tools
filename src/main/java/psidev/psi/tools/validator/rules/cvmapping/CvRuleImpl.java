@@ -22,10 +22,10 @@ import java.util.*;
  * Implementation of the CV rule that performs check based on XML definition.
  *
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
- * Author: florian
+ *         Author: florian
  * @version $Id$
- * Date: 18-Jul-2007
- * Time: 15:52:08
+ *          Date: 18-Jul-2007
+ *          Time: 15:52:08
  */
 public class CvRuleImpl extends AbstractRule implements CvRule {
 
@@ -95,10 +95,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             throw new ValidatorException( "Cannot validate a null object." );
         }
 
-        log.debug( "Given prefix Xpath: " + prefixXpath );
+
+        if ( log.isDebugEnabled() ) log.debug( "Given prefix Xpath: " + prefixXpath );
 
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
-
         Recommendation level = Recommendation.forName( getRequirementLevel() );
 
         // given the scope of the XPath expression, transform the elementXpath to it only retreive the objects on which
@@ -107,16 +107,18 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         String scopeXpath = getScopePath();
         String elementXpath = getElementPath();
 
+
         if ( prefixXpath != null ) {
+            // if the user has provided us with a prefix, we update the XPath available in the Rule (i.e. removing the prefix)
             scopeXpath = removeXpathPrefix( scopeXpath, prefixXpath );
             elementXpath = removeXpathPrefix( elementXpath, prefixXpath );
-            log.debug( "Updated scope Xpath using prefix '" + prefixXpath + "' to: " + scopeXpath );
-            log.debug( "Updated element Xpath using prefix '" + prefixXpath + "' to: " + elementXpath );
-        } else {
-            // otherwise assume the object is at the root level of the rule and use the elementXpath specified in the rule
-            //rootObjectXpath = scopeXpath;
+            if ( log.isDebugEnabled() ) {
+                log.debug( "Updated scope Xpath using prefix '" + prefixXpath + "' to: " + scopeXpath );
+                log.debug( "Updated element Xpath using prefix '" + prefixXpath + "' to: " + elementXpath );
+            }
         }
-        log.debug( "Xpath to fetch objects to check on: " + scopeXpath );
+
+        if ( log.isDebugEnabled() ) log.debug( "Xpath to fetch objects to check on: " + scopeXpath );
 
         // get the elements to check
         List<XPathResult> results = null;
@@ -137,7 +139,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         if ( results.isEmpty() ) {
 
             // there's nothing to check on, be quiet.
-            log.debug( "Count not find any object using Xpath: " + scopeXpath );
+            if ( log.isDebugEnabled() ) log.debug( "Count not find any object using Xpath: " + scopeXpath );
 
         } else {
 
@@ -154,180 +156,307 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             // example:  /garage/bikes/@color
             //           /garage/bikes         <-- this is the prefix
             String valueXpath = removeXpathPrefix( elementXpath, scopeXpath );
-            log.debug( "Xpath allowing to retreive the values from the Objects: " + valueXpath );
-
+            if ( log.isDebugEnabled() )
+                log.debug( "Xpath allowing to retreive the values from the Objects: " + valueXpath );
 
             // Check the objects one by one
             for ( XPathResult result : results ) {
                 Object objectToCheck = result.getResult();
 
-                // Retrieve the values to check against CvTerms specified in the rule
-                List<XPathResult> valueResults = null;
-                try {
-                    valueResults = XPathHelper.evaluateXPath( valueXpath, objectToCheck );
+                checkSingleObject( objectToCheck, elementXpath, valueXpath, messages, level );
 
-                    if ( log.isDebugEnabled() ) {
-                        log.debug( "XPath '" + valueXpath + "' allowed to fetch " + valueResults.size() +
-                                   " value(s) from the given " + resultClassName + ": " +
-                                   printObjectAccessions( valueResults ) );
-                    }
-
-                } catch ( JXPathException e ) {
-                    messages.add( buildMessage( valueXpath, level,
-                                                "Skip this rule as the XPath expression could not be compiled: '" + valueXpath + "'" ) );
-                    return messages;
-                }
-
-
-                final int resultCount = valueResults.size();
-
-                if ( resultCount == 0 ) {
-
-                    // In this case, we generate a message of the appropriate level for each term that the rule was expecting here.
-                    // If there are no known terms, then obviously do not generate a message.
-                    if ( getCVTerms() != null && getCVTerms().size() > 0 ) {
-                        StringBuilder sb = new StringBuilder( 256 );
-                        sb.append( "None of the given CvTerms were found at '" + getElementPath() + "' because no values were found:\n" );
-                        Iterator<CvTerm> iterator = getCVTerms().iterator();
-                        while ( iterator.hasNext() ) {
-                            CvTerm cvTerm = iterator.next();
-                            sb.append( "  - " ).append( printCvTerm( cvTerm ) );
-                            if ( iterator.hasNext() ) {
-                                sb.append( "\n" );
-                            }
-                        }
-
-                        messages.add( buildMessage( elementXpath, level, sb.toString() ) );
-                    }
-
-                } else {
-
-                    // TODO extract method here that resurns that Map initialized
-                    // Initialize the map that is going to hold the statistics that are later used to determine if there are errors
-                    Map<XPathResult, Map<CvTerm, Integer>> result2termCount =
-                            new HashMap<XPathResult, Map<CvTerm, Integer>>( valueResults.size() );
-
-                    // check that each match has at least one matching CV term amongst those specified.
-                    for ( XPathResult valueResult : valueResults ) {
-
-                        Map<CvTerm, Integer> term2count = new HashMap<CvTerm, Integer>( getCVTerms().size() );
-                        result2termCount.put( valueResult, term2count );
-
-                        // for each XPath expression
-                        if ( log.isDebugEnabled() ) {
-                            log.debug( "Processing value: " + valueResult.getResult() );
-                        }
-
-                        // check each specified CvTerm in this CvRule (and potentially child terms)
-                        for ( CvTerm cvTerm : getCVTerms() ) {
-
-                            if ( isMatchingCv( cvTerm, valueResult, messages, level, term2count ) ) {
-                                if ( log.isDebugEnabled() ) {
-                                    log.debug( "Match between '" + valueResult.getResult() + "' and " + printCvTerm( cvTerm ) );
-                                }
-                            } else {
-                                if ( log.isDebugEnabled() ) {
-                                    log.debug( "No match between '" + valueResult.getResult() + "' and " + printCvTerm( cvTerm ) );
-                                }
-                            }
-                        } // for
-                    } // results
-
-                    if ( log.isDebugEnabled() ) {
-                        printMap( result2termCount );
-                    }
-
-                    // Now that we have processed all results, lets check if we have any errors
-
-                    // After counting terms, we process the map given the boolean operator set and produce messages accordingly
-                    String operator = getCvTermsCombinationLogic();
-                    if ( operator != null ) {
-                        operator = operator.trim();
-                    }
-
-                    final int matchingCvTermCount = calculateMatchingResultCount( result2termCount );
-                    log.debug( "Matching term count: " + matchingCvTermCount );
-                    boolean xorFired = false;
-                    for ( Map.Entry<XPathResult, Map<CvTerm, Integer>> e : result2termCount.entrySet() ) {
-
-                        final String resultValue = ( String ) e.getKey().getResult();
-                        final Map<CvTerm, Integer> t2c = e.getValue();
-
-                        // Process repeatability of CvTerms according to their usage
-                        final Map<CV, Integer> term2count = calculateCvTermUsage( result2termCount );
-                        for ( Map.Entry<CV, Integer> entry2 : term2count.entrySet() ) {
-                            final CV cvTerm = entry2.getKey();
-                            final Integer count = entry2.getValue();
-
-                            // If the current CvTerm is non repeatable check that the count is < 2
-                            if ( !cvTerm.isRepeatable() && count > 1 ) {
-
-                                // TODO We need to give a context for the message: object that was checked on
-
-                                StringBuilder sb = new StringBuilder( 256 );
-                                sb.append( "According to the CvMapping, the term '" ).append( cvTerm.getAccession() )
-                                        .append( "' wasn't meant to be repeated, yet it appeared " ).append( count )
-                                        .append( " times in elements pointed out by the XPath expression: " )
-                                        .append( getElementPath() );
-                                messages.add( buildMessage( getElementPath(), level, sb.toString() ) );
-                            }
-                        } //for
-
-                        // Then check if have reach our target given the boolean operator specified on the current CvRule
-                        if ( "OR".equalsIgnoreCase( operator ) ) {
-
-                            // if any of the cvTerm got a hit, we are good
-                            if ( matchingCvTermCount == 0 ) {
-                                StringBuilder sb = new StringBuilder( 256 );
-                                // TODO generate a different message if there is a single result available
-                                // TODO provide a way to describe the object that was checked on !! otherwise the message we are giving are meaningless !!
-                                // class ObjectPrinter<T extends Object> {
-                                //       public String print( T object ){...}
-                                // }
-
-                                sb.append( "[OR] The result found at: " + elementXpath + " for which the value is '" + resultValue +
-                                           "' didn't match any of the " + getCVTerms().size() + " specified CV term" +
-                                           ( getCVTerms().size() > 1 ? "s" : "" ) + ":\n" );
-                                sb.append( listCvTerms( "  - ", getCVTerms() ) );
-                                messages.add( buildMessage( elementXpath, level, sb.toString() ) );
-                            }
-
-                        } else if ( "AND".equalsIgnoreCase( operator ) ) {
-
-                            // if all of the cvTerm got at least a hit we are good
-                            if ( matchingCvTermCount != getCVTerms().size() ) {
-                                log.debug( "Found only " + matchingCvTermCount + " matching terms while we were expecting " + getCVTerms().size() );
-
-                                StringBuilder sb = new StringBuilder( 256 );
-                                sb.append( "[AND] Not all of the " + resultCount + " values " + resultClassName + "'s CV terms [" + printObjectAccessions( valueResults ) +
-                                           "] found using the Xpath '" + elementXpath + "' matched any of the " + getCVTerms().size() +
-                                           " CvTerm(s):\n" )
-                                        .append( listCvTerms( "  - ", getCVTerms() ) );
-                                messages.add( buildMessage( elementXpath, level, sb.toString() ) );
-                            }
-
-                        } else if ( "XOR".equalsIgnoreCase( operator ) ) {
-
-                            // if exactly one cv term got a hit we are good
-                            if ( matchingCvTermCount != 1 && !xorFired) {
-                                xorFired = true;
-                                StringBuilder sb = new StringBuilder( 256 );
-                                sb.append( "[XOR] Not exactly one of the " + resultCount + " " + resultClassName + "'s CV terms [" + printObjectAccessions( valueResults ) +
-                                           "] found using the Xpath '" + elementXpath + "' matched any of the " + getCVTerms().size() +
-                                           " CvTerm(s):\n" )
-                                        .append( listCvTerms( "  - ", getCVTerms() ) );
-                                messages.add( buildMessage( elementXpath, level, sb.toString() ) );
-                            }
-                        } else {
-                            // This should not happened as the incoming data are validated by XML schema ... so just in case ...
-                            throw new UnsupportedOperationException( "CvRule count not handle boolean operator: '" + operator + "'" );
-                        }
-                    } // for all results
-                } // else -- at least 1 result to process
-            } // for each object to check upon
+            }
         } // else
 
         return messages;
+    }
+
+    /**
+     * Runs the check on a given object and potentially create messages if necessary.
+     *
+     * @param objectToCheck the object we are checking on.
+     * @param elementXpath  the path that led to this element (for error reporting purpose).
+     * @param valueXpath    the Xpath expression allowing to fetch the values on the objectToCheck.
+     * @param messages      list of message that eventually will be returned to the user.
+     * @param level         level of the messages to generate
+     * @throws ValidatorException
+     */
+    private void checkSingleObject( Object objectToCheck,
+                                    String elementXpath,
+                                    String valueXpath,
+                                    Collection<ValidatorMessage> messages,
+                                    Recommendation level ) throws ValidatorException {// Retrieve the values to check against CvTerms specified in the rule
+
+        String resultClassName = objectToCheck.getClass().getSimpleName();
+
+        // 1. Retreive the values to be checked against the CvTerms from the objectToCheck
+        List<XPathResult> valueResults = null;
+        try {
+            valueResults = XPathHelper.evaluateXPath( valueXpath, objectToCheck );
+
+            if ( log.isDebugEnabled() ) {
+                log.debug( "XPath '" + valueXpath + "' allowed to fetch " + valueResults.size() +
+                           " value(s) from the given " + resultClassName + ": " +
+                           printObjectAccessions( valueResults ) );
+            }
+
+        } catch ( JXPathException e ) {
+            messages.add( buildMessage( valueXpath, level,
+                                        "Skip this rule as the XPath expression could not be compiled: '" + valueXpath + "'" ) );
+            return;
+        }
+
+
+        final int resultCount = valueResults.size();
+
+        if ( resultCount == 0 ) {
+
+            // No value found, generate a message of the appropriate level for each cv term that the rule was expecting here.
+            // If there are no known terms, then obviously do not generate a message.
+            if ( getCVTerms() != null && getCVTerms().size() > 0 ) {
+                StringBuilder sb = new StringBuilder( 256 );
+                sb.append( "None of the given CvTerms were found at '" + getElementPath() + "' because no values were found:\n" );
+                Iterator<CvTerm> iterator = getCVTerms().iterator();
+                while ( iterator.hasNext() ) {
+                    CvTerm cvTerm = iterator.next();
+                    sb.append( "  - " ).append( printCvTerm( cvTerm ) );
+                    if ( iterator.hasNext() ) {
+                        sb.append( "\n" );
+                    }
+                }
+
+                messages.add( buildMessage( elementXpath, level, sb.toString() ) );
+            }
+
+        } else {
+
+            // Initialize the map that is going to hold the statistics that are later used to determine if there are errors
+            Map<XPathResult, Map<CvTerm, Integer>> result2termCount = checkValuesAgainstCvTerms( valueResults, messages, level );
+
+            // Now that we have processed all results, lets check if we have any errors
+
+            // After counting terms, we process the map given the boolean operator set and produce messages accordingly
+            String operator = getCvTermsCombinationLogic();
+            if ( operator != null ) {
+                operator = operator.trim();
+            }
+
+            final int matchingCvTermCount = calculateMatchingResultCount( result2termCount );
+
+            if ( log.isDebugEnabled() ) log.debug( "Matching term count: " + matchingCvTermCount );
+
+            boolean xorFired = false;
+            for ( Map.Entry<XPathResult, Map<CvTerm, Integer>> e : result2termCount.entrySet() ) {
+
+                final String resultValue = ( String ) e.getKey().getResult();
+                final Map<CvTerm, Integer> t2c = e.getValue();
+
+                // Process repeatability of CvTerms according to their usage
+                final Map<CV, Integer> term2count = calculateCvTermUsage( result2termCount );
+                for ( Map.Entry<CV, Integer> entry2 : term2count.entrySet() ) {
+                    final CV cvTerm = entry2.getKey();
+                    final Integer count = entry2.getValue();
+
+                    // If the current CvTerm is non repeatable check that the count is < 2
+                    if ( !cvTerm.isRepeatable() && count > 1 ) {
+
+                        // TODO We need to give a context for the message: object that was checked on
+
+                        StringBuilder sb = new StringBuilder( 256 );
+                        sb.append( "According to the CvMapping, the term '" ).append( cvTerm.getAccession() )
+                                .append( "' wasn't meant to be repeated, yet it appeared " ).append( count )
+                                .append( " times in elements pointed out by the XPath expression: " )
+                                .append( getElementPath() );
+                        messages.add( buildMessage( getElementPath(), level, sb.toString() ) );
+                    }
+                } //for
+
+                // Then check if have reach our target given the boolean operator specified on the current CvRule
+                if ( "OR".equalsIgnoreCase( operator ) ) {
+
+                    // if any of the cvTerm got a hit, we are good
+                    if ( matchingCvTermCount == 0 ) {
+                        StringBuilder sb = new StringBuilder( 256 );
+                        // TODO generate a different message if there is a single result available
+                        // TODO provide a way to describe the object that was checked on !! otherwise the message we are giving are meaningless !!
+                        // class ObjectPrinter<T extends Object> {
+                        //       public String print( T object ){...}
+                        // }
+
+                        sb.append( "[OR] The result found at: " + elementXpath + " for which the value is '" + resultValue +
+                                   "' didn't match any of the " + getCVTerms().size() + " specified CV term" +
+                                   ( getCVTerms().size() > 1 ? "s" : "" ) + ":\n" );
+                        sb.append( listCvTerms( "  - ", getCVTerms() ) );
+                        messages.add( buildMessage( elementXpath, level, sb.toString() ) );
+                    }
+
+                } else if ( "AND".equalsIgnoreCase( operator ) ) {
+
+                    // if all of the cvTerm got at least a hit we are good
+                    if ( matchingCvTermCount != getCVTerms().size() ) {
+                        log.debug( "Found only " + matchingCvTermCount + " matching terms while we were expecting " + getCVTerms().size() );
+
+                        StringBuilder sb = new StringBuilder( 256 );
+                        sb.append( "[AND] Not all of the " + resultCount + " values " + resultClassName + "'s CV terms [" + printObjectAccessions( valueResults ) +
+                                   "] found using the Xpath '" + elementXpath + "' matched any of the " + getCVTerms().size() +
+                                   " CvTerm(s):\n" )
+                                .append( listCvTerms( "  - ", getCVTerms() ) );
+                        messages.add( buildMessage( elementXpath, level, sb.toString() ) );
+                    }
+
+                } else if ( "XOR".equalsIgnoreCase( operator ) ) {
+
+                    // if exactly one cv term got a hit we are good
+                    if ( matchingCvTermCount != 1 && !xorFired ) {
+                        xorFired = true;
+                        StringBuilder sb = new StringBuilder( 256 );
+                        sb.append( "[XOR] Not exactly one of the " + resultCount + " " + resultClassName + "'s CV terms [" + printObjectAccessions( valueResults ) +
+                                   "] found using the Xpath '" + elementXpath + "' matched any of the " + getCVTerms().size() +
+                                   " CvTerm(s):\n" )
+                                .append( listCvTerms( "  - ", getCVTerms() ) );
+                        messages.add( buildMessage( elementXpath, level, sb.toString() ) );
+                    }
+                } else {
+                    // This should not happened as the incoming data are validated by XML schema ... so just in case ...
+                    throw new UnsupportedOperationException( "CvRule count not handle boolean operator: '" + operator + "'" );
+                }
+            } // for all results
+        } // else -- at least 1 result to process
+    }
+
+    /**
+     * Creates the map that is going to hold the statistics of usage of CvTerms in the list of provided results.
+     *
+     * @param valueResults values that have been extracted from the scope objects.
+     * @param messages     list of message that eventually will be returned to the user.
+     * @param level        level of the messages to generate
+     * @return a non null map holding the usage of CvTerm in the list of provided values.
+     * @throws ValidatorException
+     */
+    private Map<XPathResult, Map<CvTerm, Integer>> checkValuesAgainstCvTerms( final Collection<XPathResult> valueResults,
+                                                                              final Collection<ValidatorMessage> messages,
+                                                                              final Recommendation level ) throws ValidatorException {
+
+        Map<XPathResult, Map<CvTerm, Integer>> result2termCount =
+                new HashMap<XPathResult, Map<CvTerm, Integer>>( valueResults.size() );
+
+        // check that each match has at least one matching CV term amongst those specified.
+        for ( XPathResult valueResult : valueResults ) {
+
+            Map<CvTerm, Integer> term2count = new HashMap<CvTerm, Integer>( getCVTerms().size() );
+            result2termCount.put( valueResult, term2count );
+
+            // for each XPath expression
+            if ( log.isDebugEnabled() ) {
+                log.debug( "Processing value: " + valueResult.getResult() );
+            }
+
+            // check each specified CvTerm in this CvRule (and potentially child terms)
+            for ( CvTerm cvTerm : getCVTerms() ) {
+
+                if ( isMatchingCv( cvTerm, valueResult, messages, level, term2count ) ) {
+                    if ( log.isDebugEnabled() ) {
+                        log.debug( "Match between '" + valueResult.getResult() + "' and " + printCvTerm( cvTerm ) );
+                    }
+                } else {
+                    if ( log.isDebugEnabled() ) {
+                        log.debug( "No match between '" + valueResult.getResult() + "' and " + printCvTerm( cvTerm ) );
+                    }
+                }
+            } // for
+        } // results
+
+        if ( log.isDebugEnabled() ) {
+            printMap( result2termCount );
+        }
+
+        return result2termCount;
+    }
+
+    /**
+     * Checks that the given term (xpResult) is found in the ontology (by identifier or name).
+     * If so, update the given map that counts the CvTerms (term2count).
+     *
+     * @param cvTerm     CvTerm to check against
+     * @param xpResult   The accession or name of a term to compare to the CvTerm
+     * @param messages   List of messages in case of error
+     * @param level      The level of the messages to create
+     * @param term2count To keep count of how many times we have seen specific CvTerms
+     * @return true if the term was found.
+     * @throws ValidatorException
+     */
+    private boolean isMatchingCv( CvTerm cvTerm,
+                                  XPathResult xpResult,
+                                  Collection<ValidatorMessage> messages,
+                                  Recommendation level,
+                                  Map<CvTerm, Integer> term2count ) throws ValidatorException {
+        boolean isMatching = false;
+
+        String accession = null;
+        try {
+            accession = ( String ) xpResult.getResult();
+        } catch ( ClassCastException cce ) {
+            // Message explaining that the xpath doesn't describe a CV term accession
+            cce.printStackTrace();
+            messages.add( buildMessage( getElementPath(), level,
+                                        "The object pointed to by the XPath(" + getElementPath() +
+                                        ") was not a CV term accession (String) as " + "expected, instead: " +
+                                        xpResult.getResult().getClass().getName() ) );
+        }
+
+        // Get all information from the CV term
+        String ontologyID = ( ( CvReference ) cvTerm.getCvIdentifierRef() ).getCvIdentifier();
+        // Ask the ontologymanager for the required ontology
+        if ( !ontologyManager.containsOntology( ontologyID ) ) {
+            // Yikes, ontology not found! Major configuration issue, throw Exception!
+            throw new ValidatorException( "The requested ontology was not found: " + ontologyID );
+        }
+
+        String ruleTermAcc = cvTerm.getTermAccession();
+        boolean allowChildren = cvTerm.isAllowChildren();
+        boolean useTerm = cvTerm.isUseTerm();
+        boolean useTermName = cvTerm.isUseTermName();
+
+        // Get the accession numbers that are valid for this cvTerm.
+        Set<String> allowedAccs = ontologyManager.getValidIDs( ontologyID, ruleTermAcc, allowChildren, useTerm );
+
+        // Now we'll see whether we should be checking CV accessions or CV preferred names.
+        Set<String> allowedValues = null;
+        if ( useTermName ) {
+            // We should check on term names rather that accessions, apparently.
+            allowedValues = new HashSet<String>( allowedAccs.size() );
+            // So get the term names for the allowed accessions.
+            for ( String allowedAcc : allowedAccs ) {
+                // For each allowed accession, find the preferred term name and use this.
+                allowedValues.add( ontologyManager.getTermNameByID( ontologyID, allowedAcc ) );
+            }
+        } else {
+            // The allowed values in this case are the actual accession numbers.
+            // Note that the names are ignored now. Accession has precedence.
+            allowedValues = allowedAccs;
+        }
+
+        // Check whether the value found is in the allowed values (be they terms or accessions).
+        if ( allowedValues.contains( accession ) ) {
+            // Term found, we populate the map
+
+            Integer count = null;
+            if ( !term2count.containsKey( cvTerm ) ) {
+                term2count.put( cvTerm, 1 );
+            } else {
+                count = term2count.get( cvTerm ) + 1;
+                term2count.put( cvTerm, count );
+            }
+            // Flag succesful validation for this term.
+            isMatching = true;
+        } else {
+            // insert 0 in the map
+            if ( !term2count.containsKey( cvTerm ) ) {
+                term2count.put( cvTerm, 0 );
+            }
+        }
+
+        return isMatching;
     }
 
     public ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Rule rule ) {
@@ -438,6 +567,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
     /**
      * Calculate for a given result2termCount,
+     *
      * @param result2termCount
      * @return
      */
@@ -563,92 +693,6 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
     }
 
     /**
-     * Checks that the given term (xpResult) is found in the ontology (by identifier or name), if so, update the given
-     * map that counts the CvTerms (term2count).
-     *
-     * @param cvTerm      CvTerm to check against
-     * @param xpResult    The accession or name of a term to compare to the CvTerm
-     * @param messages    List of messages in case of error
-     * @param level       The level of the messages to create
-     * @param term2count  To keep count of how many times we have seen specific CvTerms
-     * @return true if the term was found.
-     * @throws ValidatorException
-     */
-    protected boolean isMatchingCv( CvTerm cvTerm,
-                                    XPathResult xpResult,
-                                    Collection<ValidatorMessage> messages,
-                                    Recommendation level,
-                                    Map<CvTerm, Integer> term2count ) throws ValidatorException {
-        boolean isMatching = false;
-
-        String accession = null;
-        try {
-            accession = ( String ) xpResult.getResult();
-        } catch ( ClassCastException cce ) {
-            // Message explaining that the xpath doesn't describe a CV term accession
-            cce.printStackTrace();
-            messages.add( buildMessage( getElementPath(), level,
-                                        "The object pointed to by the XPath(" + getElementPath() +
-                                        ") was not a CV term accession (String) as " + "expected, instead: " +
-                                        xpResult.getResult().getClass().getName() ) );
-        }
-
-        // Get all information from the CV term
-        String ontologyID = ( ( CvReference ) cvTerm.getCvIdentifierRef() ).getCvIdentifier();
-        // Ask the ontologymanager for the required ontology
-        if ( !ontologyManager.containsOntology( ontologyID ) ) {
-            // Yikes, ontology not found! Major configuration issue, throw Exception!
-            throw new ValidatorException( "The requested ontology was not found: " + ontologyID );
-        }
-
-        String ruleTermAcc = cvTerm.getTermAccession();
-        boolean allowChildren = cvTerm.isAllowChildren();
-        boolean useTerm = cvTerm.isUseTerm();
-        boolean useTermName = cvTerm.isUseTermName();
-
-        // Get the accession numbers that are valid for this cvTerm.
-        Set<String> allowedAccs = ontologyManager.getValidIDs( ontologyID, ruleTermAcc, allowChildren, useTerm );
-
-        // Now we'll see whether we should be checking CV accessions or CV preferred names.
-        Set<String> allowedValues = null;
-        if ( useTermName ) {
-            // We should check on term names rather that accessions, apparently.
-            allowedValues = new HashSet<String>( allowedAccs.size() );
-            // So get the term names for the allowed accessions.
-            for ( String allowedAcc : allowedAccs ) {
-                // For each allowed accession, find the preferred term name and use this.
-                allowedValues.add( ontologyManager.getTermNameByID( ontologyID, allowedAcc ) );
-            }
-        } else {
-            // The allowed values in this case are the actual accession numbers.
-            // Note that the names are ignored now. Accession has precedence.
-            allowedValues = allowedAccs;
-        }
-
-        // Check whether the value found is in the allowed values (be they terms or accessions).
-        if ( allowedValues.contains( accession ) ) {
-            // Term found, we populate the map
-
-            Integer count = null;
-            if ( !term2count.containsKey( cvTerm ) ) {
-                term2count.put( cvTerm, 1 );
-            } else {
-                count = term2count.get( cvTerm ) + 1;
-                term2count.put( cvTerm, count );
-            }
-            // Flag succesful validation for this term.
-            isMatching = true;
-        } else {
-            // insert 0 in the map
-            if ( !term2count.containsKey( cvTerm ) ) {
-                term2count.put( cvTerm, 0 );
-            }
-        }
-
-        return isMatching;
-    }
-
-    /**
      * Returns the xpath expression to use with this rule when checking a object other
      * than the representation of the root level element.
      *
@@ -662,17 +706,17 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 //            log.debug( "\""+ xpath +"\".substring(\""+ prefixXpath +"\".length())" );
 //            log.debug( "\""+ xpath +"\".substring(\""+ prefixXpath.length() +"\")" );
 //        }
-        if( prefixXpath.equals( "." ) ) {
+        if ( prefixXpath.equals( "." ) ) {
             // "." means the current node, this there's nothing to remove
             return xpath;
         }
 
-        if ( ! xpath.startsWith( prefixXpath ) ) {
-            throw new IllegalArgumentException( "The given prefix '"+ prefixXpath +"' is not a prefix of '"+xpath+"'" );
+        if ( !xpath.startsWith( prefixXpath ) ) {
+            throw new IllegalArgumentException( "The given prefix '" + prefixXpath + "' is not a prefix of '" + xpath + "'" );
         }
 
         String result = xpath.substring( prefixXpath.length() );
-        if(result.length() == 0) {
+        if ( result.length() == 0 ) {
             // is the prefix is the same as the xpath, then return dot, that is the current element.
             result = ".";
         }
