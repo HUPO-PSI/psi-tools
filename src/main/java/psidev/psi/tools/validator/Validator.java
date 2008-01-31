@@ -177,8 +177,8 @@ public abstract class Validator {
         this.userPreferences = userPreferences;
     }
 
-    //////////////////////
-    // Validation
+    ////////////////////////////////////
+    // Validation against object rule
 
     /**
      * Validates a document.
