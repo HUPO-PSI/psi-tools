@@ -13,6 +13,12 @@
 
     <name>master-pom</name>
 
+    <scm>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/trunk</connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/trunk</developerConnection>
+        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/trunk</url>
+    </scm>
+
     <developers>
         <developer>
             <id>skerrien</id>
