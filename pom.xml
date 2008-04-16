@@ -2,6 +2,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>psidev.psi.tools</groupId>
+        <artifactId>master-pom</artifactId>
+        <version>1</version>
+    </parent>
+    
+
     <groupId>psidev.psi.tools</groupId>
     <artifactId>validator</artifactId>
     <packaging>jar</packaging>
@@ -9,8 +16,7 @@
 
     <name>PSI :: Tools :: Generic Schema Validator</name>
     <description>
-        The library intends to provide a generic framework for validating XML Schema
-        both at the syntactic and semantic level.
+        The library intends to provide a generic framework for validating XML Schema both at the syntactic and semantic level.
     </description>
 
     <scm>
@@ -19,69 +25,7 @@
         <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/trunk</url>
     </scm>
 
-    <build>
-        <plugins>
-            <!-- To compile with JDK5.0 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <repositories>
-        <repository>
-            <id>maven repository</id>
-            <name>Maven central repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
-            <layout>legacy</layout>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <!-- EBI repositories -->
-        <repository>
-            <id>ebi-repo</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>ebi-repo-snapshots</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>java.net</id>
-            <name>java.net Maven Repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
-            <layout>legacy</layout>
-        </pluginRepository>
-    </pluginRepositories>
-
     <dependencies>
-
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>cv-rule-reader</artifactId>
@@ -119,20 +63,4 @@
             <version>1.2</version>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <repository>
-            <id>ebi-repo</id>
-            <name>EBI Repository</name>
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo</url>
-        </repository>
-
-        <snapshotRepository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>ebi-repo-snapshots</id>
-            <name>EBI Snapshots Repository</name>
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo_snapshots</url>
-        </snapshotRepository>
-
-    </distributionManagement>
 </project>
