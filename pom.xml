@@ -10,7 +10,7 @@
     <artifactId>master-pom</artifactId>
     <packaging>pom</packaging>
     <version>1</version>
-
+ 
     <name>master-pom</name>
 
     <scm>
