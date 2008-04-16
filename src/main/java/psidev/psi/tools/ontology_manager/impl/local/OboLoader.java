@@ -36,11 +36,15 @@ public class OboLoader extends AbstractLoader {
 
     private static final String ONTOLOGY_REGISTRY_NAME = "ontology.registry.map";
 
-    private final String VALIDATOR_DIRECTORY = ".validator";
+    private File ontologyDirectory;
 
     private boolean keepDownloadedOntologiesOnDisk = true;
 
 //    private UserPreferences userPreferences = new UserPreferences(); // set to default
+
+    public OboLoader(File ontologyDirectory) {
+        this.ontologyDirectory = ontologyDirectory;
+    }
 
     ////////////////////
     // Getter + Setter
@@ -52,6 +56,7 @@ public class OboLoader extends AbstractLoader {
     public void setKeepDownloadedOntologiesOnDisk(boolean keepDownloadedOntologiesOnDisk) {
         this.keepDownloadedOntologiesOnDisk = keepDownloadedOntologiesOnDisk;
     }
+
 
 
 
@@ -176,9 +181,8 @@ public class OboLoader extends AbstractLoader {
     private File getRegistryFile() throws OntologyLoaderException {
 
         // hardcode
-        File directory = getValidatorDirectory();
 
-        File[] registry = directory.listFiles( new FileFilter() {
+        File[] registry = ontologyDirectory.listFiles( new FileFilter() {
             public boolean accept( File pathname ) {
                 return ONTOLOGY_REGISTRY_NAME.equals( pathname.getName() );
             }
@@ -190,7 +194,7 @@ public class OboLoader extends AbstractLoader {
             return validatorRegistry;
         } else {
             // create it
-            return new File( directory.getAbsolutePath() + File.separator + ONTOLOGY_REGISTRY_NAME );
+            return new File( ontologyDirectory.getAbsolutePath() + File.separator + ONTOLOGY_REGISTRY_NAME );
         }
     }
 
@@ -213,20 +217,19 @@ public class OboLoader extends AbstractLoader {
             throw new IllegalArgumentException( "Please give a non null URL." );
         }
 
-        File tempDirectory = getValidatorDirectory();
 
-        log.info( "User work directory: " + tempDirectory.getAbsolutePath() );
+        log.info( "User work directory: " + ontologyDirectory.getAbsolutePath() );
         log.info( "keepTemporaryFile: " + isKeepDownloadedOntologiesOnDisk() );
 
-        if ( tempDirectory == null ) {
+        if ( ontologyDirectory == null ) {
             throw new IllegalStateException();
         }
 
-        if ( !tempDirectory.exists() ) {
+        if ( !ontologyDirectory.exists() ) {
             throw new IllegalStateException();
         }
 
-        if ( !tempDirectory.canWrite() ) {
+        if ( !ontologyDirectory.canWrite() ) {
             throw new IllegalStateException();
         }
 
@@ -309,9 +312,9 @@ public class OboLoader extends AbstractLoader {
                 InputStream is = url.openStream();
 
                 // Create a temp file and write URL content in it.
-                if ( !tempDirectory.exists() ) {
-                    if ( !tempDirectory.mkdirs() ) {
-                        throw new IOException( "Cannot create temp directory: " + tempDirectory.getAbsolutePath() );
+                if ( !ontologyDirectory.exists() ) {
+                    if ( !ontologyDirectory.mkdirs() ) {
+                        throw new IOException( "Cannot create temp directory: " + ontologyDirectory.getAbsolutePath() );
                     }
                 }
 
@@ -326,7 +329,7 @@ public class OboLoader extends AbstractLoader {
                 }
 
                 // build the file
-                ontologyFile = new File( tempDirectory + File.separator + name + System.currentTimeMillis() + ".obo" );
+                ontologyFile = new File( ontologyDirectory + File.separator + name + System.currentTimeMillis() + ".obo" );
                 if ( !isKeepDownloadedOntologiesOnDisk() ) {
                     log.info( "Request file to be deleted on exit." );
                     ontologyFile.deleteOnExit();
@@ -387,69 +390,7 @@ public class OboLoader extends AbstractLoader {
     }
 
 
-    /**
-     * Create a directory for the validator either in the user's home directory or if it cannot, in the system's temp
-     * directory.
-     *
-     * @return the created directory, never null.
-     */
-    public File getValidatorDirectory() throws OntologyLoaderException {
-
-        String path = System.getProperty( "user.home" ) + File.separator + VALIDATOR_DIRECTORY;
-//        String path = getWorkDirectory().getAbsolutePath() + File.separator + VALIDATOR_DIRECTORY;
-
-        File dir = new File( path );
-
-        if ( ! dir.exists() ) {
-
-            if ( !dir.mkdirs() ) {
-                throw new OntologyLoaderException( "Cannot create Validator's home directory: " + dir.getAbsolutePath() );
-            }
-
-            return dir;
-
-        } else {
-
-            if ( dir.canWrite() ) {
-                return dir;
-            } else {
-                // TODO log error
-                dir = null;
-                path = System.getProperty( "java.io.tmpdir", "tmp" ) + File.separator + VALIDATOR_DIRECTORY;
-//                path = TEMP_DIR + File.separator + VALIDATOR_DIRECTORY;
-                dir = new File( path );
-
-                if ( ! dir.exists() ) {
-
-                    if ( !dir.mkdirs() ) {
-                        throw new OntologyLoaderException( "Cannot create Validator's home directory: " + dir.getAbsolutePath() );
-                    }
-
-                    return dir;
-
-                } else {
-
-                    if ( dir.canWrite() ) {
-                        return dir;
-                    } else {
-                        // TODO log error
-                        throw new OntologyLoaderException( "Cannot create Validator's home directory, pleast check your config." );
-                    }
-                }
-            }
-        }
-    }
-
-    
 
 
-    public static void main( String[] args ) throws MalformedURLException, OntologyLoaderException {
-        OboLoader loader = new OboLoader();
-        Ontology ontology = loader.parseOboFile( new URL( "http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo" ) );
-        Collection<OntologyTerm> collection = ontology.getOntologyTerms();
-        for ( OntologyTerm t : collection ) {
-            System.out.println( t.getId() + " " + t.getShortName() );
-        }
 
-    }
 }

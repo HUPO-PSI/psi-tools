@@ -11,6 +11,7 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,6 +32,7 @@ public class OntologyManager {
      */
     Map<String, OntologyAccess> ontologies;
 
+    private File ontologyDirectory = null;
     ////////////////////
     // Constructors
 
@@ -91,6 +93,10 @@ public class OntologyManager {
         return ontologies.get( ontologyID );
     }
 
+    public void setOntologyDirectory(File ontologyDirectory) {
+        this.ontologyDirectory = ontologyDirectory;
+    }
+
     ////////////////////
     // Utilities
 
@@ -101,7 +107,7 @@ public class OntologyManager {
      * @param configFile a InputStream of the config file that lists the ontologies to manage.
      * @throws OntologyLoaderException if loading failed.
      */
-    private void loadOntologies(InputStream configFile) throws OntologyLoaderException {
+    public void loadOntologies(InputStream configFile) throws OntologyLoaderException {
         // parse XML
         log.info( "Parsing ontology manager config file..." );
         Document document;
@@ -157,6 +163,7 @@ public class OntologyManager {
                 loader = Class.forName( loaderClass );
                 Constructor c = loader.getConstructor();
                 OntologyAccess oa = ( OntologyAccess ) c.newInstance();
+                oa.setOntologyDirectory(ontologyDirectory);
                 oa.loadOntology(ontologyID, name, version, format, uri);
                 ontologies.put(ontologyID, oa);
             } catch (Exception e) {

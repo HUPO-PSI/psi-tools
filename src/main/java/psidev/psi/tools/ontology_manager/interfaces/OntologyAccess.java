@@ -4,6 +4,7 @@ import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 
 import java.net.URI;
 import java.util.Set;
+import java.io.File;
 
 /**
  * Author: florian
@@ -28,6 +29,8 @@ public interface OntologyAccess {
     String getTermNameByID( String id );
 
     Set<String> getDirectParentsIDs( String id );
+
+    void setOntologyDirectory( File directory );
 
     // ToDo: isParent, is Child, getChildren(term, level),
 

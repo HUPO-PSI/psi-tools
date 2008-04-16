@@ -12,6 +12,7 @@ import uk.ac.ebi.ook.web.services.QueryServiceLocator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.*;
@@ -330,6 +331,11 @@ public class OlsOntology implements OntologyAccess {
             }
         }
         return result;
+    }
+
+    public void setOntologyDirectory(File directory) {
+        // not applicable
+        log.info("setOntologyDirectory does not have any effect on the OlsOntology.");
     }
 
 

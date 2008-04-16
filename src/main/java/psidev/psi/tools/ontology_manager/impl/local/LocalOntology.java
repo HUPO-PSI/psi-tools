@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.io.File;
 
 /**
  * Author: Florian Reisinger
@@ -21,7 +22,10 @@ public class LocalOntology implements OntologyAccess {
     public static final Log log = LogFactory.getLog( LocalOntology.class );
 
     private Ontology ontology;
-    String ontologyID;
+    private final String DEFAULT_ONTOLOGY_DIRECTORY = ".downloaded-ontologies";
+
+    private File ontologyDirectory = null;
+    public String ontologyID;
 
     public LocalOntology() {
         log.info( "Creating new LocalOntology..." );
@@ -47,7 +51,7 @@ public class LocalOntology implements OntologyAccess {
                 }
 
                 // parse the URL and load the ontology
-                OboLoader loader = new OboLoader();
+                OboLoader loader = new OboLoader(getOntologyDirectory());
                 try {
                     ontology = loader.parseOboFile( url );
                 } catch ( OntologyLoaderException e ) {
@@ -122,4 +126,79 @@ public class LocalOntology implements OntologyAccess {
         }
         return result;
     }
+
+    public void setOntologyDirectory(File directory) {
+        if (directory != null) ontologyDirectory = directory;
+    }
+
+    /**
+     * Create a directory for the validator either in the user's home directory or if it cannot, in the system's temp
+     * directory.
+     *
+     * @return the created directory, never null.
+     */
+    private File getOntologyDirectory() throws OntologyLoaderException {
+        if (ontologyDirectory != null) {
+            if (!ontologyDirectory.exists()) {
+
+                if (!ontologyDirectory.mkdirs()) {
+                    throw new OntologyLoaderException("Cannot create home directory for ontologies: " + ontologyDirectory.getAbsolutePath());
+                }
+                return ontologyDirectory;
+
+            } else {
+
+                if (ontologyDirectory.canWrite()) {
+                    return ontologyDirectory;
+                }
+            }
+            log.warn("Could not create or write to specified ontologies directory.");
+        }
+
+         log.info("Using default for ontology directory.");
+        String path = System.getProperty( "user.home" ) + File.separator + DEFAULT_ONTOLOGY_DIRECTORY;
+
+        File dir = new File( path );
+
+        if ( ! dir.exists() ) {
+
+            if ( !dir.mkdirs() ) {
+                throw new OntologyLoaderException( "Cannot create home directory for ontologies: " + dir.getAbsolutePath() );
+            }
+
+            return dir;
+
+        } else {
+
+            if ( dir.canWrite() ) {
+                return dir;
+            } else {
+                // TODO log error
+                dir = null;
+                path = System.getProperty( "java.io.tmpdir", "tmp" ) + File.separator + ontologyDirectory;
+                dir = new File( path );
+
+                if ( ! dir.exists() ) {
+
+                    if ( !dir.mkdirs() ) {
+                        throw new OntologyLoaderException( "Cannot create home directory for ontologies: " + dir.getAbsolutePath() );
+                    }
+
+                    return dir;
+
+                } else {
+
+                    if ( dir.canWrite() ) {
+                        return dir;
+                    } else {
+                        // TODO log error
+                        throw new OntologyLoaderException( "Cannot create home directory for ontologies, pleast check your config." );
+                    }
+                }
+            }
+        }
+    }
+
+
+
 }

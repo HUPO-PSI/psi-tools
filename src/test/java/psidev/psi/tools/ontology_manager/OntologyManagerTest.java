@@ -10,9 +10,9 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 import java.util.Collection;
 import java.util.Set;
-import java.net.URL;
 
 /**
  * OntologyManager tester.
@@ -23,18 +23,39 @@ import java.net.URL;
 public class OntologyManagerTest {
 
     private OntologyManager om;
+    private File ontologyDirectory;
 
     @Before
     public void setup() throws OntologyLoaderException, IOException {
+        ontologyDirectory = new File(getTargetDirectory(), "downloaded-ontologies");
         String ontoConfig = "ontologies.xml";
         InputStream is = OntologyManager.class.getClassLoader().getResourceAsStream( ontoConfig );
         Assert.assertNotNull( "Could not read ontology configuration file: " + ontoConfig, is );
-        om = new OntologyManager(is);
+        om = new OntologyManager();
+        om.setOntologyDirectory(ontologyDirectory);
+        om.loadOntologies(is);
         is.close();
         Assert.assertNotNull( om );
         for ( String id : om.getOntologyIDs() ) {
             System.out.println( id );
         }
+    }
+
+    private File getTargetDirectory() {
+        String outputDirPath = OntologyManagerTest.class.getResource( "/" ).getFile();
+        Assert.assertNotNull( outputDirPath );
+        File outputDir = new File( outputDirPath );
+        // we are in test-classes, move one up
+        outputDir = outputDir.getParentFile();
+        Assert.assertNotNull( outputDir );
+        Assert.assertTrue( outputDir.isDirectory() );
+        Assert.assertEquals( "target", outputDir.getName() );
+        return outputDir;
+    }
+
+    @Test
+    public void ontologyDirectory() {
+        Assert.assertTrue(ontologyDirectory.exists());
     }
 
     @Test
@@ -73,8 +94,8 @@ public class OntologyManagerTest {
     public void getChildTermsLocal() throws OntologyLoaderException {
         // get child terms of 'stereoisomerized residue' (MOD:00664) form the MOD ontology
         Set<String> result = om.getValidIDs( "MOD", "MOD:00664", true, false );
-        // should be  terms (August 2007)
-        Assert.assertEquals( 10, result.size() );
+        // should be 12 terms (April 2008)
+        Assert.assertEquals("CV 'MOD:00664' should have 10 children! " + result, 12, result.size() );
     }
 
     @Test
