@@ -2,13 +2,11 @@ package psidev.psi.tools.validator.xpath;
 
 import junit.framework.JUnit4TestAdapter;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-
-import psidev.psi.tools.validator.xpath.XPathResult;
-import psidev.psi.tools.validator.xpath.XPathHelper;
 
 /**
  * XPathHelper Tester.
@@ -88,14 +86,27 @@ public class XPathHelperTest {
     // Tests  
 
     @Test
-    public void lala() throws Exception {
+    public void evaluateXPath() throws Exception {
         A a = new A();
-
         List<XPathResult> results = XPathHelper.evaluateXPath( "/b/c", a );
-        System.out.println( "Found " + results.size() + " result(s)" );
-        for ( XPathResult result : results ) {
-            System.out.println( result );
-        }
+        Assert.assertEquals( 1, results.size() );
+    }
 
+    @Test
+    public void hasLeadingSlash() throws Exception {
+        Assert.assertTrue( XPathHelper.hasLeadingSlash( "/b/c" ) );
+        Assert.assertFalse( XPathHelper.hasLeadingSlash( "b/c" ) );
+    }
+
+    @Test
+    public void hasTrailingSlash() throws Exception {
+        Assert.assertTrue( XPathHelper.hasTrailingSlash( "/b/c/" ) );
+        Assert.assertFalse( XPathHelper.hasTrailingSlash( "b/c" ) );
+    }
+
+    @Test
+    public void removeeTrailingSlash() throws Exception {
+        Assert.assertEquals( "/b/c", XPathHelper.removeTrailingSlash( "/b/c/" ) );
+        Assert.assertEquals( "/b/c", XPathHelper.removeTrailingSlash( "/b/c" ) );
     }
 }
