@@ -6,7 +6,6 @@
         <CvReference cvName="PSI-MI" cvIdentifier="MI"/>
         <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
         <CvReference cvName="PATO" cvIdentifier="PATO"/>
-        <CvReference cvName="Gene Ontology" cvIdentifier="GO"/>
     </CvReferenceList>
 
     <CvMappingRuleList>

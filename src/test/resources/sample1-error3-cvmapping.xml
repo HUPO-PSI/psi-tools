@@ -8,7 +8,6 @@
         <CvReference cvName="PSI-MI" cvIdentifier="MI"/>
         <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
         <CvReference cvName="PSI-MOD" cvIdentifier="MOD"/>
-        <CvReference cvName="Gene Ontology" cvIdentifier="GO"/>
     </CvReferenceList>
 
     <CvMappingRuleList>

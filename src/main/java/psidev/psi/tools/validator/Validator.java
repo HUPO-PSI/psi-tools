@@ -26,7 +26,8 @@ import java.util.List;
  * <p/>
  * Validates a XML document against a set of rules. </p>
  *
- * @author Matthias Oesterheld & Samuel Kerrien
+ * @author Samuel Kerrien (skerrien@ebi.ac.uk)
+ * @author Matthias Oesterheld
  * @version $Id: Validator.java 668 2007-06-29 16:44:18 +0100 (Fri, 29 Jun 2007) skerrien $
  * @since 1.0
  */

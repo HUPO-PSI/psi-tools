@@ -10,6 +10,8 @@ import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.MessageLevel;
+import psidev.psi.tools.validator.rules.Rule;
 import psidev.psi.tools.validator.xpath.XPathHelper;
 
 import java.util.*;
@@ -31,12 +33,15 @@ public class CvRuleManager {
 
     private Collection<CvRule> rules;
 
+    private List<CvReference> cvReferences;
+
     //////////////////
     // Constructors
 
     public CvRuleManager( OntologyManager ontoMngr, CvMapping cvMappingRules ) {
         this.ontologyMngr = ontoMngr;
         addRules(cvMappingRules.getCvMappingRuleList().getCvMappingRule());
+        cvReferences = cvMappingRules.getCvReferenceList().getCvReference();
     }
 
     ////////////////////////
@@ -87,47 +92,74 @@ public class CvRuleManager {
      * @throws psidev.psi.tools.validator.ValidatorException ...
      */
     public Collection<ValidatorMessage> checkCvMapping() throws ValidatorException {
-        // ToDo: check this!
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
 
+        if( cvReferences != null ) {
+            for ( CvReference cvReference : cvReferences ) {
+
+                // before anything else, check if the specified ontology was loaded in the ontology manager
+                if ( !ontologyMngr.containsOntology( cvReference.getCvIdentifier() ) ) {
+                    String msg = "The requested ontology wasn't defined: " + cvReference.getCvIdentifier() + " ("+
+                                 cvReference.getCvName()+"). The CvTerm will be removed.";
+                    messages.add( new ValidatorMessage( msg, MessageLevel.WARN ) );
+                }
+            }
+        }
+        
         if ( rules.size() < 1 ) {
             throw new ValidatorException("checkCvMapping: There are no rules to check! Make sure valid rules have been loaded.");
         }
         for ( Iterator<CvRule> it_rule = rules.iterator(); it_rule.hasNext(); ) {
             CvRule rule = it_rule.next();
 
+            final String elementPath = rule.getElementPath();
+            final String scopePath = rule.getScopePath();
+
             try {
                 // try to compile the xpath expression
-                // TODO this is where one would want to cache the compiled expression !
-                XPathHelper.evaluateXPath( rule.getElementPath(), "" );
 
-                int cvTermCount = rule.getCVTerms().size();
-                Iterator<CvTerm> it_cv = rule.getCVTerms().iterator();
-                while ( it_cv.hasNext() ) {
-                    CvTerm cvTerm = it_cv.next();
-                    if ( !isValidCvTerm( cvTerm, rule, messages ) ) {
-                        //ToDo: add message that TERM has been removed
-                        it_cv.remove(); // remove the term from the cvMappingRule
-                    }
-                } // cvTerms
-
-                // If no cv terms remaining, remove the rule
-                if ( rule.getCVTerms().isEmpty() ) {
+                if( ! elementPath.startsWith( scopePath )) {
                     it_rule.remove();
-                    String msg = "All CvTerm" + ( cvTermCount > 1 ? "s" : "" ) + " (" + cvTermCount + ") of this rule " +
-                                 ( cvTermCount > 1 ? "were" : "was" ) + " removed due " +
-                                 "to inconsistencies (cf. previous messages). This rule will be removed.";
-                    messages.add( rule.buildMessage( rule.getElementPath(),
-                                                Recommendation.forName( rule.getRequirementLevel() ),
-                                                msg, rule ) );
+                    String msg = "The scope ('"+ scopePath +"') of this rule did not match the element ('"+elementPath+
+                                 "') defined. This rule will be removed.";
+                    messages.add( rule.buildMessage( elementPath,
+                                                     Recommendation.forName( rule.getRequirementLevel() ),
+                                                     msg, rule ) );
+                } else {
+
+                    // test compile the XPaths
+                    // TODO this is where one would want to cache the compiled expression !
+                    XPathHelper.evaluateXPath( scopePath, "" );
+                    XPathHelper.evaluateXPath( elementPath, "" );
+
+                    int cvTermCount = rule.getCVTerms().size();
+                    Iterator<CvTerm> it_cv = rule.getCVTerms().iterator();
+                    while ( it_cv.hasNext() ) {
+                        CvTerm cvTerm = it_cv.next();
+                        if ( !isValidCvTerm( cvTerm, rule, messages ) ) {
+                            //ToDo: add message that TERM has been removed
+                            it_cv.remove(); // remove the term from the cvMappingRule
+                        }
+                    } // cvTerms
+
+                    // If no cv terms remaining, remove the rule
+                    if ( rule.getCVTerms().isEmpty() ) {
+                        it_rule.remove();
+                        String msg = "All CvTerm" + ( cvTermCount > 1 ? "s" : "" ) + " (" + cvTermCount + ") of this rule " +
+                                     ( cvTermCount > 1 ? "were" : "was" ) + " removed due " +
+                                     "to inconsistencies (cf. previous messages). This rule will be removed.";
+                        messages.add( rule.buildMessage( elementPath,
+                                                         Recommendation.forName( rule.getRequirementLevel() ),
+                                                         msg, rule ) );
+                    }
                 }
 
             } catch ( JXPathException e ) {
                 // failed to compile the XPath expression
                 it_rule.remove();
-                String msg = "The XPath expression could not be compiled: " + rule.getElementPath() +
+                String msg = "The XPath expression could not be compiled: " + elementPath +
                                             " . This rule will be removed.";
-                messages.add( rule.buildMessage( rule.getElementPath(),
+                messages.add( rule.buildMessage( elementPath,
                                             Recommendation.forName( rule.getRequirementLevel() ),
                                             msg, rule ) );
             }

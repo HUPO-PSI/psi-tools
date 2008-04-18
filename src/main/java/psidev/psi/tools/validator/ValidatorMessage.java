@@ -40,7 +40,7 @@ public class ValidatorMessage<T extends Object> {
     /////////////////////////////
     // Constructor
 
-    public ValidatorMessage( String message, MessageLevel level, Context context, Rule rule ) {
+    public ValidatorMessage( String message, MessageLevel level ) {
 
         if ( message == null ) {
             throw new IllegalArgumentException( "A message must not be null when creating a ValidatorMessage." );
@@ -51,6 +51,11 @@ public class ValidatorMessage<T extends Object> {
             throw new IllegalArgumentException( "A message level must not be null when creating a ValidatorMessage." );
         }
         this.level = level;
+    }
+
+    public ValidatorMessage( String message, MessageLevel level, Context context, Rule rule ) {
+
+        this(message, level );
 
         if ( context == null ) {
             throw new IllegalArgumentException( "A context must not be null when creating a ValidatorMessage." );
