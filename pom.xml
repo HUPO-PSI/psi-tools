@@ -25,6 +25,8 @@
         <module>validator</module>
         <module>xxindex</module>
 		<module>master-pom</module>
+        <module>ontology-config-reader</module>
+        <module>object-rule-reader</module>
     </modules>
 
 </project>
