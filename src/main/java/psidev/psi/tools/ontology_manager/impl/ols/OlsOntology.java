@@ -9,6 +9,7 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import uk.ac.ebi.ook.web.services.Query;
 import uk.ac.ebi.ook.web.services.QueryService;
 import uk.ac.ebi.ook.web.services.QueryServiceLocator;
+import uk.ac.ebi.ook.web.services.client.ConfigurableQueryServiceLocator;
 
 import java.io.IOException;
 import java.io.InputStream;
