@@ -94,7 +94,7 @@ public class OlsOntologyTest {
         Set<String> resultA3 = mi_ols.getValidIDsOld( id, true, false ); // result without using cache
         Assert.assertEquals( "Cached and uncached results have to be the same!", resultA1, resultA2 );
         Assert.assertEquals( "Cached and uncached results have to be the same!", resultA2, resultA3 );
-        Assert.assertEquals( "This set should contain 9 result terms!", 9, resultA1.size() ); // on: 20. Aug. 2007
+        Assert.assertEquals( "This set should contain 13 result terms!", 13, resultA1.size() ); // on: 20. Aug. 2007
     }
 
     @Test
