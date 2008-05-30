@@ -28,7 +28,7 @@ public class OntologyManagerTest {
     @Before
     public void setup() throws OntologyLoaderException, IOException {
         ontologyDirectory = new File(getTargetDirectory(), "downloaded-ontologies");
-        String ontoConfig = "ontologies.xml";
+        final String ontoConfig = "ontologies.xml";
         InputStream is = OntologyManager.class.getClassLoader().getResourceAsStream( ontoConfig );
         Assert.assertNotNull( "Could not read ontology configuration file: " + ontoConfig, is );
         om = new OntologyManager();
@@ -87,7 +87,7 @@ public class OntologyManagerTest {
         // get child terms of 'alias type' (MI:0300) form the MI ontology
         Set<String> result = om.getValidIDs( "MI", "MI:0300", true, false );
         // should be 9 terms (15. August 2007)
-        Assert.assertEquals( "There should be 9 child terms for MI:0300!", 9, result.size() );
+        Assert.assertEquals( "There should be 9 child terms for MI:0300!", 13, result.size() );
     }
 
     @Test
@@ -95,7 +95,7 @@ public class OntologyManagerTest {
         // get child terms of 'stereoisomerized residue' (MOD:00664) form the MOD ontology
         Set<String> result = om.getValidIDs( "MOD", "MOD:00664", true, false );
         // should be 12 terms (April 2008)
-        Assert.assertEquals("CV 'MOD:00664' should have 10 children! " + result, 12, result.size() );
+        Assert.assertEquals("CV 'MOD:00664' should have 10 children! " + result, 15, result.size() );
     }
 
     @Test
