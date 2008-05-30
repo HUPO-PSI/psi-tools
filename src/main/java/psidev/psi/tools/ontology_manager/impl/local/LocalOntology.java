@@ -53,6 +53,10 @@ public class LocalOntology implements OntologyAccess {
                 // parse the URL and load the ontology
                 OboLoader loader = new OboLoader(getOntologyDirectory());
                 try {
+                    if ( log.isDebugEnabled() ) {
+                        log.debug( "Parsing URL: " + url );
+                    }
+
                     ontology = loader.parseOboFile( url );
                 } catch ( OntologyLoaderException e ) {
                     throw new OntologyLoaderException( "OboFile parser failed with Exception: ", e );
