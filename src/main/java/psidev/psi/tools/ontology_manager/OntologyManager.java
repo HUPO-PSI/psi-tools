@@ -6,7 +6,13 @@ import org.w3c.dom.NodeList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
+import psidev.psi.tools.ontology_manager.impl.local.LocalOntology;
+import psidev.psi.tools.ontology_manager.impl.ols.OlsOntology;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
+import psidev.psi.tools.ontologyConfigReader.OntologyConfigReader;
+import psidev.psi.tools.ontologyConfigReader.OntologyConfigReaderException;
+import psidev.psi.tools.ontologyCfgReader.mapping.jaxb.CvSourceList;
+import psidev.psi.tools.ontologyCfgReader.mapping.jaxb.CvSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -103,71 +109,86 @@ public class OntologyManager {
     public static final String CLASSPATH_PREFIX = "classpath:";
 
     /**
+     * Keywords that when specified in the cvSource's source gets converted in a specific implementation of OntologyAccess.
+     */
+    public static final Map<String, Class> keyword2class = new HashMap<String, Class>( );
+    static {
+        keyword2class.put( "ols", OlsOntology.class );
+        keyword2class.put( "file", LocalOntology.class );
+    }
+
+    /**
      * Method to load the ontologies from the configuration file.
      * @param configFile a InputStream of the config file that lists the ontologies to manage.
      * @throws OntologyLoaderException if loading failed.
      */
-    public void loadOntologies(InputStream configFile) throws OntologyLoaderException {
-        // parse XML
-        log.info( "Parsing ontology manager config file..." );
-        Document document;
+    public void loadOntologies( InputStream configFile ) throws OntologyLoaderException {
+
+        OntologyConfigReader ocr = new OntologyConfigReader();
+        final CvSourceList cvSourceList;
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse( configFile );
-        } catch ( Exception e ) {
-            throw new OntologyLoaderException( "Could not parse the ontology configuration file.", e );
+            cvSourceList = ocr.read( configFile );
+        } catch ( OntologyConfigReaderException e ) {
+            throw new OntologyLoaderException( "Error while reading ontology config file", e );
         }
 
-        // search the document for the needed information
-        NodeList ontos = document.getElementsByTagName( "CVSource" );
-        log.info( "Found " + ontos.getLength() + " ontology entries in config file." );
-        for ( int i = 0; i < ontos.getLength(); i++ ) {
-            String loaderClass = ( (Element) ontos.item( i ) ).getAttribute( "loader" );
-            String ontologyID = ( (Element) ontos.item( i ) ).getAttribute( "cvIdentifier" );
-            String format = ( (Element) ontos.item( i ) ).getAttribute( "cvFormat" );
-            String version = ( (Element) ontos.item( i ) ).getAttribute( "version" );
-            String name = ( (Element) ontos.item( i ) ).getAttribute( "name" );
-            String loc = ( (Element) ontos.item( i ) ).getAttribute( "uri" );
+        if ( cvSourceList != null ) {
+            for ( CvSource cvSource : cvSourceList.getCvSource() ) {
 
-            URI uri;
-            try {
+                String sourceUri = cvSource.getUri();
+                final String id = cvSource.getIdentifier();
+                final String name = cvSource.getName();
+                final String version = cvSource.getVersion();
+                final String format = cvSource.getFormat();
+                final String loaderClass = cvSource.getSource();
 
-                if( loc != null && loc.toLowerCase().startsWith( CLASSPATH_PREFIX )) {
-                    loc = loc.substring( CLASSPATH_PREFIX.length() );
-                    if ( log.isDebugEnabled() ) {
-                        log.debug( "Loading ontology from classpath: " + loc );
-                    }
-                    final URL url = OntologyManager.class.getClassLoader().getResource( loc );
-                    if( url == null ) {
-                        throw new OntologyLoaderException( "Unable to load from classpath: " + loc );
-                    }
-                    uri = url.toURI();
-                    if ( log.isDebugEnabled() ) {
-                        log.debug( "URI="+uri.toASCIIString() );
+                URI uri;
+                try {
+
+                    if ( sourceUri != null && sourceUri.toLowerCase().startsWith( CLASSPATH_PREFIX ) ) {
+                        sourceUri = sourceUri.substring( CLASSPATH_PREFIX.length() );
+                        if ( log.isDebugEnabled() ) {
+                            log.debug( "Loading ontology from classpath: " + sourceUri );
+                        }
+                        final URL url = OntologyManager.class.getClassLoader().getResource( sourceUri );
+                        if ( url == null ) {
+                            throw new OntologyLoaderException( "Unable to load from classpath: " + sourceUri );
+                        }
+                        uri = url.toURI();
+                        if ( log.isDebugEnabled() ) {
+                            log.debug( "URI=" + uri.toASCIIString() );
+                        }
+
+                    } else {
+                        uri = new URI( sourceUri );
                     }
 
-                } else {
-                    uri = new URI(loc);
+                } catch ( URISyntaxException e ) {
+                    throw new IllegalArgumentException( "The specified uri '" + sourceUri + "' " +
+                                                        "for ontology '" + id + "' has an invalid syntax.", e );
                 }
 
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException( "The specified uri '" + loc + "' " +
-                        "for ontology '" + ontologyID + "' has a invalid syntax.", e );
-            }
-
-            log.info( "Loading ontology: name=" + name + ", ID= " + ontologyID + ", format=" + format
-                    + ", version=" + version + ", uri=" + uri + " using loader: " + loaderClass );
-            Class loader;
-            try {
-                loader = Class.forName( loaderClass );
-                Constructor c = loader.getConstructor();
-                OntologyAccess oa = ( OntologyAccess ) c.newInstance();
-                oa.setOntologyDirectory(ontologyDirectory);
-                oa.loadOntology(ontologyID, name, version, format, uri);
-                ontologies.put(ontologyID, oa);
-            } catch (Exception e) {
-                throw new OntologyLoaderException( "Failed loading ontology loader: " + loaderClass, e );
+                log.info( "Loading ontology: name=" + name + ", ID= " + id + ", format=" + format
+                          + ", version=" + version + ", uri=" + uri + " using source: " + loaderClass );
+                Class loader;
+                try {
+                    final String lcLoaderClass = loaderClass.toLowerCase();
+                    if( keyword2class.containsKey( lcLoaderClass ) ) {
+                        loader = keyword2class.get( lcLoaderClass );
+                        if ( log.isDebugEnabled() ) {
+                            log.debug( "the source '"+ loaderClass +"' was converted to Class: " + loader );
+                        }
+                    } else {
+                        loader = Class.forName( loaderClass );
+                    }
+                    Constructor c = loader.getConstructor();
+                    OntologyAccess oa = ( OntologyAccess ) c.newInstance();
+                    oa.setOntologyDirectory( ontologyDirectory );
+                    oa.loadOntology( id, name, version, format, uri );
+                    ontologies.put( id, oa );
+                } catch ( Exception e ) {
+                    throw new OntologyLoaderException( "Failed loading ontology source: " + loaderClass, e );
+                }
             }
         }
     }
