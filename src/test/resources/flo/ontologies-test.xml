@@ -1,17 +1,19 @@
-<CVSourceList>
-    <CVSource loader="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+<?xml version="1.0" encoding="UTF-8"?>
+<cvSourceList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/CvSourceList.xsd">
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
               uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mi.obo"
-              cvFormat="OBO" name="PSI-MI" cvIdentifier="MI" version="1.154"/>
-    <CVSource loader="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              format="OBO" name="PSI-MI" identifier="MI" version="1.154"/>
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
               uri="http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo"
-              cvFormat="OBO" name="PSI-MS" cvIdentifier="MS" version="1.01"/>
-    <CVSource loader="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              format="OBO" name="PSI-MS" identifier="MS" version="1.01"/>
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
               uri="http://pride-proteome.cvs.sourceforge.net/*checkout*/pride-proteome/PRIDE/schema/pride_cv.obo"
-              cvFormat="OBO" name="PRIDE Ontology" cvIdentifier="PRIDE" version="1.54"/>
-    <CVSource loader="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              format="OBO" name="PRIDE Ontology" identifier="PRIDE" version="1.54"/>
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
               uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo"
-              cvFormat="OBO" name="Phenotypic qualities (properties)" cvIdentifier="PATO" version="NA"/>
-    <CVSource loader="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+              format="OBO" name="Phenotypic qualities (properties)" identifier="PATO" version="NA"/>
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
               uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mod.obo"
-              cvFormat="OBO" name="PSI-MOD" cvIdentifier="MOD" version="1.260"/>    
-</CVSourceList>
+              format="OBO" name="PSI-MOD" identifier="MOD" version="1.260"/>
+</cvSourceList>

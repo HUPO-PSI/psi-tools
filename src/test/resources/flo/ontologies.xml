@@ -1,8 +1,10 @@
-<CVSourceList>
-    <CVSource loader="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+<?xml version="1.0" encoding="UTF-8"?>
+<cvSourceList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/CvSourceList.xsd">
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
               uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mi.obo"
-              cvFormat="OBO" name="PSI-MI" cvIdentifier="MI" version="1.154"/>
-    <CVSource loader="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+              format="OBO" name="PSI-MI" identifier="MI" version="1.154"/>
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
               uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mod.obo"
-              cvFormat="OBO" name="PSI-MOD" cvIdentifier="MOD" version="1.260"/>
-</CVSourceList>
+              format="OBO" name="PSI-MOD" identifier="MOD" version="1.260"/>
+</cvSourceList>

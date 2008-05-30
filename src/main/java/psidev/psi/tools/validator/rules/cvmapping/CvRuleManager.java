@@ -39,6 +39,9 @@ public class CvRuleManager {
     // Constructors
 
     public CvRuleManager( OntologyManager ontoMngr, CvMapping cvMappingRules ) {
+        if( ontoMngr == null ) {
+            throw new IllegalArgumentException( "The given OntologyManager was null, cannot instanciate a CvRuleManager" );
+        }
         this.ontologyMngr = ontoMngr;
         addRules(cvMappingRules.getCvMappingRuleList().getCvMappingRule());
         cvReferences = cvMappingRules.getCvReferenceList().getCvReference();

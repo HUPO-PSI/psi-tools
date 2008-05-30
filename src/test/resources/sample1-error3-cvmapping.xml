@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CvMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:noNamespaceSchemaLocation="CvMapping.xsd" modelName="MIF.xsd"
+           xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/CvMapping.xsd" modelName="MIF.xsd"
            modelVersion="2.53"
            modelURI="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
 
-    <CvReferenceList CvSourceVersion="0.9">
+    <CvReferenceList cvSourceVersion="0.9">
         <CvReference cvName="PSI-MI" cvIdentifier="MI"/>
         <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
         <CvReference cvName="PSI-MOD" cvIdentifier="MOD"/>

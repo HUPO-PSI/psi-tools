@@ -12,6 +12,9 @@ import psidev.psi.tools.validator.preferences.UserPreferences;
 import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
+import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
+import psidev.psi.tools.objectRuleReader.mapping.jaxb.ObjectRuleList;
+import psidev.psi.tools.objectRuleReader.mapping.jaxb.Rule;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -61,30 +64,18 @@ public abstract class Validator {
     //////////////////////
     // Constructor
 
-    public Validator( InputStream ontoConfig, InputStream cvRuleConfig, InputStream oRuleConfig ) throws ValidatorException, OntologyLoaderException {
-        // load the ontologies
-        // TODO handle null !!
-        ontologyMngr = new OntologyManager( ontoConfig );
-
-        // if specified, load cvRules
-        if ( cvRuleConfig != null ) {
-            try {
-                setCvMappingRules( cvRuleConfig );
-            } catch ( CvRuleReaderException e ) {
-                // TODO This is a nice behaviour for the API, we should extend that to the how class !!
-                throw new ValidatorException( "CvMappingException while trying to load the CvRules.", e );
-            }
-        }
+    public Validator( InputStream ontoConfig, InputStream cvRuleConfig, InputStream objectRuleConfig ) throws ValidatorException, OntologyLoaderException {
+        this( ontoConfig, cvRuleConfig );
 
         // if specified, load objectRules
-        if ( oRuleConfig != null ) {
-            setObjectRules( oRuleConfig );
+        if ( objectRuleConfig != null ) {
+            setObjectRules( objectRuleConfig );
         }
     }
 
     public Validator( InputStream ontoConfig, InputStream cvRuleConfig ) throws ValidatorException, OntologyLoaderException {
         // load the ontologies
-        ontologyMngr = new OntologyManager( ontoConfig );
+        this( ontoConfig );
 
         // if specified, load cvRules
         if ( cvRuleConfig != null ) {
@@ -141,33 +132,53 @@ public abstract class Validator {
      */
     public void setObjectRules( InputStream configFile ) throws ValidatorException {
         rules = new ArrayList<ObjectRule>(); // set -> replace whatever there might have been
-        // parse XML
-        Document document;
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse( configFile );
-        } catch ( Exception e ) {
-            throw new ValidatorException( "Error while parsing configuration file", e );
-        }
 
-        // instantiate rules with ontologies
-        NodeList rs = document.getElementsByTagName( "rule" );
-        for ( int i = 0; i < rs.getLength(); i++ ) {
-            NodeList texts = rs.item( i ).getChildNodes();
-            String className = texts.item( 0 ).getNodeValue();
-            try {
-                Class rule = Class.forName( className );
-                Constructor c = rule.getConstructor( OntologyManager.class );
+        ObjectRuleReader reader = new ObjectRuleReader();
+        String className = null;
+        try {
+            final ObjectRuleList rules = reader.read( configFile );
+            for ( Rule rule : rules.getRule() ) {
+                className = rule.getClazz();
+                Class ruleClass = Class.forName( className );
+                Constructor c = ruleClass.getConstructor( OntologyManager.class );
                 ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
-                rules.add( r );
+                this.rules.add( r );
                 if ( log.isInfoEnabled() ) {
                     log.info( "Added rule: " + r.getClass() );
                 }
-            } catch ( Exception e ) {
-                throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
+
             }
+        } catch ( Exception e ) {
+            throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
         }
+
+//        // parse XML
+//        Document document;
+//        try {
+//            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder builder = factory.newDocumentBuilder();
+//            document = builder.parse( configFile );
+//        } catch ( Exception e ) {
+//            throw new ValidatorException( "Error while parsing configuration file", e );
+//        }
+//
+//        // instantiate rules with ontologies
+//        NodeList rs = document.getElementsByTagName( "rule" );
+//        for ( int i = 0; i < rs.getLength(); i++ ) {
+//            NodeList texts = rs.item( i ).getChildNodes();
+//            String className = texts.item( 0 ).getNodeValue();
+//            try {
+//                Class rule = Class.forName( className );
+//                Constructor c = rule.getConstructor( OntologyManager.class );
+//                ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
+//                this.rules.add( r );
+//                if ( log.isInfoEnabled() ) {
+//                    log.info( "Added rule: " + r.getClass() );
+//                }
+//            } catch ( Exception e ) {
+//                throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
+//            }
+//        }
     }
 
     public UserPreferences getUserPreferences() {

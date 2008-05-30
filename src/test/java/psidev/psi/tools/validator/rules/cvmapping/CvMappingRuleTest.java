@@ -41,8 +41,8 @@ public class CvMappingRuleTest {
     static {
         try {
             ontologyMngr = new OntologyManager(oMngrConfig);
-        } catch (OntologyLoaderException e) {
-            e.printStackTrace();
+        } catch ( OntologyLoaderException e ) {
+            throw new RuntimeException( e );
         }
     }
 
