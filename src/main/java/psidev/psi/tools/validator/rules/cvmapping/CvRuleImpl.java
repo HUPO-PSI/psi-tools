@@ -75,6 +75,14 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return status;
     }
 
+    public String getId() {
+        return cvMappingRule.getId();
+    }
+
+    public String getName() {
+        return cvMappingRule.getName();
+    }
+
     //////////////////
     // Rule
 

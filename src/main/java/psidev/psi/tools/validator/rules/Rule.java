@@ -15,7 +15,5 @@ public interface Rule {
 
     Collection<String> getHowToFixTips();
 
-//    Ontology getOntology( String id ) throws ValidatorException;
-
     String toString();
 }

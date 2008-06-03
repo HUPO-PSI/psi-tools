@@ -75,25 +75,6 @@ public abstract class AbstractRule implements Rule {
         return howToFixTips;
     }
 
-
-//    /**
-//     * Get an Ontology object by its ID as defined in the configuration file.
-//     *
-//     * @param id identifier of the ontology.
-//     *
-//     * @return an Ontology or an exception if thrown if the identifier is not known.
-//     *
-//     * @throws ValidatorException if the id is not known.
-//     */
-//    public Ontology getOntology( String id ) throws ValidatorException {
-//
-//        if ( !ontologies.containsKey( id ) ) {
-//            throw new ValidatorException( "Unknown ontology identifier: " + id + ", please check your configuration file." );
-//        }
-//
-//        return ontologies.get( id );
-//    }
-
     public String toString() {
 
         StringBuffer sb = new StringBuffer( 256 );

@@ -5,6 +5,7 @@ import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.rules.Rule;
 import psidev.psi.tools.validator.MessageLevel;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRule;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +25,10 @@ public interface CvRule extends Rule {
 
     public Collection<ValidatorMessage> check( Object object, String xPath ) throws ValidatorException;
 
+    public String getId();
+    
+    public String getName();
+
     public String getElementPath();
 
     public String getScopePath();
@@ -35,4 +40,6 @@ public interface CvRule extends Rule {
     public MessageLevel convertCvMappingLevel( Recommendation level );
 
     public ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Rule rule );
+
+    public MappingRuleStatus getStatus();
 }

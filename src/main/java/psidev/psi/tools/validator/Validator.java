@@ -12,6 +12,7 @@ import psidev.psi.tools.validator.preferences.UserPreferences;
 import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
+import psidev.psi.tools.validator.util.ValidatorReport;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
 import psidev.psi.tools.objectRuleReader.mapping.jaxb.ObjectRuleList;
 import psidev.psi.tools.objectRuleReader.mapping.jaxb.Rule;
@@ -334,5 +335,9 @@ public abstract class Validator {
             log.error( "The CvRuleManager has not been set up yet." );
         }
         return messages;
+    }
+
+    public ValidatorReport getReport() {
+        return new ValidatorReport( cvRuleManager.getCvRules() );
     }
 }

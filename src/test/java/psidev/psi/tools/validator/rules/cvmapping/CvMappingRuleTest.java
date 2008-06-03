@@ -11,6 +11,7 @@ import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.validator.MessageLevel;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.util.ValidatorReport;
 import psidev.psi.tools.validator.xpath.XPathHelper;
 import psidev.psi.tools.validator.xpath.XPathResult;
 import psidev.psi.tools.validator.rules.cvmapping.house.House;
@@ -737,7 +738,8 @@ public class CvMappingRuleTest {
         messages = ruleMngr.check( protein, "/protein" );
         print( messages );
         Assert.assertEquals( 1, messages.size() );
+
+        ValidatorReport report = new ValidatorReport( ruleMngr.getCvRules() );
+        Assert.assertEquals( 1, report.getCvRulesInvalidXpath().size() );
     }
-
-
 }
