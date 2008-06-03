@@ -24,17 +24,17 @@ public class CvMappingReaderTest {
     public static final String SAMPLE_RULE_DEFINITION =
             "<CvMapping modelName=\"string\" modelURI=\"http://www.company.org/lala/sonoras\" modelVersion=\"string\">\n" +
             "\n" +
-            "    <CvReferenceList CvSourceVersion=\"anySimpleType\">\n" +
+            "    <CvReferenceList cvSourceVersion=\"anySimpleType\">\n" +
             "        <CvReference cvIdentifier=\"A\" cvName=\"string\"/>\n" +
             "        <CvReference cvIdentifier=\"B\" cvName=\"string\"/>\n" +
             "    </CvReferenceList>\n" +
             "\n" +
             "    <CvMappingRuleList>\n" +
-            "        <CvMappingRule scopePath=\"/a/b/c/d/e\" cvElementPath=\"/a/b/c\" cvTermsCombinationLogic=\"AND\" requirementLevel=\"SHOULD\">\n" +
+            "        <CvMappingRule id=\"R1\" name=\"sample rule 1\" scopePath=\"/a/b/c/d/e\" cvElementPath=\"/a/b/c\" cvTermsCombinationLogic=\"AND\" requirementLevel=\"SHOULD\">\n" +
             "            <CvTerm cvIdentifierRef=\"A\" termAccession=\"XX:0001\" termName=\"lala\" useTermName=\"false\" useTerm=\"true\" allowChildren=\"false\" isRepeatable=\"true\"/>\n" +
             "            <CvTerm cvIdentifierRef=\"B\" termAccession=\"YY:0001\" termName=\"foo\" useTermName=\"true\" useTerm=\"false\" allowChildren=\"true\" isRepeatable=\"false\"/>\n" +
             "        </CvMappingRule>\n" +
-            "        <CvMappingRule scopePath=\"/a/b/c/d/e\" cvElementPath=\"/a/b/c\" cvTermsCombinationLogic=\"AND\" requirementLevel=\"SHOULD\">\n" +
+            "        <CvMappingRule id=\"R2\" name=\"sample rule 2\" scopePath=\"/a/b/c/d/e\" cvElementPath=\"/a/b/c\" cvTermsCombinationLogic=\"AND\" requirementLevel=\"SHOULD\">\n" +
             "            <CvTerm cvIdentifierRef=\"A\" termAccession=\"XX:0001\" termName=\"lala\" useTermName=\"false\" useTerm=\"true\" allowChildren=\"false\" isRepeatable=\"true\"/>\n" +
             "        </CvMappingRule>\n" +
             "    </CvMappingRuleList>\n" +
