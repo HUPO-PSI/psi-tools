@@ -11,6 +11,7 @@ import psidev.psi.tools.validator.Context;
 import psidev.psi.tools.validator.MessageLevel;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.util.XpathValidator;
 import psidev.psi.tools.validator.rules.AbstractRule;
 import psidev.psi.tools.validator.rules.Rule;
 import psidev.psi.tools.validator.xpath.XPathHelper;
@@ -22,16 +23,17 @@ import java.util.*;
  * Implementation of the CV rule that performs check based on XML definition.
  *
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
- *         Author: florian
+ * @author Florian Reisinger (florian@ebi.ac.uk)
  * @version $Id$
- *          Date: 18-Jul-2007
- *          Time: 15:52:08
+ * @since 2.0.0
  */
 public class CvRuleImpl extends AbstractRule implements CvRule {
 
     public static final Log log = LogFactory.getLog( CvRuleImpl.class );
 
     private CvMappingRule cvMappingRule;
+
+    private MappingRuleStatus status = MappingRuleStatus.NOT_CHECKED;
 
     public CvRuleImpl( OntologyManager ontologyManager ) {
         super( ontologyManager );
@@ -69,6 +71,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return cvMappingRule.getCvTermsCombinationLogic();
     }
 
+    public MappingRuleStatus getStatus() {
+        return status;
+    }
+
     //////////////////
     // Rule
 
@@ -104,9 +110,14 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             throw new ValidatorException( "Cannot validate a null object." );
         }
 
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        if( status.equals( MappingRuleStatus.INVALID_XPATH )) {
+            // do not run the rule as it is not valid.
+            return messages;
+        }
+
         if ( log.isDebugEnabled() ) log.debug( "Given prefix Xpath: " + prefixXpath );
 
-        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Recommendation level = Recommendation.forName( getRequirementLevel() );
 
         // given the scope of the XPath expression, transform the elementXpath to it only retreive the objects on which
@@ -114,7 +125,6 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         String scopeXpath = getScopePath();
         String elementXpath = getElementPath();
-
 
         if ( prefixXpath != null ) {
             // if the user has provided us with a prefix, we update the XPath available in the Rule (i.e. removing the prefix)
@@ -146,9 +156,24 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         if ( results.isEmpty() ) {
 
-            // there's nothing to check on, be quiet.
-            // TODO do we need to log an error in the validator too ??
-            if ( log.isDebugEnabled() ) log.debug( "Count not find any object using Xpath: " + scopeXpath );
+            // then check if the XPath expression if valid.
+            if( ! status.equals( MappingRuleStatus.VALID_RULE  )) {
+                // here we check the root
+                XpathValidator validator = new XpathValidator( elementXpath );
+                String msg = validator.validate( object );
+                if( msg != null ) {
+                    messages.add( new ValidatorMessage( msg,
+                                                        MessageLevel.ERROR,
+                                                        new Context( "Flaw in the rule definition: " + getCvMappingRule().getId()),
+                                                        this) );
+
+                    status = MappingRuleStatus.INVALID_XPATH;
+
+                    return messages; // abort the rule as itx xpath is not valid.
+                } else {
+                    status = MappingRuleStatus.VALID_XPATH;
+                }
+            }
 
         } else {
 
@@ -174,6 +199,9 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
                 checkSingleObject( objectToCheck, elementXpath, valueXpath, messages, level );
 
+                if( status.equals( MappingRuleStatus.INVALID_XPATH ) ) {
+                    return messages;
+                }
             }
         } // else
 
@@ -202,6 +230,29 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         List<XPathResult> valueResults = null;
         try {
             valueResults = XPathHelper.evaluateXPath( valueXpath, objectToCheck );
+
+            if( ! valueResults.isEmpty() ) {
+                status = MappingRuleStatus.VALID_RULE;
+            } else {
+                // then check if the XPath expression if valid.
+                if( ! status.equals( MappingRuleStatus.VALID_RULE  )) {
+                    // here we check the root
+                    XpathValidator validator = new XpathValidator( valueXpath );
+                    String msg = validator.validate( objectToCheck );
+                    if( msg != null ) {
+                        messages.add( new ValidatorMessage( msg,
+                                                            MessageLevel.ERROR,
+                                                            new Context( "Flaw in the rule definition: " +  getCvMappingRule().getId() ),
+                                                            this) );
+
+                        status = MappingRuleStatus.INVALID_XPATH;
+
+                        return; // abort the rule as itx xpath is not valid.
+                    } else {
+                        status = MappingRuleStatus.VALID_XPATH;
+                    }
+                }
+            }
 
             if ( log.isDebugEnabled() ) {
                 log.debug( "XPath '" + valueXpath + "' allowed to fetch " + valueResults.size() +

@@ -681,4 +681,63 @@ public class CvMappingRuleTest {
         print( messages );
         Assert.assertEquals( 0, messages.size() );
     }
+
+    @Test
+    public void check_mismatch_scope_element() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample5-protein-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals( 1, messages.size() );
+    }
+
+    @Test
+    public void check_typo_in_scope_xpath() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample6-protein-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+        // building model to apply checks on - one term from the list and 2 others not expected
+        Protein protein = new Protein( "prot1",
+                               new Modification( "MOD:00003" ),
+                               new Modification( "MOD:00649" ),
+                               new Modification( "MOD:00004" ) );
+        messages = ruleMngr.check( protein, "/protein" );
+        print( messages );
+        Assert.assertEquals( 1, messages.size() );
+    }
+
+    @Test
+    public void check_typo_in_value_xpath() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample7-protein-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+        // building model to apply checks on - one term from the list and 2 others not expected
+        Protein protein = new Protein( "prot1",
+                               new Modification( "MOD:00003" ),
+                               new Modification( "MOD:00649" ),
+                               new Modification( "MOD:00004" ) );
+        messages = ruleMngr.check( protein, "/protein" );
+        print( messages );
+        Assert.assertEquals( 1, messages.size() );
+    }
+
+
 }

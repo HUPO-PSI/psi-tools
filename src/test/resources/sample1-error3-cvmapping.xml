@@ -11,7 +11,7 @@
     </CvReferenceList>
 
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="a/b/c/d" requirementLevel="MAY"
+        <CvMappingRule id="R1" cvElementPath="a/b/c/d" requirementLevel="MAY"
                        scopePath="/a"
                        cvTermsCombinationLogic="OR">
             <!-- fine term -->

@@ -14,7 +14,7 @@
              it fetches 6 colors from 'garage/bikes/@color' where it should retreive
              6 bikes and check on their individual color
           -->        
-        <CvMappingRule cvElementPath="/house/garage/bikes/@color" cvTermsCombinationLogic="AND"
+        <CvMappingRule id="R1" cvElementPath="/house/garage/bikes/@color" cvTermsCombinationLogic="AND"
                        scopePath="/house/garage/bikes" requirementLevel="MUST" >
             <CvTerm termAccession="MI:0300" useTermName="true" useTerm="true" termName="alias type"
                     allowChildren="false" cvIdentifierRef="MI" isRepeatable="false" />

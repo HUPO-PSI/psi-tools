@@ -10,7 +10,7 @@
     </CvReferenceList>
 
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="a/b/c/d" requirementLevel="MAY" scopePath="a" cvTermsCombinationLogic="OR">
+        <CvMappingRule id="R1" cvElementPath="a/b/c/d" requirementLevel="MAY" scopePath="a" cvTermsCombinationLogic="OR">
             <!-- obsolete term -->
             <CvTerm termAccession="PSI:1000009" useTerm="true" termName="Ionization Mode" allowChildren="true"
                     cvIdentifierRef="MS" />

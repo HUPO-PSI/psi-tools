@@ -11,7 +11,7 @@
 
     <CvMappingRuleList>
 
-        <CvMappingRule cvElementPath="/protein/modifications/@accession" cvTermsCombinationLogic="XOR"
+        <CvMappingRule id="R1" cvElementPath="/protein/modifications/@accession" cvTermsCombinationLogic="XOR"
                        scopePath="/protein" requirementLevel="SHOULD" >
 
             <CvTerm termAccession="MOD:00001" useTermName="false" useTerm="true" termName="alkylated residue"

@@ -10,7 +10,7 @@
     </CvReferenceList>
 
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="/house/kitchen/note" requirementLevel="MUST" cvTermsCombinationLogic="OR"
+        <CvMappingRule id="R1" cvElementPath="/house/kitchen/note" requirementLevel="MUST" cvTermsCombinationLogic="OR"
                        scopePath="/house/kitchen">
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
                     cvIdentifierRef="MS" isRepeatable="false"/>
@@ -18,7 +18,7 @@
                     cvIdentifierRef="PATO"/>
         </CvMappingRule>
 
-        <CvMappingRule cvElementPath="/house/bathroom/bathtub/color" requirementLevel="SHOULD"
+        <CvMappingRule id="R2" cvElementPath="/house/bathroom/bathtub/color" requirementLevel="SHOULD"
                        cvTermsCombinationLogic="OR"
                        scopePath="/house/bathroom">
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"

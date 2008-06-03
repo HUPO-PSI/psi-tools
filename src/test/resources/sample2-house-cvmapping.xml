@@ -9,7 +9,7 @@
     </CvReferenceList>
 
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="/house/kitchen/note" requirementLevel="MAY"
+        <CvMappingRule id="R1" cvElementPath="/house/kitchen/note" requirementLevel="MAY"
                        scopePath="/house/kitchen" cvTermsCombinationLogic="OR">
 
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"

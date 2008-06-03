@@ -10,7 +10,7 @@
     </CvReferenceList>
 
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="a/b/c/d" scopePath="a" requirementLevel="MAY" cvTermsCombinationLogic="OR">
+        <CvMappingRule id="R1" cvElementPath="a/b/c/d" scopePath="a" requirementLevel="MAY" cvTermsCombinationLogic="OR">
             <!-- term without children for which we advise to use children -->
             <CvTerm termAccession="PSI:1000232" useTerm="false" termName="Peak Intensity" allowChildren="true"
                     cvIdentifierRef="MS" isRepeatable="false"/>

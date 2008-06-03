@@ -12,7 +12,7 @@
     </CvReferenceList>
 
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="a/b/c/d" scopePath="a" requirementLevel="MAY" cvTermsCombinationLogic="OR">
+        <CvMappingRule id="R1" cvElementPath="a/b/c/d" scopePath="a" requirementLevel="MAY" cvTermsCombinationLogic="OR">
             <!-- fake term -->
             <CvTerm termAccession="PSI:xxxx" cvIdentifierRef="MS" useTerm="false" termName="fake term 1"
                     allowChildren="true"

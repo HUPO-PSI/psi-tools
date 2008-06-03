@@ -11,10 +11,13 @@
 
     <CvMappingRuleList>
 
-        <CvMappingRule id="R1" cvElementPath="/protein/modifications/@accession" cvTermsCombinationLogic="AND"
-                       scopePath="/protein" requirementLevel="SHOULD" >
+        <CvMappingRule id="R1" cvElementPath="/protein/modifications/@accession" cvTermsCombinationLogic="XOR"
+                       scopePath="/proTein" requirementLevel="SHOULD" >
 
             <CvTerm termAccession="MOD:00001" useTermName="false" useTerm="true" termName="alkylated residue"
+                    allowChildren="false" cvIdentifierRef="MOD" isRepeatable="false" />
+
+            <CvTerm termAccession="MOD:00400" useTermName="false" useTerm="true" termName="deamidated residue"
                     allowChildren="false" cvIdentifierRef="MOD" isRepeatable="false" />
 
             <CvTerm termAccession="MOD:00649" useTermName="false" useTerm="true" termName="acylated residue"

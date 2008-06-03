@@ -10,7 +10,7 @@
 
     <!-- There is NO cupboard in the kitchen ! -->
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="kitchen/cupboard" requirementLevel="MUST" cvTermsCombinationLogic="OR"
+        <CvMappingRule id="R1" cvElementPath="kitchen/cupboard" requirementLevel="MUST" cvTermsCombinationLogic="OR"
                 scopePath="kitchen">
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
                     cvIdentifierRef="MS" />

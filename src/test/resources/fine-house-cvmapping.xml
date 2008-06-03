@@ -10,14 +10,14 @@
     </CvReferenceList>
 
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="/house/kitchen/note" requirementLevel="MUST" cvTermsCombinationLogic="OR" scopePath="/house/kitchen">
+        <CvMappingRule id="R1" cvElementPath="/house/kitchen/note" requirementLevel="MUST" cvTermsCombinationLogic="OR" scopePath="/house/kitchen">
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
                     cvIdentifierRef="MS" isRepeatable="false" />
             <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"
                     cvIdentifierRef="PATO" isRepeatable="false" />
         </CvMappingRule>
 
-        <CvMappingRule cvElementPath="/house/bathroom/bathtub/color" requirementLevel="SHOULD" cvTermsCombinationLogic="OR" scopePath="/house/bathroom">
+        <CvMappingRule id="R2" cvElementPath="/house/bathroom/bathtub/color" requirementLevel="SHOULD" cvTermsCombinationLogic="OR" scopePath="/house/bathroom">
             <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
                     cvIdentifierRef="MS" isRepeatable="false" />
             <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"

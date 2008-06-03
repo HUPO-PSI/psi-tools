@@ -8,7 +8,7 @@
     </CvReferenceList>
 
     <CvMappingRuleList>
-        <CvMappingRule cvElementPath="/house/garage/bikes/@color" requirementLevel="MUST" cvTermsCombinationLogic="OR"
+        <CvMappingRule id="R1" cvElementPath="/house/garage/bikes/@color" requirementLevel="MUST" cvTermsCombinationLogic="OR"
                        scopePath="/house/garage/bikes">
             <CvTerm termAccession="MI:0300" useTermName="true" useTerm="false" termName="alias type"
                     allowChildren="true" cvIdentifierRef="MI"/>
