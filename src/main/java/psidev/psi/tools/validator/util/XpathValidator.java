@@ -15,14 +15,14 @@
  */
 package psidev.psi.tools.validator.util;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Checks if a specific Xpath expression can be threaded onto an object instance.
@@ -79,7 +79,7 @@ public class XpathValidator {
         String xpathElement = xpathElements[idx];
         for ( Object currentObject : currentObjects ) {
 
-            if( currentObject == null ) {
+            if ( currentObject == null ) {
                 // there's nothing to check on
                 continue;
             }
@@ -88,24 +88,60 @@ public class XpathValidator {
                 log.debug( "Looking for " + xpathElement + " in " + currentObject.getClass().getSimpleName() );
             }
 
-            final Method method;
-            try {
-                if( xpathElement.startsWith( "@" )) {
-                    xpathElement = xpathElement.substring( 1 );
-                }
-                PropertyDescriptor pd = new PropertyDescriptor( xpathElement, currentObject.getClass() );
-                method = pd.getReadMethod();
-            } catch ( IntrospectionException e ) {
-                return "Could not find property '" + xpathElement + "' of the xpath expression '"+xpath+
-                       "' (element position: "+(idx+1)+") in the given object of: " +
-                       currentObject.getClass().getName();
+            if ( xpathElement.startsWith( "@" ) ) {
+                xpathElement = xpathElement.substring( 1 );
             }
-            if ( method != null && xpathElements.length > ( idx + 1 ) ) {
+
+            PropertyDescriptor propertyDescriptor = null;
+            try {
+                propertyDescriptor = PropertyUtils.getPropertyDescriptor( currentObject, xpathElement );
+            } catch ( Exception e ) {
+                // ignore
+                log.info( "Error while introspecting fields of bean: " + currentObject.getClass().getName(), e );
+            }
+
+            if ( propertyDescriptor == null ) {
+                // could not find that property in this file
+
+                int currentMinimumLevensteinDistance = Integer.MAX_VALUE;
+                Collection<String> bestGuesses = new ArrayList<String>( 2 );
+
                 try {
+                    final Set<String> properties = PropertyUtils.describe( currentObject ).keySet();
+
+                    for ( String fieldName : properties ) {
+                        int distance = StringUtils.getLevenshteinDistance( xpathElement, fieldName );
+                        if ( log.isDebugEnabled() ) {
+                            log.debug( "Levenshtein distance(" + xpathElement + ", " + fieldName + ") = " + distance );
+                        }
+
+                        if ( distance < currentMinimumLevensteinDistance ) {
+                            bestGuesses.clear();
+                            currentMinimumLevensteinDistance = distance;
+                            bestGuesses.add( fieldName );
+                        } else if ( distance == currentMinimumLevensteinDistance ) {
+                            bestGuesses.add( fieldName );
+                        }
+                    }
+
+                } catch ( Exception e ) {
+                    log.info( "Error while introspecting fields of bean: " + currentObject.getClass().getName(), e );
+                }
+
+
+                return "Could not find property '" + xpathElement + "' of the xpath expression '" + xpath +
+                       "' (element position: " + ( idx + 1 ) + ") in the given object of: " +
+                       currentObject.getClass().getName() + printGuess( bestGuesses );
+
+            } else if ( xpathElements.length > ( idx + 1 ) ) {
+
+                Method method = null;
+                try {
+                    method = propertyDescriptor.getReadMethod();
                     currentObject = method.invoke( currentObject );
                 } catch ( Exception e ) {
                     throw new RuntimeException( "Error invoking method " + currentObject.getClass().getName() + "." +
-                                                method.getName() + "()", e );
+                                                ( method.getName() != null ? method.getName() : "???" ) + "()", e );
                 }
 
                 if ( !( currentObject instanceof Collection ) ) {
@@ -116,5 +152,28 @@ public class XpathValidator {
         } // for
 
         return null; // success
+    }
+
+    private String printGuess( Collection<String> bestGuesses ) {
+        switch ( bestGuesses.size() ) {
+            case 0:
+                return "";
+
+            case 1:
+                return " - Did you mean '" + bestGuesses.iterator().next() + "' ?";
+
+            default:
+                StringBuilder sb = new StringBuilder();
+                sb.append( " - Did you mean any of the following: " );
+                for ( Iterator<String> stringIterator = bestGuesses.iterator(); stringIterator.hasNext(); ) {
+                    String guess = stringIterator.next();
+                    sb.append( '\'' ).append( guess ).append( '\'' );
+                    if ( stringIterator.hasNext() ) {
+                        sb.append( ", " );
+                    }
+                }
+                sb.append( " ?" );
+                return sb.toString();
+        }
     }
 }
