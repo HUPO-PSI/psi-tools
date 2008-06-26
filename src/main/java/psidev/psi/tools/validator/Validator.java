@@ -2,10 +2,11 @@ package psidev.psi.tools.validator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import psidev.psi.tools.cvrReader.CvRuleReader;
 import psidev.psi.tools.cvrReader.CvRuleReaderException;
+import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
+import psidev.psi.tools.objectRuleReader.mapping.jaxb.ObjectRuleList;
+import psidev.psi.tools.objectRuleReader.mapping.jaxb.Rule;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.validator.preferences.UserPreferences;
@@ -13,12 +14,7 @@ import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
 import psidev.psi.tools.validator.util.ValidatorReport;
-import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
-import psidev.psi.tools.objectRuleReader.mapping.jaxb.ObjectRuleList;
-import psidev.psi.tools.objectRuleReader.mapping.jaxb.Rule;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -201,7 +197,11 @@ public abstract class Validator {
      * @param file InputStream holding document to be validated
      * @return Collection of validator messages.
      * @throws ValidatorException Exception while trying to validate the input.
+     * @deprecated this method is specific to file validation. This calidator is only dealing with Object validation.
+     *             If you are using this mehod, keep in mind it will remove is later releases. Yet you can still
+     *             implement it in your own cvalidator.
      */
+    @Deprecated
     public abstract Collection<ValidatorMessage> validate( InputStream file ) throws ValidatorException;
 
     /**
