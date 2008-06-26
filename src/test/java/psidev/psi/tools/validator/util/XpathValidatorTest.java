@@ -2,6 +2,8 @@ package psidev.psi.tools.validator.util;
 
 import static org.junit.Assert.*;
 import org.junit.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.validator.rules.cvmapping.protein.Protein;
 import psidev.psi.tools.validator.rules.cvmapping.protein.CrossReference;
 import psidev.psi.tools.validator.rules.cvmapping.protein.Modification;
@@ -17,6 +19,8 @@ import java.util.ArrayList;
  * @version $Id$
  */
 public class XpathValidatorTest {
+
+    private static final Log log = LogFactory.getLog( XpathValidatorTest.class );
 
     @Test
     public void valid() throws Exception {
@@ -49,7 +53,6 @@ public class XpathValidatorTest {
 
         XpathValidator validator = new XpathValidator( xpath );
         final String msg = validator.validate( protein );
-        System.out.println( msg );
         Assert.assertNull( msg );
     }
 
@@ -61,7 +64,6 @@ public class XpathValidatorTest {
 
         XpathValidator validator = new XpathValidator( xpath );
         final String msg = validator.validate( protein );
-        System.out.println( msg );
         Assert.assertNull( msg );
     }
 
@@ -74,7 +76,6 @@ public class XpathValidatorTest {
 
         XpathValidator validator = new XpathValidator( xpath );
         final String msg = validator.validate( protein );
-        System.out.println( msg );
         Assert.assertNotNull( msg );
     }
 
@@ -87,7 +88,6 @@ public class XpathValidatorTest {
 
         XpathValidator validator = new XpathValidator( xpath );
         final String msg = validator.validate( protein );
-        System.out.println( msg );
         Assert.assertNotNull( msg );
     }
 
@@ -100,7 +100,6 @@ public class XpathValidatorTest {
 
         XpathValidator validator = new XpathValidator( xpath );
         final String msg = validator.validate( protein );
-        System.out.println( msg );
         Assert.assertNotNull( msg );
     }
 
@@ -113,7 +112,6 @@ public class XpathValidatorTest {
 
         XpathValidator validator = new XpathValidator( xpath );
         final String msg = validator.validate( protein );
-        System.out.println( msg );
         Assert.assertNotNull( msg );
     }
 }
