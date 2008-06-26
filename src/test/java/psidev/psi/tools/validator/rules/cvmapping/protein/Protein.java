@@ -28,10 +28,10 @@ import java.util.ArrayList;
  */
 public class Protein {
 
-    String name;
-    Collection<CrossReference> references;
-    Collection<Modification> modifications;
-    String sequence;
+    private String name;
+    private Collection<CrossReference> references;
+    private Collection<Modification> modifications;
+    private String sequence;
 
     public Protein( String name, CrossReference... references ) {
         this.name = name;
