@@ -3,9 +3,10 @@ package psidev.psi.tools.validator.rules;
 import java.util.Collection;
 
 /**
- * Author: florian
- * Date: 18-Jul-2007
- * Time: 11:55:58
+ * Definition of a rule.
+ *
+ * @author: florian
+ * @since 2.0.0
  */
 public interface Rule {
 

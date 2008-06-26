@@ -11,7 +11,7 @@ import java.util.Iterator;
  * 
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id: AbstractRule.java 656 2007-06-29 11:18:19 +0100 (Fri, 29 Jun 2007) skerrien $
- * @since <pre>26-Dec-2005</pre>
+ * @since 1.0
  */
 public abstract class AbstractRule implements Rule {
 
@@ -20,7 +20,6 @@ public abstract class AbstractRule implements Rule {
     ////////////////////////////
     // Instance variables
 
-    // TODO these attributes could be popuplated from the XML file as well.
     /**
      * The name of the rule.
      */
