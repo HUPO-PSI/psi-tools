@@ -22,8 +22,10 @@
     </description>
 
     <scm>
-        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk</connection>
-        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk</developerConnection>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk
+        </connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk
+        </developerConnection>
         <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk</url>
     </scm>
 
@@ -65,8 +67,14 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1</version>
+            <version>1.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.15</version>
+        </dependency>
+
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
@@ -105,5 +113,5 @@
             </snapshots>
         </repository>
     </repositories>
-    
+
 </project>
