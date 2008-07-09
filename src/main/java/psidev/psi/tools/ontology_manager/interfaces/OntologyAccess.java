@@ -15,29 +15,19 @@ public interface OntologyAccess {
 
     void loadOntology( String ontologyID, String name, String version, String format, URI uri) throws OntologyLoaderException;
 
-    /**
-     * Creates a Set of valid ontology term IDs accoring to the specified parameters.
-     * @param id the ontology term ID to search for.
-     * @param allowChildren if true, will add the IDs of all children of the specified term.
-     * @param useTerm if false, will not include the ID of the term itself.
-     * @return a Set of ontology IDs according to the specified parameters. Must always return a set. It might be empty. but must not be null.
-     */
-    Set<String> getValidIDs( String id, boolean allowChildren, boolean useTerm );
-
-    boolean isObsoleteID( String id );
-
-    String getTermNameByID( String id );
-
-    Set<String> getDirectParentsIDs( String id );
-
     void setOntologyDirectory( File directory );
 
-    // ToDo: isParent, is Child, getChildren(term, level),
-
     public Set<OntologyTermI> getValidTerms( String accession, boolean allowChildren, boolean useTerm );
+
     public OntologyTermI getTermForAccession( String accession );
+
     public boolean isObsolete( OntologyTermI term );
+
     public Set<OntologyTermI> getDirectParents( OntologyTermI term );
+
     public Set<OntologyTermI> getDirectChildren( OntologyTermI term );
 
+    public Set<OntologyTermI> getAllParents( OntologyTermI term );
+
+    public Set<OntologyTermI> getAllChildren( OntologyTermI term );
 }
