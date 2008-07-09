@@ -34,4 +34,10 @@ public interface OntologyAccess {
 
     // ToDo: isParent, is Child, getChildren(term, level),
 
+    public Set<OntologyTermI> getValidTerms( String accession, boolean allowChildren, boolean useTerm );
+    public OntologyTermI getTermForAccession( String accession );
+    public boolean isObsolete( OntologyTermI term );
+    public Set<OntologyTermI> getDirectParents( OntologyTermI term );
+    public Set<OntologyTermI> getDirectChildren( OntologyTermI term );
+
 }

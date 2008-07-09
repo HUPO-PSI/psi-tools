@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.ontology_manager.impl.local.model.OntologyTerm;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -133,6 +134,26 @@ public class LocalOntology implements OntologyAccess {
 
     public void setOntologyDirectory(File directory) {
         if (directory != null) ontologyDirectory = directory;
+    }
+
+    public Set<OntologyTermI> getValidTerms(String accession, boolean allowChildren, boolean useTerm) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public OntologyTermI getTermForAccession(String accession) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean isObsolete(OntologyTermI term) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Set<OntologyTermI> getDirectParents(OntologyTermI term) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Set<OntologyTermI> getDirectChildren(OntologyTermI term) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
