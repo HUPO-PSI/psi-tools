@@ -2,7 +2,9 @@ package psidev.psi.tools.ontology_manager.impl.local;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
 import psidev.psi.tools.ontology_manager.impl.local.model.OntologyTerm;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.util.*;
 
@@ -15,9 +17,6 @@ import java.util.*;
  */
 public class OntologyImpl implements Ontology {
 
-    /**
-     * Sets up a logger for that class.
-     */
     public static final Log log = LogFactory.getLog( OntologyImpl.class );
 
     ///////////////////////////////
@@ -26,17 +25,32 @@ public class OntologyImpl implements Ontology {
     /**
      * Pool of all term contained in that ontology.
      */
-    private Collection<OntologyTerm> ontologyTerms = new ArrayList<OntologyTerm>( 1024 );
+    private Collection<OntologyTermI> ontologyTerms = new ArrayList<OntologyTermI>( 1024 );
+
+    /**
+     * Represent the relationship: child -> parents.
+     */
+    private final Map<OntologyTermI, Set<OntologyTermI>> parents = new HashMap<OntologyTermI, Set<OntologyTermI>>();
+
+    /**
+     * Represent the relationship: parent -> children.
+     */
+    private final Map<OntologyTermI, Set<OntologyTermI>> children = new HashMap<OntologyTermI, Set<OntologyTermI>>();
 
     /**
      * Mapping of all OboTerm by their ID.
      */
-    private Map<String, OntologyTerm> id2ontologyTerm = new HashMap<String, OntologyTerm>( 1024 );
+    private Map<String, OntologyTermI> id2ontologyTerm = new HashMap<String, OntologyTermI>( 1024 );
 
     /**
      * Collection of root terms of that ontology. A root term is defined as follow: term having no parent.
      */
-    private Collection<OntologyTerm> roots = null;
+    private Collection<OntologyTermI> roots = null;
+
+    /**
+     * List of all obsolete term found while loading the ontology.
+     */
+    private Collection<OntologyTermI> obsoleteTerms = new ArrayList<OntologyTermI>( );
 
     /////////////////////////////
     // Public methods
@@ -46,15 +60,16 @@ public class OntologyImpl implements Ontology {
      *
      * @param term the OntologyTerm to add in that Ontology.
      */
-    public void addTerm( OntologyTerm term ) {
+    public void addTerm( OntologyTermI term ) {
 
         ontologyTerms.add( term );
-        String id = term.getId();
+        String id = term.getTermAccession();
         if ( id2ontologyTerm.containsKey( id ) ) {
-            OntologyTerm old = (OntologyTerm) id2ontologyTerm.get( id );
+            OntologyTermI old = id2ontologyTerm.get( id );
+
             System.err.println( "WARNING: 2 Objects have the same ID (" + id + "), the old one is being replaced." );
-            System.err.println( "         old: '" + old.getShortName() + "'" );
-            System.err.println( "         new: '" + term.getShortName() + "'" );
+            System.err.println( "         old: '" + old.getPreferredName() + "'" );
+            System.err.println( "         new: '" + term.getPreferredName() + "'" );
         }
 
         id2ontologyTerm.put( id, term );
@@ -69,12 +84,28 @@ public class OntologyImpl implements Ontology {
      * @param childId  The child term.
      */
     public void addLink( String parentId, String childId ) {
+        
+        OntologyTermI child = id2ontologyTerm.get( childId );
+        OntologyTermI parent = id2ontologyTerm.get( parentId );
 
-        OntologyTerm child = (OntologyTerm) id2ontologyTerm.get( childId );
-        OntologyTerm parent = (OntologyTerm) id2ontologyTerm.get( parentId );
+        if ( child == null ) {
+            throw new NullPointerException( "You must give a non null child" );
+        }
 
-        child.addParent( parent );
-        parent.addChild( child );
+        if ( parent == null ) {
+            throw new NullPointerException( "You must give a non null parent" );
+        }
+
+        if ( !children.containsKey( parent ) ) {
+            children.put( parent, new HashSet<OntologyTermI>() );
+        }
+
+        if ( !parents.containsKey( child ) ) {
+            parents.put( child, new HashSet<OntologyTermI>() );
+        }
+
+        children.get( parent ).add( child );
+        parents.get( child ).add( parent );
 
         flushRootsCache();
     }
@@ -104,11 +135,14 @@ public class OntologyImpl implements Ontology {
      * Search for a OboTerm by its ID.
      *
      * @param id the identifier of the OntologyTerm we are looking for.
-     *
      * @return a OntologyTerm or null if not found.
      */
-    public OntologyTerm search( String id ) {
-        return (OntologyTerm) id2ontologyTerm.get( id );
+    public OntologyTermI search( String id ) {
+        return id2ontologyTerm.get( id );
+    }
+
+    public boolean hasParent( OntologyTermI term ) {
+        return parents.containsKey( term );
     }
 
     /**
@@ -117,19 +151,19 @@ public class OntologyImpl implements Ontology {
      *
      * @return a collection of Root term.
      */
-    public Collection<OntologyTerm> getRoots() {
+    public Collection<OntologyTermI> getRoots() {
 
         if ( roots != null ) {
             return roots;
         }
 
         // it wasn't precalculated, then do it here...
-        roots = new HashSet<OntologyTerm>();
+        roots = new HashSet<OntologyTermI>();
 
         for ( Iterator iterator = ontologyTerms.iterator(); iterator.hasNext(); ) {
-            OntologyTerm ontologyTerm = (OntologyTerm) iterator.next();
+            OntologyTermI ontologyTerm = ( OntologyTermI ) iterator.next();
 
-            if ( ! ontologyTerm.hasParent() ) {
+            if ( !hasParent( ontologyTerm )) {
                 roots.add( ontologyTerm );
             }
         }
@@ -146,57 +180,96 @@ public class OntologyImpl implements Ontology {
      *
      * @return all Ontology term found in the Ontology.
      */
-    public Collection<OntologyTerm> getOntologyTerms() {
+    public Collection<OntologyTermI> getOntologyTerms() {
         return Collections.unmodifiableCollection( ontologyTerms );
     }
+
+    public void addObsoleteTerm(OntologyTermI term) {
+         obsoleteTerms.add( term );
+    }
+
+    public boolean isObsoleteTerm( OntologyTermI term ) {
+        return obsoleteTerms.contains( term );
+    }    
 
     /**
      * Go through the list of all CV Term and select those that are obsolete.
      *
      * @return a non null Collection of obsolete term.
      */
-    public Collection<OntologyTerm> getObsoleteTerms() {
-
-        Collection<OntologyTerm> obsoleteTerms = new ArrayList<OntologyTerm>();
-
-        for ( Iterator iterator = getOntologyTerms().iterator(); iterator.hasNext(); ) {
-            OntologyTerm ontologyTerm = (OntologyTerm) iterator.next();
-
-            if ( ontologyTerm.isObsolete() ) {
-                obsoleteTerms.add( ontologyTerm );
-            }
-        }
-
+    public Collection<OntologyTermI> getObsoleteTerms() {
         return obsoleteTerms;
+    }
+
+    public Set<OntologyTermI> getDirectParents( OntologyTermI term ) {
+        final Set<OntologyTermI> directParents = parents.get( term );
+        if( directParents == null ) {
+            return Collections.EMPTY_SET;
+        } else {
+            return directParents;
+        }
+    }
+
+    public Set<OntologyTermI> getDirectChildren( OntologyTermI term ) {
+        final Set<OntologyTermI> directChildren = children.get( term );
+        if( directChildren == null ) {
+            return Collections.EMPTY_SET;
+        } else {
+            return directChildren;
+        }
+    }
+
+    public Set<OntologyTermI> getAllParents( OntologyTermI term ) {
+        Set<OntologyTermI> parents = new HashSet<OntologyTermI>( );
+        getAllParents( term, parents );
+        return parents;
+    }
+
+    private void getAllParents( OntologyTermI term, Set<OntologyTermI> parents ) {
+        final Collection<OntologyTermI> directParents = getDirectParents( term );
+        parents.addAll( directParents );
+        for ( OntologyTermI parent : directParents ) {
+            getAllParents( parent, parents );
+        }
+    }
+
+    public Set<OntologyTermI> getAllChildren( OntologyTermI term ) {
+        Set<OntologyTermI> children = new HashSet<OntologyTermI>( );
+        getAllChildren( term, children );
+        return children;
+    }
+
+    private void getAllChildren( OntologyTermI term, Set<OntologyTermI> children ) {
+        final Collection<OntologyTermI> directChildren = getDirectParents( term );
+        children.addAll( directChildren );
+        for ( OntologyTermI child : directChildren ) {
+            getAllParents( child, children );
+        }
     }
 
     /////////////////////////////////
     // Utility - Display methods
 
     public void print() {
-
         log.info( ontologyTerms.size() + " terms to display." );
-
-        Collection roots = getRoots();
-        log.info( roots.size() + " root(s) found." );
-
-        for ( Iterator iterator = roots.iterator(); iterator.hasNext(); ) {
-            OntologyTerm root = (OntologyTerm) iterator.next();
-
+        final Collection<OntologyTermI> roots = getRoots();
+        if ( log.isDebugEnabled() ) {
+            log.info( this.roots.size() + " root(s) found." );
+        }
+        for ( OntologyTermI root : roots ) {
             print( root );
         }
     }
 
-    private void print( OntologyTerm term, String indent ) {
+    private void print( OntologyTermI term, String indent ) {
 
-        log.info( indent + term.getId() + "   " + term.getShortName() + " (" + term.getFullName() + ")" );
-        for ( Iterator iterator = term.getChildren().iterator(); iterator.hasNext(); ) {
-            OntologyTerm ontologyTerm = (OntologyTerm) iterator.next();
-            print( ontologyTerm, indent + "  " );
+        log.info( indent + term.getTermAccession() + "   " + term.getPreferredName() );
+        for ( OntologyTermI child : getDirectChildren( term ) ) {
+            print( child, indent + "  " );
         }
     }
 
-    public void print( OntologyTerm term ) {
+    public void print( OntologyTermI term ) {
         print( term, "" );
     }
 }

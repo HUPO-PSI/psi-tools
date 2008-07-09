@@ -9,6 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import psidev.psi.tools.ontology_manager.impl.local.model.OntologyTerm;
+import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 import uk.ac.ebi.ook.loader.impl.AbstractLoader;
 import uk.ac.ebi.ook.loader.parser.OBOFormatParser;
 import uk.ac.ebi.ook.model.interfaces.TermRelationship;
@@ -57,9 +59,6 @@ public class OboLoader extends AbstractLoader {
         this.keepDownloadedOntologiesOnDisk = keepDownloadedOntologiesOnDisk;
     }
 
-
-
-
     /////////////////////////////
     // AbstractLoader's methods
 
@@ -103,29 +102,9 @@ public class OboLoader extends AbstractLoader {
             TermBean term = ( TermBean ) iterator.next();
 
             // convert term into a OboTerm
-            OntologyTerm ontologyTerm = new OntologyTerm( term.getIdentifier() );
+            OntologyTermI ontologyTerm = new OntologyTermImpl( term.getIdentifier(), term.getName() );
 
-            // try to split the name into short and long name
-            int index = term.getName().indexOf( ':' );
-            if ( index != -1 ) {
-                // found it !
-                String name = term.getName();
-                String shortName = name.substring( 0, index ).trim();
-                String longName = name.substring( index + 1, name.length() ).trim();
-
-                ontologyTerm.setShortName( shortName );
-                ontologyTerm.setFullName( longName );
-
-            } else {
-                // not found
-                ontologyTerm.setShortName( term.getName() );
-                ontologyTerm.setFullName( term.getName() );
-            }
-
-            ontologyTerm.setObsolete( term.isObsolete() );
-
-            // TODO OboTerm.setObsoleteMessage( );
-
+            ontology.addObsoleteTerm( ontologyTerm );
             ontology.addTerm( ontologyTerm );
         }
 
@@ -145,10 +124,6 @@ public class OboLoader extends AbstractLoader {
 
         return ontology;
     }
-
-//    public void setUserPreferences( UserPreferences userPreferences ) {
-//        this.userPreferences = userPreferences;
-//    }
 
     /**
      * Parse the given OBO file and build a representation of the DAG into an IntactOntology.
