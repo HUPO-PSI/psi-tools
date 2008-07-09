@@ -13,10 +13,18 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 public class OntologyTermImpl implements OntologyTermI {
 
     private String acc;
+    
     private String name;
 
-    public OntologyTermImpl( String acc, String name ) {
+    //////////////////////////
+    // Constructors
+
+    public OntologyTermImpl( String acc ) {
         setTermAccession( acc );
+    }
+
+    public OntologyTermImpl( String acc, String name ) {
+        this( acc );
         this.name = name;
     }
 
@@ -58,7 +66,6 @@ public class OntologyTermImpl implements OntologyTermI {
         OntologyTermImpl that = ( OntologyTermImpl ) o;
 
         if ( !acc.equals( that.acc ) ) return false;
-        if ( name != null ? !name.equals( that.name ) : that.name != null ) return false;
 
         return true;
     }
@@ -67,7 +74,6 @@ public class OntologyTermImpl implements OntologyTermI {
     public int hashCode() {
         int result;
         result = acc.hashCode();
-        result = 31 * result + ( name != null ? name.hashCode() : 0 );
         return result;
     }
 }
