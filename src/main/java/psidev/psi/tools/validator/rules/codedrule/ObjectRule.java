@@ -28,7 +28,7 @@ public abstract class ObjectRule<T> extends AbstractRule {
      * @param t the object we want to check on.
      * @return true is the current rule is able to check on it.
      */
-    public abstract boolean canCheck( T t );
+    public abstract boolean canCheck( Object t );
 
     /**
      * Validates the given object.
