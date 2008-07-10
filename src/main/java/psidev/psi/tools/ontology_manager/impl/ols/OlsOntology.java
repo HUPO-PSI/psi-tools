@@ -32,6 +32,7 @@ public class OlsOntology implements OntologyAccess {
     private static String cacheConfig = "olsontology-oscache.properties";
     static Query query;
     String ontologyID;
+    Set<String> rootAccs;
 
     // methods that use the cache, use the method name to as part of the cahce key
     private final byte GET_VALID_IDS = 1;
@@ -39,6 +40,10 @@ public class OlsOntology implements OntologyAccess {
     private final byte GET_TERM_NAME_BY_ID = 3;
     private final byte GET_DIRECT_PARENTS_IDS = 4;
     private final byte GET_CHILD_TERMS = 5;
+    private final byte GET_CHILDREN = 6;
+    private final byte GET_DIRECT_PARENTS = 7;
+    private final byte IS_OBSOLETE = 8;
+    private final byte GET_TERM_FOR_ACCESSION = 9;
 
     private final boolean useByteCodeGroup = true;
 
@@ -86,6 +91,13 @@ public class OlsOntology implements OntologyAccess {
 
     public void loadOntology( String ontologyID, String name, String version, String format, URI uri ) {
         this.ontologyID = ontologyID;
+        try {
+            Map roots = query.getRootTerms( ontologyID );
+            rootAccs = new HashSet<String>();
+            rootAccs.addAll(roots.keySet());
+        } catch (RemoteException e) {
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+        }
         log.info("Successfully created OlsOntology from values: ontology=" + ontologyID + " name=" + name
                 + " version=" + version + " format=" + format + " location=" + uri);
     }
@@ -399,8 +411,16 @@ public class OlsOntology implements OntologyAccess {
     }
 
 
-
-
+    /**
+     * Method that is used by the validator to determine a Set of Ontology terms that are valid terms
+     * for a particular rule. E.g. according to the flags, this can be the term corresponding to the
+     * provided accession or its children or both.
+     *
+     * @param accession the accession (ID) of a ontology term.
+     * @param allowChildren flag weather or not to allow child terms of the specified accession.
+     * @param useTerm flag weather or not to use the given accession as one of the valid terms.
+     * @return a Set of OntologyTerms that are valid (in terms of the validator).
+     */
     public Set<OntologyTermI> getValidTerms(String accession, boolean allowChildren, boolean useTerm) {
         Set<OntologyTermI> validTerms = new HashSet<OntologyTermI>();
         OntologyTermI term = getTermForAccession( accession );
@@ -415,7 +435,7 @@ public class OlsOntology implements OntologyAccess {
         return validTerms;
     }
 
-    public OntologyTermI getTermForAccession( String accession ) {
+    public OntologyTermI getTermForAccessionUncached( String accession ) {
         String termName;
         try {
             termName = query.getTermById( accession, ontologyID );
@@ -425,18 +445,51 @@ public class OlsOntology implements OntologyAccess {
         // check the result! ols returns the input accession if no matching entry was found
         OntologyTermI term;
         if ( termName != null && termName.length() > 0 && !termName.equals( accession ) ) {
-            term = new OntologyTermImpl();
-            term.setTermAccession( accession );
-            term.setPreferredName( termName );
+            term = new OntologyTermImpl(accession, termName);
         } else {
-            // ToDo: maybe change? throw Exception, return accession, ...
             term = null;
         }
 
         return term;
     }
+    public OntologyTermI getTermForAccession( String accession ) {
+        // create a unique string for this query
+        // generate from from method specific ID, the ontology ID and the input parameter
+        String myKey = GET_TERM_FOR_ACCESSION + '_' + ontologyID + '_' + accession;
 
-    public boolean isObsolete(OntologyTermI term) {
+        OntologyTermI result;
+        // try to get the result from the cache
+        try {
+            result = (OntologyTermI) admin.getFromCache(myKey);
+            log.debug( "Using cached terms for key: " + myKey );
+        } catch (NeedsRefreshException nre) {
+            boolean updated = false;
+            // if not found in cache, use uncached method and store result in cache
+            try {
+                result = this.getTermForAccessionUncached( accession );
+                log.debug( "Storing uncached terms for key: " + myKey );
+                admin.putInCache(myKey, result);
+                updated = true;
+            } finally {
+                if (!updated) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    admin.cancelUpdate(myKey);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * This method will use a OLS query to check weather the specified
+     * ontoloy term is obsolete or not.
+     * Note: this is the uncached version which will always use OLS
+     * (remote sevice calls).
+     *
+     * @param term the ontology term to check for being obsolete.
+     * @return true if the term is flagged obolete, false otherwise.
+     */
+    public boolean isObsoleteUncached(OntologyTermI term) {
         boolean retVal;
         try {
             retVal = query.isObsolete( term.getTermAccession(), ontologyID );
@@ -445,8 +498,45 @@ public class OlsOntology implements OntologyAccess {
         }
         return retVal;
     }
+    /**
+     * This method will check weather the specified ontoloy term is
+     * obsolete or not.
+     * Note: this is the cached version which will first lookup the cache
+     * and only invoke the uncached method if no cached entry was found.
+     *
+     * @param term the ontology term to check for being obsolete.
+     * @return true if the term is flagged obolete, false otherwise.
+     */
+    public boolean isObsolete(OntologyTermI term) {
+        // create a unique string for this query
+        // generate from from method specific ID, the ontology ID and the input parameter
+        String myKey = IS_OBSOLETE + '_' + ontologyID + '_' + term.getTermAccession();
 
-    public Set<OntologyTermI> getDirectParents(OntologyTermI term) {
+        boolean result;
+        // try to get the result from the cache
+        try {
+            result = (Boolean) admin.getFromCache(myKey);
+            log.debug( "Using cached terms for key: " + myKey );
+        } catch (NeedsRefreshException nre) {
+            boolean updated = false;
+            // if not found in cache, use uncached method and store result in cache
+            try {
+                result = this.isObsoleteUncached( term );
+                log.debug( "Storing uncached terms for key: " + myKey );
+                admin.putInCache(myKey, result);
+                updated = true;
+            } finally {
+                if (!updated) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    admin.cancelUpdate(myKey);
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public Set<OntologyTermI> getDirectParentsUncached(OntologyTermI term) {
         Map results;
         try {
             results = query.getTermParents( term.getTermAccession(), ontologyID );
@@ -455,12 +545,62 @@ public class OlsOntology implements OntologyAccess {
         }
         return olsMap2TermSet( results );
     }
+    public Set<OntologyTermI> getDirectParents(OntologyTermI term) {
+        // create a unique string for this query
+        // generate from from method specific ID, the ontology ID and the input parameter
+        String myKey = GET_DIRECT_PARENTS + '_' + ontologyID + '_' + term.getTermAccession();
 
-    public Set<OntologyTermI> getDirectChildren(OntologyTermI term) {
-        return getChildren( term, 1);
+        Set<OntologyTermI> result;
+        // try to get the result from the cache
+        try {
+            result = (Set<OntologyTermI>) admin.getFromCache(myKey);
+            log.debug( "Using cached terms for key: " + myKey );
+        } catch (NeedsRefreshException nre) {
+            boolean updated = false;
+            // if not found in cache, use uncached method and store result in cache
+            try {
+                result = this.getDirectParentsUncached( term );
+                log.debug( "Storing uncached terms for key: " + myKey );
+                admin.putInCache(myKey, result);
+                updated = true;
+            } finally {
+                if (!updated) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    admin.cancelUpdate(myKey);
+                }
+            }
+        }
+        return result;
+    }
+    public Set<OntologyTermI> getAllParents(OntologyTermI term) {
+        Set<OntologyTermI> allParents = new HashSet<OntologyTermI>();
+        addParents(term, allParents);
+        return allParents;
+    }
+    private void addParents(OntologyTermI term, Set<OntologyTermI> parents) {
+        Set<OntologyTermI> dps = getDirectParents(term);
+        for (OntologyTermI dp : dps) {
+            // if the parent is not already contained in the list: add it
+            if ( !parents.contains(dp)  ) {
+                parents.add(dp);
+                // only if it is not a root term, look for more parents
+                if ( !rootAccs.contains(dp.getTermAccession()) ) {
+                    addParents(dp, parents);
+                }
+            }
+        }
     }
 
-    public Set<OntologyTermI> getChildren(OntologyTermI term, int level ) {
+
+    /**
+     * Method to retrieve child terms of the specified ontology term.
+     * Note: this method is uncached.
+     *
+     * @param term the ontology term to get the child terms for.
+     * @param level up to which level in depth to search (note: -1 will get ALL children)
+     * @return a Set containing the child terms of the specified term.
+     */
+    public Set<OntologyTermI> getChildrenUncached(OntologyTermI term, int level ) {
         int[] relationshipTypes = { 1, 2, 3, 4 };
         Map results;
         try {
@@ -470,17 +610,81 @@ public class OlsOntology implements OntologyAccess {
         }
         return olsMap2TermSet( results );
     }
+    /**
+     * Method to retrieve only the direct child terms of the specified
+     * ontology term. This method uses the getChildren(OntologyTermI, int)
+     * method with a level of 1 to retrieve the direct children on the
+     *  specified term.
+     *
+     * @param term the ontology term to get the child terms for.
+     * @return a Set containing the direct child terms of the specified term.
+     */
+    public Set<OntologyTermI> getDirectChildren(OntologyTermI term) {
+        return getChildren( term, 1);
+    }
+    /**
+     * Method to retrieve child terms of the specified ontology term.
+     * Note: this method is cached.
+     *
+     * @param term the ontology term to get the child terms for.
+     * @param level up to which level in depth to search for children (note: -1 will get ALL children)
+     * @return a Set containing the child terms of the specified term.
+     */
+    public Set<OntologyTermI> getChildren(OntologyTermI term, int level ) {
+        // create a unique string for this query
+        // generate from from method specific ID, the ontology ID and the input parameter
+        String myKey = GET_CHILDREN + '_' + ontologyID + '_' + term.getTermAccession() + '_' + level;
 
+        Set<OntologyTermI> result;
+        // try to get the result from the cache
+        try {
+            result = (Set<OntologyTermI>) admin.getFromCache(myKey);
+            log.debug( "Using cached terms for key: " + myKey );
+        } catch (NeedsRefreshException nre) {
+            boolean updated = false;
+            // if not found in cache, use uncached method and store result in cache
+            try {
+                result = this.getChildrenUncached( term, level );
+                log.debug( "Storing uncached terms for key: " + myKey );
+                admin.putInCache(myKey, result);
+                updated = true;
+            } finally {
+                if (!updated) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    admin.cancelUpdate(myKey);
+                }
+            }
+        }
+        return result;
+    }
+    /**
+     * Method to retrieve all child terms of the specified ontology term.
+     * This method uses the getChildren(OntologyTermI, int) method with
+     * a level of -1 to retrieve all the children on the specified term.
+     *
+     * @param term the ontology term to get the child terms for.
+     * @return a Set containing all the child terms of the specified term.
+     */
+    public Set<OntologyTermI> getAllChildren(OntologyTermI term) {
+        return getChildren( term, -1 );
+    }
+
+    /**
+     * Method to convert the Map returned by the OLS query into a Set of OntologyTerms.
+     * The OLS Map is supposed to contain a ontology term accession (String) as key
+     * and a preferred name (String) as value for each ontology term entry.
+     * In the conversion, each accession - preferred name -pair is combined in one
+     * OntologyTermI compliant Object and all such objects are collected in the result set.
+     *
+     * @param results the Map returned my a OLS query.
+     * @return a Set of OntologyTermI objects representing the result contained in the Map.
+     */
     private Set<OntologyTermI> olsMap2TermSet( Map results ) {
         Set<OntologyTermI> terms = new HashSet<OntologyTermI>();
-        OntologyTermI ot;
         for ( Object o : results.keySet() ) {
             Object v = results.get( o );
             if (o instanceof String && v instanceof String ) {
-                ot = new OntologyTermImpl();
-                ot.setTermAccession( (String)o );
-                ot.setPreferredName( (String)v );
-                terms.add( ot );
+                terms.add( new OntologyTermImpl( (String)o, (String)v ) );
             } else {
                 throw new IllegalStateException( "OLS query returned unexpected result!" +
                         " Expected Map with key and value of class String," +
@@ -510,6 +714,12 @@ public class OlsOntology implements OntologyAccess {
 
         Set<OntologyTermI> parents = ols.getDirectParents( term );
         System.out.println( "Has parents: " + parents.size() );
+        Set<OntologyTermI> allParents = ols.getAllParents( term );
+        System.out.println( "All parents: " + allParents.size() );
+        for (OntologyTermI allParent : allParents) {
+            System.out.println(allParent);
+        }
+
         Set<OntologyTermI> valid = ols.getValidTerms( "GO:0030288", true, true );
         System.out.println( "Valid terms: " + valid.size() );
 
