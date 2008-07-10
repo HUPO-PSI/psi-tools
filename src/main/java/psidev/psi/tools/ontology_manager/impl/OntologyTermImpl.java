@@ -32,8 +32,8 @@ public class OntologyTermImpl implements OntologyTermI {
     // Getter & Setter
 
     public void setTermAccession( String accession ) {
-        if ( acc == null || acc.trim().length()==0) {
-            throw new NullPointerException( "You must give a non null/empty term accession" );
+        if ( accession == null || accession.trim().length()==0) {
+            throw new IllegalArgumentException( "You must give a non null/empty term accession" );
         }
         acc = accession;
     }
