@@ -7,13 +7,13 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
  *
  * @author Florian Reisinger (florian@ebi.ac.uk)
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
- * @since 2.0.0
  * @version $Id$
+ * @since 2.0.0
  */
 public class OntologyTermImpl implements OntologyTermI {
 
     private String acc;
-    
+
     private String name;
 
     //////////////////////////
@@ -32,11 +32,12 @@ public class OntologyTermImpl implements OntologyTermI {
     // Getter & Setter
 
     public void setTermAccession( String accession ) {
-        if ( accession == null || accession.trim().length()==0) {
+        if ( accession == null || accession.trim().length() == 0 ) {
             throw new IllegalArgumentException( "You must give a non null/empty term accession" );
         }
         acc = accession;
     }
+
     public String getTermAccession() {
         return acc;
     }
@@ -44,6 +45,7 @@ public class OntologyTermImpl implements OntologyTermI {
     public void setPreferredName( String preferredName ) {
         name = preferredName;
     }
+
     public String getPreferredName() {
         return name;
     }
