@@ -2,7 +2,6 @@ package psidev.psi.tools.ontology_manager.impl.local;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.tools.ontology_manager.impl.local.model.OntologyTerm;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
@@ -10,7 +9,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +17,7 @@ import java.util.Set;
  *
  * @author Florian Reisinger
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
- * Date: 07-Aug-2007
+ * @since 2.0.0
  */
 public class LocalOntology implements OntologyAccess {
 
@@ -78,35 +76,25 @@ public class LocalOntology implements OntologyAccess {
         }
     }
 
-    public Set<String> getValidIDs( String id, boolean allowChildren, boolean useTerm ) {
-        Set<String> terms = new HashSet<String>();
-
-        OntologyTermI resultTerm = ontology.search( id ); // will return null if no such term found
-
-        if ( resultTerm != null ) {
-            if ( useTerm ) {
-                terms.add( resultTerm.getTermAccession() );
-            }
-            if ( allowChildren ) {
-                Collection<OntologyTermI> childTerms = ontology.getAllChildren( resultTerm );
-                for ( OntologyTermI childTerm : childTerms ) {
-                    terms.add( childTerm.getTermAccession() );
-                }
-            }
-        } else {
-            log.warn( "No matching entries in local ontology '" + ontologyID
-                      + "' for term '" + id + "'. Returning empty set of valid terms." );
-        }
-        log.debug( "Returning " + terms.size() + " valid IDs for ontology= " + ontologyID + " id=" + id + " allowChilrden=" + allowChildren + " useTerm=" + useTerm );
-        return terms;
-    }
-
     public void setOntologyDirectory( File directory ) {
         if ( directory != null ) ontologyDirectory = directory;
     }
 
     public Set<OntologyTermI> getValidTerms( String accession, boolean allowChildren, boolean useTerm ) {
-        throw new UnsupportedOperationException( "NOT IMPLEMENTED YET." );
+        Set<OntologyTermI> collectedTerms = new HashSet<OntologyTermI>();
+
+        final OntologyTermI term = getTermForAccession( accession );
+        if ( term != null ) {
+            if ( useTerm ) {
+                collectedTerms.add( term );
+            }
+
+            if ( allowChildren ) {
+                collectedTerms.addAll( getAllChildren( term ) );
+            }
+        }
+
+        return collectedTerms;
     }
 
     public OntologyTermI getTermForAccession( String accession ) {
@@ -122,7 +110,7 @@ public class LocalOntology implements OntologyAccess {
     }
 
     public Set<OntologyTermI> getDirectChildren( OntologyTermI term ) {
-        return ontology.getDirectChildren(  term );
+        return ontology.getDirectChildren( term );
     }
 
     public Set<OntologyTermI> getAllParents( OntologyTermI term ) {
@@ -200,6 +188,4 @@ public class LocalOntology implements OntologyAccess {
             }
         }
     }
-
-
 }
