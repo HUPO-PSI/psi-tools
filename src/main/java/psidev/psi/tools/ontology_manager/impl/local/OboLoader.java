@@ -8,7 +8,6 @@ package psidev.psi.tools.ontology_manager.impl.local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
-import psidev.psi.tools.ontology_manager.impl.local.model.OntologyTerm;
 import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 import uk.ac.ebi.ook.loader.impl.AbstractLoader;
@@ -17,10 +16,12 @@ import uk.ac.ebi.ook.model.interfaces.TermRelationship;
 import uk.ac.ebi.ook.model.ojb.TermBean;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * Wrapper class that hides the way OLS handles OBO files.
@@ -44,7 +45,7 @@ public class OboLoader extends AbstractLoader {
 
 //    private UserPreferences userPreferences = new UserPreferences(); // set to default
 
-    public OboLoader(File ontologyDirectory) {
+    public OboLoader( File ontologyDirectory ) {
         this.ontologyDirectory = ontologyDirectory;
     }
 
@@ -55,7 +56,7 @@ public class OboLoader extends AbstractLoader {
         return keepDownloadedOntologiesOnDisk;
     }
 
-    public void setKeepDownloadedOntologiesOnDisk(boolean keepDownloadedOntologiesOnDisk) {
+    public void setKeepDownloadedOntologiesOnDisk( boolean keepDownloadedOntologiesOnDisk ) {
         this.keepDownloadedOntologiesOnDisk = keepDownloadedOntologiesOnDisk;
     }
 
@@ -104,8 +105,11 @@ public class OboLoader extends AbstractLoader {
             // convert term into a OboTerm
             OntologyTermI ontologyTerm = new OntologyTermImpl( term.getIdentifier(), term.getName() );
 
-            ontology.addObsoleteTerm( ontologyTerm );
             ontology.addTerm( ontologyTerm );
+
+            if( term.isObsolete() ) {
+                ontology.addObsoleteTerm( ontologyTerm );
+            }
         }
 
         // 2. build hierarchy based on the relations of the Terms
@@ -363,9 +367,6 @@ public class OboLoader extends AbstractLoader {
             throw new OntologyLoaderException( "Error while loading URL (" + url + ")", e );
         }
     }
-
-
-
 
 
 }
