@@ -81,38 +81,4 @@ public class OntologyManagerTest {
         // ontologies.xml defines a LocalOntology for 'MOD'
         Assert.assertTrue( oa3 instanceof LocalOntology);
     }
-
-    @Test
-    public void getChildTermsOLS() throws OntologyLoaderException {
-        // get child terms of 'alias type' (MI:0300) form the MI ontology
-        Set<String> result = om.getValidIDs( "MI", "MI:0300", true, false );
-        // should be 9 terms (15. August 2007)
-        Assert.assertEquals( "There should be 9 child terms for MI:0300!", 13, result.size() );
-    }
-
-    @Test
-    public void getChildTermsLocal() throws OntologyLoaderException {
-        // get child terms of 'stereoisomerized residue' (MOD:00664) form the MOD ontology
-        Set<String> result = om.getValidIDs( "MOD", "MOD:00664", true, false );
-        // should be 12 terms (April 2008)
-        Assert.assertEquals("CV 'MOD:00664' should have 10 children! " + result, 15, result.size() );
-    }
-
-    @Test
-    public void noChildTermsOLS() {
-        // get child terms of term that does not have children
-        Set<String> result = om.getValidIDs( "MI", "MI:0326", true, false );
-        // should be no terms (August 2007)
-        Assert.assertEquals( "There should be no child terms for MI:0326!", 0, result.size() );
-
-    }
-
-    @Test
-    public void noChildTermsLocal() {
-        // get child terms of term that does not have children   (isomerization to D-alanine MOD:00198)
-        Set<String> result = om.getValidIDs( "MOD", "MOD:00198", true, false );
-        // should be no terms (August 2007)
-        Assert.assertEquals( "There should be no child terms for MOD:00198!", 0, result.size() );
-
-    }
 }
