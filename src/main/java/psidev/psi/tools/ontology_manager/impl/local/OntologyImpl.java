@@ -247,7 +247,7 @@ public class OntologyImpl implements Ontology {
         final Collection<OntologyTermI> directChildren = getDirectChildren( term );
         children.addAll( directChildren );
         for ( OntologyTermI child : directChildren ) {
-            getAllParents( child, children );
+            getAllChildren( child, children );
         }
     }
 
