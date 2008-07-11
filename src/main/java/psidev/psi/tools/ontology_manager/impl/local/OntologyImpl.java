@@ -2,8 +2,6 @@ package psidev.psi.tools.ontology_manager.impl.local;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
-import psidev.psi.tools.ontology_manager.impl.local.model.OntologyTerm;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.util.*;
@@ -26,7 +24,6 @@ public class OntologyImpl implements Ontology {
      * Pool of all term contained in that ontology.
      */
     private Collection<OntologyTermI> ontologyTerms = new ArrayList<OntologyTermI>( 1024 );
-
 
     // TODO introduce an interface for querying/updating the relationship
     // TODO replace the hashmap by a Lucene index -> using a different interface !!
@@ -54,7 +51,7 @@ public class OntologyImpl implements Ontology {
     /**
      * List of all obsolete term found while loading the ontology.
      */
-    private Collection<OntologyTermI> obsoleteTerms = new ArrayList<OntologyTermI>( );
+    private Collection<OntologyTermI> obsoleteTerms = new ArrayList<OntologyTermI>();
 
     /////////////////////////////
     // Public methods
@@ -88,7 +85,7 @@ public class OntologyImpl implements Ontology {
      * @param childId  The child term.
      */
     public void addLink( String parentId, String childId ) {
-        
+
         OntologyTermI child = id2ontologyTerm.get( childId );
         OntologyTermI parent = id2ontologyTerm.get( parentId );
 
@@ -167,7 +164,7 @@ public class OntologyImpl implements Ontology {
         for ( Iterator iterator = ontologyTerms.iterator(); iterator.hasNext(); ) {
             OntologyTermI ontologyTerm = ( OntologyTermI ) iterator.next();
 
-            if ( !hasParent( ontologyTerm )) {
+            if ( !hasParent( ontologyTerm ) ) {
                 roots.add( ontologyTerm );
             }
         }
@@ -188,13 +185,19 @@ public class OntologyImpl implements Ontology {
         return Collections.unmodifiableCollection( ontologyTerms );
     }
 
-    public void addObsoleteTerm(OntologyTermI term) {
-         obsoleteTerms.add( term );
+    public void addObsoleteTerm( OntologyTermI term ) {
+        if ( term == null ) {
+            throw new IllegalArgumentException( "You must give a non null term" );
+        }
+        if ( log.isDebugEnabled() ) {
+            log.debug( "Adding obsolete term: " + term.getTermAccession() + " " + term.getPreferredName() );
+        }
+        obsoleteTerms.add( term );
     }
 
     public boolean isObsoleteTerm( OntologyTermI term ) {
         return obsoleteTerms.contains( term );
-    }    
+    }
 
     /**
      * Go through the list of all CV Term and select those that are obsolete.
@@ -202,12 +205,12 @@ public class OntologyImpl implements Ontology {
      * @return a non null Collection of obsolete term.
      */
     public Collection<OntologyTermI> getObsoleteTerms() {
-        return obsoleteTerms;
+        return Collections.unmodifiableCollection( obsoleteTerms );
     }
 
     public Set<OntologyTermI> getDirectParents( OntologyTermI term ) {
         final Set<OntologyTermI> directParents = parents.get( term );
-        if( directParents == null ) {
+        if ( directParents == null ) {
             return Collections.EMPTY_SET;
         } else {
             return directParents;
@@ -216,7 +219,7 @@ public class OntologyImpl implements Ontology {
 
     public Set<OntologyTermI> getDirectChildren( OntologyTermI term ) {
         final Set<OntologyTermI> directChildren = children.get( term );
-        if( directChildren == null ) {
+        if ( directChildren == null ) {
             return Collections.EMPTY_SET;
         } else {
             return directChildren;
@@ -224,7 +227,7 @@ public class OntologyImpl implements Ontology {
     }
 
     public Set<OntologyTermI> getAllParents( OntologyTermI term ) {
-        Set<OntologyTermI> parents = new HashSet<OntologyTermI>( );
+        Set<OntologyTermI> parents = new HashSet<OntologyTermI>();
         getAllParents( term, parents );
         return parents;
     }
@@ -238,7 +241,7 @@ public class OntologyImpl implements Ontology {
     }
 
     public Set<OntologyTermI> getAllChildren( OntologyTermI term ) {
-        Set<OntologyTermI> children = new HashSet<OntologyTermI>( );
+        Set<OntologyTermI> children = new HashSet<OntologyTermI>();
         getAllChildren( term, children );
         return children;
     }
