@@ -30,7 +30,6 @@
     </scm>
 
     <dependencies>
-
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>ontology-config-reader</artifactId>
@@ -74,11 +73,11 @@
             <artifactId>log4j</artifactId>
             <version>1.2.15</version>
             <exclusions>
-                   <exclusion>
-                      <groupId>javax.jms</groupId>
-                      <artifactId>jms</artifactId>
-                   </exclusion>
-                </exclusions>
+                <exclusion>
+                    <groupId>javax.jms</groupId>
+                    <artifactId>jms</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
