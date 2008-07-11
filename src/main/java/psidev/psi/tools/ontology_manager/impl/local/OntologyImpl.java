@@ -27,6 +27,10 @@ public class OntologyImpl implements Ontology {
      */
     private Collection<OntologyTermI> ontologyTerms = new ArrayList<OntologyTermI>( 1024 );
 
+
+    // TODO introduce an interface for querying/updating the relationship
+    // TODO replace the hashmap by a Lucene index -> using a different interface !!
+
     /**
      * Represent the relationship: child -> parents.
      */
@@ -240,7 +244,7 @@ public class OntologyImpl implements Ontology {
     }
 
     private void getAllChildren( OntologyTermI term, Set<OntologyTermI> children ) {
-        final Collection<OntologyTermI> directChildren = getDirectParents( term );
+        final Collection<OntologyTermI> directChildren = getDirectChildren(+ term );
         children.addAll( directChildren );
         for ( OntologyTermI child : directChildren ) {
             getAllParents( child, children );
