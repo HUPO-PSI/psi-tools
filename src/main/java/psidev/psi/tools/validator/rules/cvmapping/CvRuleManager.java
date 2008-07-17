@@ -8,10 +8,12 @@ import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRule;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvReference;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
 import psidev.psi.tools.ontology_manager.OntologyManager;
+import psidev.psi.tools.ontology_manager.OntologyUtils;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
+import psidev.psi.tools.validator.MessageLevel;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
-import psidev.psi.tools.validator.MessageLevel;
-import psidev.psi.tools.validator.rules.Rule;
 import psidev.psi.tools.validator.xpath.XPathHelper;
 
 import java.util.*;
@@ -185,6 +187,8 @@ public class CvRuleManager {
                                    CvRule rule,
                                    Collection<ValidatorMessage> messages ) throws ValidatorException {
 
+        // ToDo: !! RESTRUCTURE THIS !! 
+
         String ontologyID = (( CvReference ) cvTerm.getCvIdentifierRef()).getCvIdentifier();
         System.out.println("##### DEBUG: Checking cvTerm " + cvTerm.getTermName() + " for ontology: " + ontologyID );
 
@@ -199,7 +203,9 @@ public class CvRuleManager {
 
         // check if the specified term is valid in the given ontology
         String ruleTermAcc = cvTerm.getTermAccession();
-        Set<String> validAccs = ontologyMngr.getValidIDs( ontologyID, ruleTermAcc, false, true );
+        OntologyAccess ontoAccess = ontologyMngr.getOntologyAccess(ontologyID);
+        Set<OntologyTermI> validTerms = ontoAccess.getValidTerms( ruleTermAcc, false, true );
+        Collection<String> validAccs = OntologyUtils.getAccessions(validTerms);
         if ( validAccs.size() == 1 && validAccs.contains( ruleTermAcc ) ) {
             // no children, only use the specified term -> there should be only one result (if the term is valid)
         } else {
@@ -212,7 +218,7 @@ public class CvRuleManager {
         }
 
         // check if the used term is obsolete
-        if ( ontologyMngr.isObsoleteID( ontologyID, ruleTermAcc )) {
+        if ( ontoAccess.isObsolete(ontoAccess.getTermForAccession(ruleTermAcc)) ) {
             // this term should not be in use here
             String msg = "The term " + printSimpleCvTerm( cvTerm ) + " is obsolote in the ontology " +
                          ontologyID + ". The CvTerm will be removed.";
@@ -224,7 +230,8 @@ public class CvRuleManager {
 
         // ToDo: restructure this
         // check if the specified term has children if it was specified to use children and not the term itself
-        validAccs = ontologyMngr.getValidIDs( ontologyID, ruleTermAcc, true, false );
+        validTerms = ontoAccess.getValidTerms( ruleTermAcc, true, false );
+        validAccs = OntologyUtils.getAccessions(validTerms);
         // if validAccs == 0, then there were no children
         if ( (validAccs.size() == 0) && !cvTerm.isUseTerm() && cvTerm.isAllowChildren() ) {
             // this term doesn't have children yet the cvmapping recommends to use them

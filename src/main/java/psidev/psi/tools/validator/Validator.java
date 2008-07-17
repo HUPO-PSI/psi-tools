@@ -190,21 +190,6 @@ public abstract class Validator {
     // Validation against object rule
 
     /**
-     * Validates a document.
-     * <p/>
-     * The implementing class will have to take care of parsing the document and validate each entity.
-     *
-     * @param file InputStream holding document to be validated
-     * @return Collection of validator messages.
-     * @throws ValidatorException Exception while trying to validate the input.
-     * @deprecated this method is specific to file validation. This calidator is only dealing with Object validation.
-     *             If you are using this mehod, keep in mind it will remove is later releases. Yet you can still
-     *             implement it in your own cvalidator.
-     */
-    @Deprecated
-    public abstract Collection<ValidatorMessage> validate( InputStream file ) throws ValidatorException;
-
-    /**
      * Validates a collection of objects against all the (object) rules.
      *
      * @param col collection of objects to check on.

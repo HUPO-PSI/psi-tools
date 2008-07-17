@@ -1,8 +1,8 @@
 package psidev.psi.tools.validator.rules.cvmapping;
 
 import org.junit.Assert;
-import org.junit.Test;
 import org.junit.Ignore;
+import org.junit.Test;
 import psidev.psi.tools.cvrReader.CvRuleReader;
 import psidev.psi.tools.cvrReader.CvRuleReaderException;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
@@ -11,20 +11,19 @@ import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.validator.MessageLevel;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.rules.cvmapping.house.Bike;
+import psidev.psi.tools.validator.rules.cvmapping.house.House;
+import psidev.psi.tools.validator.rules.cvmapping.house.HouseFactory;
+import psidev.psi.tools.validator.rules.cvmapping.protein.Modification;
+import psidev.psi.tools.validator.rules.cvmapping.protein.Protein;
 import psidev.psi.tools.validator.util.ValidatorReport;
 import psidev.psi.tools.validator.xpath.XPathHelper;
 import psidev.psi.tools.validator.xpath.XPathResult;
-import psidev.psi.tools.validator.rules.cvmapping.house.House;
-import psidev.psi.tools.validator.rules.cvmapping.house.HouseFactory;
-import psidev.psi.tools.validator.rules.cvmapping.house.Bike;
-import psidev.psi.tools.validator.rules.cvmapping.protein.Modification;
-import psidev.psi.tools.validator.rules.cvmapping.protein.Protein;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -197,8 +196,7 @@ public class CvMappingRuleTest {
         House house = HouseFactory.buildSimpleHouse();
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
-        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
-            CvRule cvRule = lIterator.next();
+        for (CvRule cvRule : cvRules) {
             messages.addAll(cvRule.check(house, "/house"));
         }
 
@@ -221,8 +219,7 @@ public class CvMappingRuleTest {
         House house = HouseFactory.buildSimpleHouse();
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
-        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
-            CvRule cvRule = lIterator.next();
+        for (CvRule cvRule : cvRules) {
             messages.addAll(cvRule.check(house, "/house"));
         }      
 
@@ -273,8 +270,7 @@ public class CvMappingRuleTest {
         house.getKitchen().setNote( "PSI:1000292" ); // Mass Spectrograph: different branch than PSI:1000010 (analyser)
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
-        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
-            CvRule cvRule = lIterator.next();
+        for (CvRule cvRule : cvRules) {
             messages.addAll(cvRule.check(house, "/house"));
         }
 
@@ -299,8 +295,7 @@ public class CvMappingRuleTest {
         house.getKitchen().setNote( "FAKE:00000" ); // that id is not in any given ontology
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
-        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
-            CvRule cvRule = lIterator.next();
+        for (CvRule cvRule : cvRules) {
             messages.addAll(cvRule.check(house, "/house"));
         }
 
@@ -328,8 +323,7 @@ public class CvMappingRuleTest {
         house.getKitchen().setNote( "FAKE:00000" ); // that id is not in any given ontology
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
-        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
-            CvRule cvRule = lIterator.next();
+        for (CvRule cvRule : cvRules) {
             messages.addAll(cvRule.check(house, "/house"));
         }
 
@@ -357,8 +351,7 @@ public class CvMappingRuleTest {
         house.getKitchen().setNote( "FAKE:00000" ); // that id is not in any given ontology
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
-        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
-            CvRule cvRule = lIterator.next();
+        for (CvRule cvRule : cvRules) {
             messages.addAll(cvRule.check(house, "/house"));
         }
 
@@ -386,8 +379,7 @@ public class CvMappingRuleTest {
         house.getKitchen().setNote( "FAKE:00000" ); // that id is not in any given ontology
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
-        for (Iterator<CvRule> lIterator = cvRules.iterator(); lIterator.hasNext();) {
-            CvRule cvRule = lIterator.next();
+        for (CvRule cvRule : cvRules) {
             messages.addAll(cvRule.check(house, "/house"));
         }
 

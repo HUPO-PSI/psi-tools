@@ -7,6 +7,8 @@ import psidev.psi.tools.cvrReader.mapping.jaxb.CvMappingRule;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvReference;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
 import psidev.psi.tools.ontology_manager.OntologyManager;
+import psidev.psi.tools.ontology_manager.OntologyUtils;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 import psidev.psi.tools.validator.Context;
 import psidev.psi.tools.validator.MessageLevel;
 import psidev.psi.tools.validator.ValidatorException;
@@ -100,7 +102,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
     /**
      * @param object      the object on which we will apply the validation
      * @param prefixXpath the xpath that describe the object given as parameter.
-     * @return
+     * @return a Collection of ValidatorMessages
      * @throws ValidatorException
      */
     public Collection<ValidatorMessage> check( Object object, String prefixXpath ) throws ValidatorException {
@@ -147,7 +149,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         if ( log.isDebugEnabled() ) log.debug( "Xpath to fetch objects to check on: " + scopeXpath );
 
         // get the elements to check
-        List<XPathResult> results = null;
+        List<XPathResult> results;
         try {
             results = XPathHelper.evaluateXPath( scopeXpath, object );
             if ( log.isDebugEnabled() ) {
@@ -224,7 +226,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
      * @param valueXpath    the Xpath expression allowing to fetch the values on the objectToCheck.
      * @param messages      list of message that eventually will be returned to the user.
      * @param level         level of the messages to generate
-     * @throws ValidatorException
+     * @throws ValidatorException if the provided Xpath could not be compiled.
      */
     private void checkSingleObject( Object objectToCheck,
                                     String elementXpath,
@@ -235,7 +237,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         String resultClassName = objectToCheck.getClass().getSimpleName();
 
         // 1. Retrieve the values to be checked against the CvTerms from the objectToCheck
-        List<XPathResult> valueResults = null;
+        List<XPathResult> valueResults;
         try {
             valueResults = XPathHelper.evaluateXPath( valueXpath, objectToCheck );
 
@@ -283,7 +285,9 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             // If there are no known terms, then obviously do not generate a message.
             if ( getCVTerms() != null && getCVTerms().size() > 0 ) {
                 StringBuilder sb = new StringBuilder( 256 );
-                sb.append( "None of the given CvTerms were found at '" + getElementPath() + "' because no values were found:\n" );
+                sb.append("None of the given CvTerms were found at '")
+                        .append(getElementPath())
+                        .append("' because no values were found:\n");
                 Iterator<CvTerm> iterator = getCVTerms().iterator();
                 while ( iterator.hasNext() ) {
                     CvTerm cvTerm = iterator.next();
@@ -327,7 +331,8 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
                     StringBuilder sb = new StringBuilder( 256 );
                     sb.append( "According to the CvMapping, the term '" ).append( cvTerm.getAccession() )
-                            .append( "' wasn't meant to be repeated, yet it appeared " ).append( count )
+                            .append( "' wasn't meant to be repeated, yet it appeared " )
+                            .append( count )
                             .append( " times in elements pointed out by the XPath expression: " )
                             .append( getElementPath() );
                     messages.add( buildMessage( getElementPath(), level, sb.toString() ) );
@@ -349,10 +354,16 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                     //       public String print( T object ){...}
                     // }
 
-                    sb.append( "[OR] The result found at: " + elementXpath + " for which the values are '" + printObjectAccessions( valueResults ) +
-                               "' didn't match any of the " + getCVTerms().size() + " specified CV term" +
-                               ( getCVTerms().size() > 1 ? "s" : "" ) + ":\n" );
-                    sb.append( listCvTerms( "  - ", getCVTerms() ) );
+                    sb.append("[OR] The result found at: ")
+                            .append(elementXpath)
+                            .append(" for which the values are '")
+                            .append(printObjectAccessions(valueResults))
+                            .append("' didn't match any of the ")
+                            .append(getCVTerms().size())
+                            .append(" specified CV term")
+                            .append(getCVTerms().size() > 1 ? "s" : "")
+                            .append(":\n")
+                            .append( listCvTerms( "  - ", getCVTerms() ) );
                     messages.add( buildMessage( elementXpath, level, sb.toString() ) );
                 }
 
@@ -365,9 +376,17 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                     }
 
                     StringBuilder sb = new StringBuilder( 256 );
-                    sb.append( "[AND] Not all of the " + resultCount + " values " + resultClassName + "'s CV terms [" + printObjectAccessions( valueResults ) +
-                               "] found using the Xpath '" + elementXpath + "' matched any of the " + getCVTerms().size() +
-                               " CvTerm(s):\n" )
+                    sb.append("[AND] Not all of the ")
+                            .append(resultCount)
+                            .append(" values ")
+                            .append(resultClassName)
+                            .append("'s CV terms [")
+                            .append(printObjectAccessions(valueResults))
+                            .append("] found using the Xpath '")
+                            .append(elementXpath)
+                            .append("' matched any of the ")
+                            .append(getCVTerms().size())
+                            .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
                     messages.add( buildMessage( elementXpath, level, sb.toString() ) );
                 }
@@ -377,9 +396,16 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                 // if exactly one cv term got a hit we are good
                 if ( matchingCvTermCount != 1 ) {
                     StringBuilder sb = new StringBuilder( 256 );
-                    sb.append( "[XOR] Not exactly one of the " + resultCount + " " + resultClassName + "'s CV terms [" + printObjectAccessions( valueResults ) +
-                               "] found using the Xpath '" + elementXpath + "' matched any of the " + getCVTerms().size() +
-                               " CvTerm(s):\n" )
+                    sb.append("[XOR] Not exactly one of the ")
+                            .append(resultCount).append(" ")
+                            .append(resultClassName)
+                            .append("'s CV terms [")
+                            .append(printObjectAccessions(valueResults))
+                            .append("] found using the Xpath '")
+                            .append(elementXpath)
+                            .append("' matched any of the ")
+                            .append(getCVTerms().size())
+                            .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
                     messages.add( buildMessage( elementXpath, level, sb.toString() ) );
                 }
@@ -397,11 +423,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
      * @param messages     list of message that eventually will be returned to the user.
      * @param level        level of the messages to generate
      * @return a non null map holding the usage of CvTerm in the list of provided values.
-     * @throws ValidatorException
      */
     private Map<XPathResult, Map<CvTerm, Integer>> checkValuesAgainstCvTerms( final Collection<XPathResult> valueResults,
                                                                               final Collection<ValidatorMessage> messages,
-                                                                              final Recommendation level ) throws ValidatorException {
+                                                                              final Recommendation level ) {
 
         Map<XPathResult, Map<CvTerm, Integer>> result2termCount =
                 new HashMap<XPathResult, Map<CvTerm, Integer>>( valueResults.size() );
@@ -450,13 +475,12 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
      * @param level      The level of the messages to create
      * @param term2count To keep count of how many times we have seen specific CvTerms
      * @return true if the term was found.
-     * @throws ValidatorException
      */
     private boolean isMatchingCv( CvTerm cvTerm,
                                   XPathResult xpResult,
                                   Collection<ValidatorMessage> messages,
                                   Recommendation level,
-                                  Map<CvTerm, Integer> term2count ) throws ValidatorException {
+                                  Map<CvTerm, Integer> term2count ) {
         boolean isMatching = false;
 
         String accession = null;
@@ -480,29 +504,25 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         // Get the accession numbers that are valid for this cvTerm.
         // Note: the ontologyID is checkd on by the CvRuleManager.checkCvMapping()
-        Set<String> allowedAccs = ontologyManager.getValidIDs( ontologyID, ruleTermAcc, allowChildren, useTerm );
+        Collection<OntologyTermI> allowedTerms = ontologyManager.getOntologyAccess(ontologyID).getValidTerms( ruleTermAcc, allowChildren, useTerm );
 
         // Now we'll see whether we should be checking CV accessions or CV preferred names.
-        Set<String> allowedValues = null;
+        Collection<String> allowedValues;
         if ( useTermName ) {
             // We should check on term names rather that accessions.
-            allowedValues = new HashSet<String>( allowedAccs.size() );
-            // So get the term names for the allowed accessions.
-            for ( String allowedAcc : allowedAccs ) {
-                // For each allowed accession, find the preferred term name and use this.
-                allowedValues.add( ontologyManager.getTermNameByID( ontologyID, allowedAcc ) );
-            }
+            // Note that the names are the preferred names.
+            allowedValues = OntologyUtils.getTermNames(allowedTerms);
         } else {
             // The allowed values in this case are the actual accession numbers.
             // Note that the names are ignored now. Accession has precedence.
-            allowedValues = allowedAccs;
+            allowedValues = OntologyUtils.getAccessions(allowedTerms);
         }
 
         // Check whether the value found is in the allowed values (be they terms or accessions).
         if ( allowedValues.contains( accession ) ) {
             // Term found, we populate the map
 
-            Integer count = null;
+            Integer count;
             if ( !term2count.containsKey( cvTerm ) ) {
                 term2count.put( cvTerm, 1 );
             } else {
@@ -612,10 +632,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
             CV cv = ( CV ) o;
 
-            if ( !accession.equals( cv.accession ) ) return false;
-            if ( name != null ? !name.equals( cv.name ) : cv.name != null ) return false;
-
-            return true;
+            return accession.equals(cv.accession) && !(name != null ? !name.equals(cv.name) : cv.name != null);
         }
 
         @Override
@@ -659,6 +676,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
     /**
      * Pretty print of the result map for debugging purpose.
+     * @param result2termCount
      */
     private void printMap( Map<XPathResult, Map<CvTerm, Integer>> result2termCount ) {
         log.debug( "===============================================================" );
@@ -722,13 +740,15 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 //        sb.append( ")" );
 
         if ( cv.isUseTerm() && cv.isAllowChildren() ) {
-            sb.append( cv.getTermAccession() + " (" + cv.getTermName() + ")" );
+            sb.append(cv.getTermAccession()).append(" (").append(cv.getTermName()).append(")");
             sb.append( " or any of its children. " );
         } else if ( !cv.isUseTerm() && cv.isAllowChildren() ) {
-            sb.append( "Any children term of " + cv.getTermAccession() + " (" + cv.getTermName() + "). " );
+            sb.append("Any children term of ").append(cv.getTermAccession())
+                    .append(" (").append(cv.getTermName()).append("). ");
         } else if ( cv.isUseTerm() && !cv.isAllowChildren() ) {
-            sb.append( "The sole term " + cv.getTermAccession() + " (" + cv.getTermName() + ") " );
-            sb.append( "or any of its children. " );
+            sb.append("The sole term ").append(cv.getTermAccession())
+                    .append(" (").append(cv.getTermName()).append(") ")
+                    .append( "or any of its children. " );
         } else {
             throw new IllegalStateException( "Either the term itself of its children have to be allowed" );
         }
