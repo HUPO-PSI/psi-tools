@@ -805,4 +805,18 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         }
         return result;
     }
+
+    public String toString() {
+
+        StringBuffer sb = new StringBuffer( 256 );
+
+        sb.append("[Rule: ID=");
+        sb.append(this.getId());
+        if (this.getName() != null && this.getName().trim().length() > 0) {
+            sb.append("Name=").append(this.getName());
+        }
+        sb.append("]");
+
+        return sb.toString();
+    }
 }
