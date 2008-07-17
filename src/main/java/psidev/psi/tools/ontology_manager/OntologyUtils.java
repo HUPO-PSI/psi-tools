@@ -19,6 +19,7 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Ontology utils.
@@ -35,6 +36,9 @@ public class OntologyUtils {
      * @return a non null collection of accession.
      */
     public static Collection<String> getAccessions(  Collection<OntologyTermI> terms ) {
+        if ( terms == null ) {
+            return Collections.EMPTY_LIST;
+        }
         Collection<String> accessions = new ArrayList<String>( terms.size() );
         for ( OntologyTermI term : terms ) {
             accessions.add( term.getTermAccession() );
@@ -48,6 +52,9 @@ public class OntologyUtils {
      * @return a non null collection of names.
      */
     public static Collection<String> getTermNames(  Collection<OntologyTermI> terms ) {
+        if ( terms == null ) {
+            return Collections.EMPTY_LIST;
+        }
         Collection<String> names = new ArrayList<String>( terms.size() );
         for ( OntologyTermI term : terms ) {
             names.add( term.getPreferredName() );
