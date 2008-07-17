@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.File;
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * OntologyManager tester.

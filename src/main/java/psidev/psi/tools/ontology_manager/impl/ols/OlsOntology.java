@@ -34,7 +34,7 @@ public class OlsOntology implements OntologyAccess {
     String ontologyID;
     Set<String> rootAccs;
 
-    // methods that use the cache, use the method name to as part of the cahce key
+    // methods that use the cache, use the method name to as part of the cache key
     private final byte GET_VALID_IDS = 1;
     private final byte IS_OBSOLETE_ID = 2;
     private final byte GET_TERM_NAME_BY_ID = 3;
@@ -61,7 +61,6 @@ public class OlsOntology implements OntologyAccess {
             } catch ( IOException e ) {
                 log.error( "Failed to load cache configuration properties: " + cacheConfig, e );
             }
-            // ToDo: fail over with default settings ?
             if ( cacheProps.isEmpty() ) {
                 log.warn( "Using default cache configuration!" );
                 admin = new GeneralCacheAdministrator();
@@ -102,312 +101,13 @@ public class OlsOntology implements OntologyAccess {
                   + " version=" + version + " format=" + format + " location=" + uri );
     }
 
-    // This has issues finding all the child terms if the tree changes relationship types -> use getValidIDs2 
-    public Set<String> getValidIDsOld( String id, boolean allowChildren, boolean useTerm ) {
-        Set<String> terms = new HashSet<String>();
-        try {
-            if ( useTerm ) {
-                String result = query.getTermById( id, ontologyID );
-                // check if the id returns a valid term name - if not, the id is not valid for this ontology
-                if ( result.equalsIgnoreCase( id ) ) { // OLS returns the (unchanged) id if no matching term is found
-                    log.warn( "The Term ID '" + id + "' was not found in ontology '" + ontologyID + "'." );
-                } else {
-                    // id is valid for this ontology
-                    log.debug( "Found valid id: " + id + " in ontology: " + ontologyID );
-                    terms.add( id );
-                }
-            }
-            if ( allowChildren ) { // get all children
-                int[] relationshipTypes = new int[4];
-                relationshipTypes[0] = 1;
-                relationshipTypes[1] = 2;
-                relationshipTypes[2] = 3;
-                relationshipTypes[3] = 4;
-
-                Map resultMap = query.getTermChildren( id, ontologyID, -1, relationshipTypes );
-//                Map resultMap = query.getTermChildren(id, ontologyID, -1, null );
-                if ( resultMap == null ) { // should not happen, but just in case ...
-                    // ToDo: not sure what is returned from OLS when term has no children (suppose empty Map)
-                } else {
-                    log.debug( "Found " + resultMap.keySet().size()
-                               + " child terms of id: " + id + " in ontology: " + ontologyID );
-                    terms.addAll( resultMap.keySet() );
-                }
-            }
-        } catch ( RemoteException e ) {
-            log.error( "RemoteException while trying to connect to OLS.", e );
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
-        }
-        return terms;
-    }
-
-    protected Set<String> getValidIDs2( String id, boolean allowChildren, boolean useTerm ) {
-        Set<String> terms = new HashSet<String>();
-        try {
-            if ( useTerm ) {
-                String result = query.getTermById( id, ontologyID );
-                // check if the id returns a valid term name - if not, the id is not valid for this ontology
-                if ( result.equalsIgnoreCase( id ) ) { // OLS returns the (unchanged) id if no matching term is found
-                    log.warn( "The Term ID '" + id + "' was not found in ontology '" + ontologyID + "'." );
-                } else {
-                    // id is valid for this ontology
-                    terms.add( id );
-                }
-            }
-            if ( allowChildren ) { // get all children
-                Set<String> children = getAllChildTerms( id );
-                log.debug( "Found " + children.size()
-                           + " child terms of id: " + id + " in ontology: " + ontologyID );
-                terms.addAll( children );
-            }
-        } catch ( RemoteException e ) {
-            log.error( "RemoteException while trying to connect to OLS.", e );
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
-        }
-        return terms;
-    }
-
-    public Set<String> getValidIDs( String queryTerm, boolean allowChildren, boolean useTerm ) {
-        Set<String> terms; // to store the results
-
-        // create unique string for this query
-        String queryGroup = "getValidIDs_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = GET_VALID_IDS + '_' + ontologyID + '_' + queryTerm + '_' + allowChildren + '_' + useTerm;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + queryTerm + "_" + allowChildren + "_" + useTerm;
-        }
-        String[] groups = {queryGroup};
-        try {
-            // Get from the cache
-            terms = ( Set<String> ) admin.getFromCache( myKey );
-            log.debug( "Using cached terms for key: " + myKey );
-        } catch ( NeedsRefreshException nre ) {
-            boolean updated = false;
-            try {
-                // result of this query not in cache, get it from the un-cached method
-                //terms = this.getValidIDs2( queryTerm, allowChildren, useTerm );
-                terms = this.getValidIDsOld( queryTerm, allowChildren, useTerm );
-                log.debug( "Storing uncached terms with key: " + myKey );
-                // store in the cache
-                admin.putInCache( myKey, terms, groups );
-                updated = true;
-            } finally {
-                if ( !updated ) {
-                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
-                    admin.cancelUpdate( myKey );
-                }
-            }
-        }
-        return terms;
-    }
-
-    protected boolean isObsoleteIDUncached( String id ) {
-        boolean result;
-        try {
-            // OLS does return false if the term does not exist! -> check the existence of the term first
-            String s = query.getTermById( id, ontologyID );
-            if ( s.equalsIgnoreCase( id ) ) {
-                // term not in database (if instead of the term name the accession is returned)
-                throw new IllegalStateException( "Checking obsolete on term '" + id
-                                                 + "' which does not exist in '" + ontologyID + "'!" );
-            }
-            result = query.isObsolete( id, ontologyID );
-        } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
-        }
-        return result;
-    }
-
-    public boolean isObsoleteID( String id ) {
-        Boolean result;
-
-        // create unique string for this query
-        String queryGroup = "isObsoleteID_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = IS_OBSOLETE_ID + '_' + ontologyID + '_' + id;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + id;
-        }
-        String[] groups = {queryGroup};
-        try {
-            // Get from the cache
-            result = ( Boolean ) admin.getFromCache( myKey );
-            log.debug( "Using cached term for key: " + myKey );
-        } catch ( NeedsRefreshException nre ) {
-            boolean updated = false;
-            try {
-                // result of this query not in cache, get it from the un-cached method
-                result = this.isObsoleteIDUncached( id );
-                log.debug( "Storing uncached term with key: " + myKey );
-                // Store in the cache
-                admin.putInCache( myKey, result, groups );
-                updated = true;
-            } finally {
-                if ( !updated ) {
-                    // It is essential that cancelUpdate is called if the
-                    // cached content could not be rebuilt
-                    admin.cancelUpdate( myKey );
-                }
-            }
-        }
-        return result;
-    }
-
-    protected String getTermNameByIDUncached( String id ) {
-        String result;
-        try {
-            result = query.getTermById( id, ontologyID );
-        } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to query OLS for: "
-                                             + id + " in ontology: " + ontologyID );
-        }
-        return result;
-    }
-
-    public String getTermNameByID( String id ) {
-        String result;
-
-        // create unique string for this query
-        String queryGroup = "getTermNameByID_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = GET_TERM_NAME_BY_ID + '_' + ontologyID + '_' + id;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + id;
-        }
-        String[] groups = {queryGroup};
-        try {
-            // Get from the cache
-            result = ( String ) admin.getFromCache( myKey );
-            log.debug( "Using cached term name for key: " + myKey );
-        } catch ( NeedsRefreshException nre ) {
-            boolean updated = false;
-            try {
-                // result of this query not in cache, get it from the un-cached method
-                result = this.getTermNameByIDUncached( id );
-                log.debug( "Storing uncached term name with key: " + myKey );
-                // Store in the cache
-                admin.putInCache( myKey, result, groups );
-                updated = true;
-            } finally {
-                if ( !updated ) {
-                    // It is essential that cancelUpdate is called if the
-                    // cached content could not be rebuilt
-                    admin.cancelUpdate( myKey );
-                }
-            }
-        }
-        return result;
-    }
-
-    protected Set<String> getDirectParentsIDsUncached( String id ) {
-        Set<String> result;
-        try {
-            result = ( query.getTermParents( id, ontologyID ) ).keySet();
-        } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
-        }
-        return result;
-    }
-
-    public Set<String> getDirectParentsIDs( String id ) {
-        Set<String> result;
-
-        // create unique string for this query
-        String queryGroup = "getDirectParentsIDs_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = GET_DIRECT_PARENTS_IDS + '_' + ontologyID + '_' + id;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + id;
-        }
-        String[] groups = {queryGroup};
-        try {
-            // Get from the cache
-            result = ( Set<String> ) admin.getFromCache( myKey );
-            log.debug( "Using cached terms for key: " + myKey );
-        } catch ( NeedsRefreshException nre ) {
-            boolean updated = false;
-            try {
-                // result of this query not in cache, get it from the un-cached method
-                result = this.getDirectParentsIDsUncached( id );
-                log.debug( "Storing uncached terms with key: " + myKey );
-                // Store in the cache
-                admin.putInCache( myKey, result, groups );
-                updated = true;
-            } finally {
-                if ( !updated ) {
-                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
-                    admin.cancelUpdate( myKey );
-                }
-            }
-        }
-        return result;
-    }
-
+    /**
+     * This method is not applicable for this implementation of the OntologyAccess interface.
+     * @param directory
+     */
     public void setOntologyDirectory( File directory ) {
         // not applicable
         log.info( "setOntologyDirectory does not have any effect on the OlsOntology." );
-    }
-
-    public Set<String> getAllChildTerms( String id ) throws RemoteException {
-        Set<String> retVal = new TreeSet<String>();
-        appendChildTerms( retVal, getChildTerms( id ) );
-        return retVal;
-    }
-
-    private void appendChildTerms( Set<String> set, Set<String> children ) throws RemoteException {
-        for ( String child : children ) {
-            if ( !set.contains( child ) ) {
-                set.add( child );
-                appendChildTerms( set, getChildTerms( child ) );
-            }
-        }
-    }
-
-    protected Set<String> getChildTermsUncached( String id ) throws RemoteException {
-        Map<String, String> result;
-        result = query.getTermChildren( id, ontologyID, 1, null );
-        return result.keySet();
-    }
-
-    private Set<String> getChildTerms( String id ) throws RemoteException {
-        Set<String> result;
-
-        // create unique string for this query
-        String queryGroup = "getChildTerms_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = GET_CHILD_TERMS + '_' + ontologyID + '_' + id;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + id;
-        }
-        String[] groups = {queryGroup};
-        try {
-            // Get from the cache
-            result = ( Set<String> ) admin.getFromCache( myKey );
-            log.debug( "Using cached terms for key: " + myKey );
-        } catch ( NeedsRefreshException nre ) {
-            boolean updated = false;
-            try {
-                // result of this query not in cache, get it from the un-cached method
-                result = this.getChildTermsUncached( id );
-                log.debug( "Storing uncached terms for key: " + myKey );
-                // Store in the cache
-                admin.putInCache( myKey, result, groups );
-                updated = true;
-            } finally {
-                if ( !updated ) {
-                    // It is essential that cancelUpdate is called if the
-                    // cached content could not be rebuilt
-                    admin.cancelUpdate( myKey );
-                }
-            }
-        }
-        return result;
     }
 
 
@@ -435,6 +135,14 @@ public class OlsOntology implements OntologyAccess {
         return validTerms;
     }
 
+    /**
+     * This method is used to create a full OntologyTermI
+     * from the given accession only (using the OLS service).
+     * Note: this is the uncached method version.
+     *
+     * @param accession the ontology term accession for which to look up the term.
+     * @return the OntologyTermI for the specified accession.
+     */
     public OntologyTermI getTermForAccessionUncached( String accession ) {
         String termName;
         try {
@@ -453,7 +161,15 @@ public class OlsOntology implements OntologyAccess {
         return term;
     }
 
-    public OntologyTermI getTermForAccession( String accession ) {
+    /**
+      * This method is used to create a full OntologyTermI
+      * from the given accession via using the OLS service.
+      * Note: this is method uses a cache.
+      *
+      * @param accession the ontology term accession for which to look up the term.
+      * @return the OntologyTermI for the specified accession.
+      */
+     public OntologyTermI getTermForAccession( String accession ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         String myKey = GET_TERM_FOR_ACCESSION + '_' + ontologyID + '_' + accession;
@@ -537,7 +253,13 @@ public class OlsOntology implements OntologyAccess {
         return result;
     }
 
-
+    /**
+     * This method looks up the direct parents of the given OntologyTermI.
+     * Note: this method is uncached and operates directly on OLS.
+     *
+     * @param term the OntologyTermI for which to look up its direct parents.
+     * @return a Set of OntologyTermIs of the direct parents of the given term.
+     */
     public Set<OntologyTermI> getDirectParentsUncached( OntologyTermI term ) {
         Map results;
         try {
@@ -545,9 +267,19 @@ public class OlsOntology implements OntologyAccess {
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
+        // OLS returns a empty map if no parents are found for the query, so we
+        // will always retrun a Set (empty or non-empty) if no exception is thrown.
         return olsMap2TermSet( results );
     }
 
+    /**
+     * This method looks up the direct parents of the given OntologyTermI.
+     * Note: this method is cached and only operates directly on OLS if
+     * the query has not been performed before.
+     *
+     * @param term the OntologyTermI for which to look up its direct parents.
+     * @return a Set of OntologyTermIs of the direct parents of the given term.
+     */
     public Set<OntologyTermI> getDirectParents( OntologyTermI term ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
@@ -576,12 +308,26 @@ public class OlsOntology implements OntologyAccess {
         return result;
     }
 
+    /**
+     * This method looks up all parents of the given OntologyTermI.
+     * Note: this method is cached and uses the #getDirectParents method
+     * recursively until the root terms of the ontology are reached.
+     *
+     * @param term the OntologyTermI for which to look up its direct parents.
+     * @return a Set of OntologyTermIs of the direct parents of the given term.
+     */
     public Set<OntologyTermI> getAllParents( OntologyTermI term ) {
         Set<OntologyTermI> allParents = new HashSet<OntologyTermI>();
         addParents( term, allParents );
         return allParents;
     }
 
+    /**
+     * Helper method for the recursive call of the #getAllParents method.
+     *
+     * @param term the OntologyTermI for which to get the parents.
+     * @param parents Set of OntologyTermIs to which to add the found parents.
+     */
     private void addParents( OntologyTermI term, Set<OntologyTermI> parents ) {
         Set<OntologyTermI> dps = getDirectParents( term );
         for ( OntologyTermI dp : dps ) {
@@ -595,7 +341,6 @@ public class OlsOntology implements OntologyAccess {
             }
         }
     }
-
 
     /**
      * Method to retrieve child terms of the specified ontology term.
@@ -613,6 +358,8 @@ public class OlsOntology implements OntologyAccess {
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
+        // OLS returns a empty map if no children are found for the query, so we
+        // will always retrun a Set (empty or non-empty) if no exception is thrown.
         return olsMap2TermSet( results );
     }
 
@@ -704,33 +451,326 @@ public class OlsOntology implements OntologyAccess {
     }
 
 
-    public static void main( String[] args ) throws OntologyLoaderException, URISyntaxException {
 
-        OlsOntology ols = new OlsOntology();
-        ols.loadOntology( "GO", "", "", "", new URI( "foo" ) );
 
-        String acc = "GO:0003675";
-        System.out.println( "Querying for term: " + acc );
-        OntologyTermI term = ols.getTermForAccession( acc );
-        System.out.println( "Is obsolete? " + ols.isObsolete( term ) );
 
-        acc = "GO:0030288";
-        System.out.println( "Querying for term: " + acc );
-        term = ols.getTermForAccession( acc );
-        System.out.println( "Is obsolete? " + ols.isObsolete( term ) );
 
-        Set<OntologyTermI> parents = ols.getDirectParents( term );
-        System.out.println( "Has parents: " + parents.size() );
-        Set<OntologyTermI> allParents = ols.getAllParents( term );
-        System.out.println( "All parents: " + allParents.size() );
-        for ( OntologyTermI allParent : allParents ) {
-            System.out.println( allParent );
+
+
+    // This has issues finding all the child terms if the tree changes relationship types -> use getValidIDs2
+    @Deprecated
+    public Set<String> getValidIDsOld( String id, boolean allowChildren, boolean useTerm ) {
+        Set<String> terms = new HashSet<String>();
+        try {
+            if ( useTerm ) {
+                String result = query.getTermById( id, ontologyID );
+                // check if the id returns a valid term name - if not, the id is not valid for this ontology
+                if ( result.equalsIgnoreCase( id ) ) { // OLS returns the (unchanged) id if no matching term is found
+                    log.warn( "The Term ID '" + id + "' was not found in ontology '" + ontologyID + "'." );
+                } else {
+                    // id is valid for this ontology
+                    log.debug( "Found valid id: " + id + " in ontology: " + ontologyID );
+                    terms.add( id );
+                }
+            }
+            if ( allowChildren ) { // get all children
+                int[] relationshipTypes = new int[4];
+                relationshipTypes[0] = 1;
+                relationshipTypes[1] = 2;
+                relationshipTypes[2] = 3;
+                relationshipTypes[3] = 4;
+
+                Map resultMap = query.getTermChildren( id, ontologyID, -1, relationshipTypes );
+//                Map resultMap = query.getTermChildren(id, ontologyID, -1, null );
+                if ( resultMap == null ) { // should not happen, but just in case ...
+                } else {
+                    log.debug( "Found " + resultMap.keySet().size()
+                               + " child terms of id: " + id + " in ontology: " + ontologyID );
+                    terms.addAll( resultMap.keySet() );
+                }
+            }
+        } catch ( RemoteException e ) {
+            log.error( "RemoteException while trying to connect to OLS.", e );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
-
-        Set<OntologyTermI> valid = ols.getValidTerms( "GO:0030288", true, true );
-        System.out.println( "Valid terms: " + valid.size() );
-
-
+        return terms;
     }
+
+    @Deprecated
+    protected Set<String> getValidIDs2( String id, boolean allowChildren, boolean useTerm ) {
+        Set<String> terms = new HashSet<String>();
+        try {
+            if ( useTerm ) {
+                String result = query.getTermById( id, ontologyID );
+                // check if the id returns a valid term name - if not, the id is not valid for this ontology
+                if ( result.equalsIgnoreCase( id ) ) { // OLS returns the (unchanged) id if no matching term is found
+                    log.warn( "The Term ID '" + id + "' was not found in ontology '" + ontologyID + "'." );
+                } else {
+                    // id is valid for this ontology
+                    terms.add( id );
+                }
+            }
+            if ( allowChildren ) { // get all children
+                Set<String> children = getAllChildTerms( id );
+                log.debug( "Found " + children.size()
+                           + " child terms of id: " + id + " in ontology: " + ontologyID );
+                terms.addAll( children );
+            }
+        } catch ( RemoteException e ) {
+            log.error( "RemoteException while trying to connect to OLS.", e );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+        }
+        return terms;
+    }
+
+    @Deprecated
+    public Set<String> getValidIDs( String queryTerm, boolean allowChildren, boolean useTerm ) {
+        Set<String> terms; // to store the results
+
+        // create unique string for this query
+        String queryGroup = "getValidIDs_query";
+        String myKey;
+        if ( useByteCodeGroup ) {
+            myKey = GET_VALID_IDS + '_' + ontologyID + '_' + queryTerm + '_' + allowChildren + '_' + useTerm;
+        } else {
+            myKey = queryGroup + "_" + ontologyID + "_" + queryTerm + "_" + allowChildren + "_" + useTerm;
+        }
+        String[] groups = {queryGroup};
+        try {
+            // Get from the cache
+            terms = ( Set<String> ) admin.getFromCache( myKey );
+            log.debug( "Using cached terms for key: " + myKey );
+        } catch ( NeedsRefreshException nre ) {
+            boolean updated = false;
+            try {
+                // result of this query not in cache, get it from the un-cached method
+                //terms = this.getValidIDs2( queryTerm, allowChildren, useTerm );
+                terms = this.getValidIDsOld( queryTerm, allowChildren, useTerm );
+                log.debug( "Storing uncached terms with key: " + myKey );
+                // store in the cache
+                admin.putInCache( myKey, terms, groups );
+                updated = true;
+            } finally {
+                if ( !updated ) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    admin.cancelUpdate( myKey );
+                }
+            }
+        }
+        return terms;
+    }
+
+    @Deprecated
+    protected boolean isObsoleteIDUncached( String id ) {
+        boolean result;
+        try {
+            // OLS does return false if the term does not exist! -> check the existence of the term first
+            String s = query.getTermById( id, ontologyID );
+            if ( s.equalsIgnoreCase( id ) ) {
+                // term not in database (if instead of the term name the accession is returned)
+                throw new IllegalStateException( "Checking obsolete on term '" + id
+                                                 + "' which does not exist in '" + ontologyID + "'!" );
+            }
+            result = query.isObsolete( id, ontologyID );
+        } catch ( RemoteException e ) {
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+        }
+        return result;
+    }
+
+    @Deprecated
+    public boolean isObsoleteID( String id ) {
+        Boolean result;
+
+        // create unique string for this query
+        String queryGroup = "isObsoleteID_query";
+        String myKey;
+        if ( useByteCodeGroup ) {
+            myKey = IS_OBSOLETE_ID + '_' + ontologyID + '_' + id;
+        } else {
+            myKey = queryGroup + "_" + ontologyID + "_" + id;
+        }
+        String[] groups = {queryGroup};
+        try {
+            // Get from the cache
+            result = ( Boolean ) admin.getFromCache( myKey );
+            log.debug( "Using cached term for key: " + myKey );
+        } catch ( NeedsRefreshException nre ) {
+            boolean updated = false;
+            try {
+                // result of this query not in cache, get it from the un-cached method
+                result = this.isObsoleteIDUncached( id );
+                log.debug( "Storing uncached term with key: " + myKey );
+                // Store in the cache
+                admin.putInCache( myKey, result, groups );
+                updated = true;
+            } finally {
+                if ( !updated ) {
+                    // It is essential that cancelUpdate is called if the
+                    // cached content could not be rebuilt
+                    admin.cancelUpdate( myKey );
+                }
+            }
+        }
+        return result;
+    }
+
+    @Deprecated
+    protected String getTermNameByIDUncached( String id ) {
+        String result;
+        try {
+            result = query.getTermById( id, ontologyID );
+        } catch ( RemoteException e ) {
+            throw new IllegalStateException( "RemoteException while trying to query OLS for: "
+                                             + id + " in ontology: " + ontologyID );
+        }
+        return result;
+    }
+
+    @Deprecated
+    public String getTermNameByID( String id ) {
+        String result;
+
+        // create unique string for this query
+        String queryGroup = "getTermNameByID_query";
+        String myKey;
+        if ( useByteCodeGroup ) {
+            myKey = GET_TERM_NAME_BY_ID + '_' + ontologyID + '_' + id;
+        } else {
+            myKey = queryGroup + "_" + ontologyID + "_" + id;
+        }
+        String[] groups = {queryGroup};
+        try {
+            // Get from the cache
+            result = ( String ) admin.getFromCache( myKey );
+            log.debug( "Using cached term name for key: " + myKey );
+        } catch ( NeedsRefreshException nre ) {
+            boolean updated = false;
+            try {
+                // result of this query not in cache, get it from the un-cached method
+                result = this.getTermNameByIDUncached( id );
+                log.debug( "Storing uncached term name with key: " + myKey );
+                // Store in the cache
+                admin.putInCache( myKey, result, groups );
+                updated = true;
+            } finally {
+                if ( !updated ) {
+                    // It is essential that cancelUpdate is called if the
+                    // cached content could not be rebuilt
+                    admin.cancelUpdate( myKey );
+                }
+            }
+        }
+        return result;
+    }
+
+    @Deprecated
+    protected Set<String> getDirectParentsIDsUncached( String id ) {
+        Set<String> result;
+        try {
+            result = ( query.getTermParents( id, ontologyID ) ).keySet();
+        } catch ( RemoteException e ) {
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+        }
+        return result;
+    }
+
+    @Deprecated
+    public Set<String> getDirectParentsIDs( String id ) {
+        Set<String> result;
+
+        // create unique string for this query
+        String queryGroup = "getDirectParentsIDs_query";
+        String myKey;
+        if ( useByteCodeGroup ) {
+            myKey = GET_DIRECT_PARENTS_IDS + '_' + ontologyID + '_' + id;
+        } else {
+            myKey = queryGroup + "_" + ontologyID + "_" + id;
+        }
+        String[] groups = {queryGroup};
+        try {
+            // Get from the cache
+            result = ( Set<String> ) admin.getFromCache( myKey );
+            log.debug( "Using cached terms for key: " + myKey );
+        } catch ( NeedsRefreshException nre ) {
+            boolean updated = false;
+            try {
+                // result of this query not in cache, get it from the un-cached method
+                result = this.getDirectParentsIDsUncached( id );
+                log.debug( "Storing uncached terms with key: " + myKey );
+                // Store in the cache
+                admin.putInCache( myKey, result, groups );
+                updated = true;
+            } finally {
+                if ( !updated ) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    admin.cancelUpdate( myKey );
+                }
+            }
+        }
+        return result;
+    }
+
+    @Deprecated
+    public Set<String> getAllChildTerms( String id ) throws RemoteException {
+        Set<String> retVal = new TreeSet<String>();
+        appendChildTerms( retVal, getChildTerms( id ) );
+        return retVal;
+    }
+
+    @Deprecated
+    private void appendChildTerms( Set<String> set, Set<String> children ) throws RemoteException {
+        for ( String child : children ) {
+            if ( !set.contains( child ) ) {
+                set.add( child );
+                appendChildTerms( set, getChildTerms( child ) );
+            }
+        }
+    }
+
+    @Deprecated
+    protected Set<String> getChildTermsUncached( String id ) throws RemoteException {
+        Map<String, String> result;
+        result = query.getTermChildren( id, ontologyID, 1, null );
+        return result.keySet();
+    }
+
+    @Deprecated
+    private Set<String> getChildTerms( String id ) throws RemoteException {
+        Set<String> result;
+
+        // create unique string for this query
+        String queryGroup = "getChildTerms_query";
+        String myKey;
+        if ( useByteCodeGroup ) {
+            myKey = GET_CHILD_TERMS + '_' + ontologyID + '_' + id;
+        } else {
+            myKey = queryGroup + "_" + ontologyID + "_" + id;
+        }
+        String[] groups = {queryGroup};
+        try {
+            // Get from the cache
+            result = ( Set<String> ) admin.getFromCache( myKey );
+            log.debug( "Using cached terms for key: " + myKey );
+        } catch ( NeedsRefreshException nre ) {
+            boolean updated = false;
+            try {
+                // result of this query not in cache, get it from the un-cached method
+                result = this.getChildTermsUncached( id );
+                log.debug( "Storing uncached terms for key: " + myKey );
+                // Store in the cache
+                admin.putInCache( myKey, result, groups );
+                updated = true;
+            } finally {
+                if ( !updated ) {
+                    // It is essential that cancelUpdate is called if the
+                    // cached content could not be rebuilt
+                    admin.cancelUpdate( myKey );
+                }
+            }
+        }
+        return result;
+    }
+
 
 }

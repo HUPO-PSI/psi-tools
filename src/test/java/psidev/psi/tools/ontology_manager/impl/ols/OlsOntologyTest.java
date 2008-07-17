@@ -1,239 +1,233 @@
 package psidev.psi.tools.ontology_manager.impl.ols;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import psidev.psi.tools.ontology_manager.impl.ols.OlsOntology;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
+import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
+import psidev.psi.tools.ontology_manager.OntologyManager;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.util.Set;
 import java.rmi.RemoteException;
+import java.io.InputStream;
 
 /**
- * Author: Florian Reisinger
+ * @author Florian Reisinger
  * Date: 20-Aug-2007
  */
 public class OlsOntologyTest {
 
-    static OlsOntology mi_ols;
-    static OlsOntology go_ols;
+    private OntologyManager manager;
 
-    @BeforeClass
-    public static void setup() throws OntologyLoaderException {
-        mi_ols = new OlsOntology();
-        mi_ols.loadOntology( "MI", null, null, null, null );
-        Assert.assertNotNull(mi_ols);
-        
-        go_ols = new OlsOntology();
-        go_ols.loadOntology( "GO", null, null, null, null );
-        Assert.assertNotNull(go_ols);
+    @Before
+    public void setup() throws OntologyLoaderException {
+        if ( manager == null ) {
+            final InputStream config = OlsOntologyTest.class.getResourceAsStream( "/ols-ontologies.xml" );
+            manager = new OntologyManager( config );
+        }
+    }
+
+    @After
+    public void cleanup() throws Exception {
+        manager = null;
+    }
+
+    ////////////
+    // Tests
+
+    @Test
+    public void getValidTerms() throws OntologyLoaderException {
+        final OntologyAccess mod = manager.getOntologyAccess( "GO" );
+        // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
+        final Set<OntologyTermI> terms = mod.getValidTerms( "GO:0055044", true, false );
+        Assert.assertEquals( 7, terms.size() );
+        // inclusive the query term itself = 8 valid terms
+        final Set<OntologyTermI> terms2 = mod.getValidTerms( "GO:0055044", true, true );
+        Assert.assertEquals( 8, terms2.size() );
+        // the query term only = 1 valid term
+        final Set<OntologyTermI> terms3 = mod.getValidTerms( "GO:0055044", false, true );
+        Assert.assertEquals( 1, terms3.size() );
+        // neither the query term itself nor its child terms = 0 valid term
+        final Set<OntologyTermI> terms4 = mod.getValidTerms( "GO:0055044", false, false );
+        Assert.assertTrue( terms4.isEmpty() );
+        // empty accession = 0 valid term
+        final Set<OntologyTermI> terms5 = mod.getValidTerms( "", false, false );
+        Assert.assertTrue( terms5.isEmpty() );
+        // null accession = 0 valid term
+        final Set<OntologyTermI> terms6 = mod.getValidTerms( null, false, false );
+        Assert.assertTrue( terms6.isEmpty() );
     }
 
     @Test
-    public void emptyStringQuery() {
-        String id = ""; // check on empty string as id
+    public void isObsolete() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+        final OntologyTermI term = mi.getTermForAccession( "MI:0205" );
+        Assert.assertTrue(mi.isObsolete( term ));
 
-        // check getValidIDs
-        Set<String> result1 = mi_ols.getValidIDs( id, true, false );
-        Assert.assertNotNull(result1);
-        Assert.assertEquals( "The result set must be empty, since we don't expect any " +
-                "results from empty queries!", 0, result1.size() );
-
-        // check isObsoleteID
-        try {
-            mi_ols.isObsoleteID( id );
-        } catch ( Exception e) {
-            // calling isObsoleteID on non existing id causes IllegalStateException
-            Assert.assertTrue( e instanceof IllegalStateException );
-        }
-
-        // check getTermNameByID
-        String result3 = mi_ols.getTermNameByID( id );
-        Assert.assertEquals( "", result3);
-
-        // check getDirectParentsIDs
-        Set<String> result4 = mi_ols.getDirectParentsIDs( id );
-        Assert.assertNotNull( result4 );
-        Assert.assertEquals( "The result set must be empty, since we don't expect any " +
-                "results from empty queries!", 0, result4.size() );
+        final OntologyTermI term2 = mi.getTermForAccession( "MI:0001" );
+        Assert.assertFalse(mi.isObsolete( term2 ));
     }
+
+    @Test
+    public void isObsolete_unknown_accession() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+        final OntologyTermI term = new OntologyTermImpl( "MI:xxxx", "bogus term" );
+        Assert.assertFalse(mi.isObsolete( term ));
+    }
+
+    @Test
+    public void getTermForAccession() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+        final OntologyTermI term = mi.getTermForAccession( "MI:0013" );
+        Assert.assertNotNull( term );
+        Assert.assertEquals( "MI:0013", term.getTermAccession() );
+        Assert.assertEquals( "biophysical", term.getPreferredName() );
+    }
+
+    @Test
+    public void getTermForAccession_unknown_accession() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+        final OntologyTermI term = mi.getTermForAccession( "MI:xxxx" );
+        Assert.assertNull( term );
+    }
+
+    //////////////////
+    // Children
+
+    @Test
+    public void getDirectChildren() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermI term = mi.getTermForAccession( "MI:0417" ); // footprinting
+        Assert.assertNotNull( term );
+
+        final Set<OntologyTermI> children = mi.getDirectChildren( term );
+        Assert.assertNotNull( children );
+        Assert.assertEquals( 2, children.size() );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0605", "enzymatic footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0602", "chemical footprinting" ) ) );
+    }
+
+    @Test
+    public void getDirectChildren_unknown_accession() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermI term = new OntologyTermImpl( "MI:xxxx", "bogus term" );
+
+        final Set<OntologyTermI> children = mi.getDirectChildren( term );
+        Assert.assertNotNull( children );
+        Assert.assertEquals( 0, children.size() );
+    }
+
+    @Test
+    public void getAllChildren() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermI term = mi.getTermForAccession( "MI:0417" ); // footprinting
+        Assert.assertNotNull( term );
+
+        final Set<OntologyTermI> children = mi.getAllChildren( term );
+        Assert.assertNotNull( children );
+        Assert.assertEquals( children.toString(), 7, children.size() );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0901", "isotope label footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0602", "chemical footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0603", "dimethylsulphate footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0604", "potassium permanganate footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0605", "enzymatic footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0606", "DNase I footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0814", "protease accessibility laddering" ) ) );
+    }
+
+    @Test
+    public void getAllChildren_unknown_accession() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermI term = new OntologyTermImpl( "MI:xxxx", "bogus term" );
+
+        final Set<OntologyTermI> children = mi.getAllChildren( term );
+        Assert.assertNotNull( children );
+        Assert.assertEquals( 0, children.size() );
+    }
+
+    ///////////////////
+    // Parents
+
+    @Test
+    public void getDirectParents() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermI term = mi.getTermForAccession( "MI:0013" );
+        Assert.assertNotNull( term );
+
+        final Set<OntologyTermI> parents = mi.getDirectParents( term );
+        Assert.assertNotNull( parents );
+        Assert.assertEquals( 1, parents.size() );
+        Assert.assertTrue( parents.contains( new OntologyTermImpl( "MI:0045", "experimental interaction detection" ) ) );
+    }
+
+    @Test
+    public void getDirectParents_unknown_accession() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermImpl term = new OntologyTermImpl( "MI:xxxx", "bogus term" );
+
+        final Set<OntologyTermI> parents = mi.getDirectParents( term );
+        Assert.assertNotNull( parents );
+        Assert.assertEquals( 0, parents.size() );
+    }
+
+    @Test
+    public void getAllParents() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermI term = mi.getTermForAccession( "MI:0013" );
+        Assert.assertNotNull( term );
+
+        final Set<OntologyTermI> parents = mi.getAllParents( term );
+        Assert.assertNotNull( parents );
+        Assert.assertEquals( 3, parents.size() );
+        Assert.assertTrue( parents.contains( new OntologyTermImpl( "MI:0045", "experimental interaction detection" ) ) );
+        Assert.assertTrue( parents.contains( new OntologyTermImpl( "MI:0001", "interaction detection method" ) ) );
+        Assert.assertTrue( parents.contains( new OntologyTermImpl( "MI:0000", "molecular interaction" ) ) );
+    }
+
+    @Test
+    public void getAllParents_unknown_accession() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermImpl term = new OntologyTermImpl( "MI:xxxx", "bogus term" );
+
+        final Set<OntologyTermI> parents = mi.getAllParents( term );
+        Assert.assertNotNull( parents );
+        Assert.assertEquals( 0, parents.size() );
+    }
+
+    ///////////////////
+    // Various
 
     @Test
     public void cacheSpeed() {
         // get child terms of 'alias type' (MI:0300) from the MI ontology
-        String id = "MI:0300";
+        OntologyAccess mi = manager.getOntologyAccess("MI");
+        OntologyTermI term =  mi.getTermForAccession( "MI:0300" ); // accession not used before
+
         // run first time -> uncached
-        Set<String> result1 = mi_ols.getDirectParentsIDs( id ); // run with cache
-        // run second time -> now cached
         long start = System.currentTimeMillis();
-        Set<String> result2 = mi_ols.getDirectParentsIDs( id );
+        Set<OntologyTermI> result_uc = mi.getDirectParents( term ); // first run will fill cache
         long stop = System.currentTimeMillis();
-        long cachedDif = stop - start;
-
-        // run uncached
+        long time_uncached = stop - start;
+        // run second time -> now cached
         start = System.currentTimeMillis();
-        Set<String> result3 = mi_ols.getDirectParentsIDsUncached( id );
+        Set<OntologyTermI> result_c = mi.getDirectParents( term );
         stop = System.currentTimeMillis();
-        long uncachedDif = stop - start;
+        long time_cached = stop - start;
 
-        System.out.println("Comparing performance between cached and uncached method...");
-        System.out.println("uncached: " + uncachedDif + "(ms) and cached: " + cachedDif + "(ms)");
-        Assert.assertEquals( "Cached and uncached results have to be the same!", result1, result2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", result2, result3 );
-
+        System.out.println("Comparing performance between cached and uncached method:");
+        System.out.println("uncached: " + time_uncached + "(ms) and cached: " + time_cached + "(ms).");
+        Assert.assertEquals("Cached and uncached query have to return the same result!", result_uc, result_c );
+        Assert.assertFalse("Cached and uncached query should not take the same time to execute!", time_uncached == time_cached );
     }
 
-    @Test
-    public void getValidIDsWithMI() {
-        String id = "MI:0300";
-        Set<String> resultA1 = mi_ols.getValidIDs( id, true, false ); // not yet cached
-        Set<String> resultA2 = mi_ols.getValidIDs( id, true, false ); // now cached
-//        // retrieval of child terms through recursive OLS queries from client: takes too long
-//        Set<String> resultA3 = mi_ols.getValidIDs2( id, true, false ); // result without using cache
-        // retrieval of child terms on OLS server side: much faster
-        Set<String> resultA3 = mi_ols.getValidIDsOld( id, true, false ); // result without using cache
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA1, resultA2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA2, resultA3 );
-        Assert.assertEquals( "This set should contain 13 result terms!", 13, resultA1.size() ); // on: 20. Aug. 2007
-    }
 
-    @Test
-    public void getValidIDsWithGO() {
-        String id = "GO:0055044";
-        Set<String> resultB1 = go_ols.getValidIDs( id, true, false ); // not yet cached
-        Set<String> resultB2 = go_ols.getValidIDs( id, true, false ); // now cached
-//        // retrieval of child terms through recursive OLS queries from client: takes too long
-//        Set<String> resultB3 = go_ols.getValidIDs2( id, true, false ); // result without using cache
-        // retrieval of child terms on OLS server side: much faster
-        Set<String> resultB3 = go_ols.getValidIDsOld( id, true, false ); // result without using cache
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB1, resultB2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB2, resultB3 );
-        Assert.assertEquals( "This set should contain 7 result terms!", 7, resultB1.size() ); // on: 20. Aug. 2007
-    }
-
-    @Test
-    public void isObsoleteWithMI() {
-        String idA = "MI:0021"; // obsolete
-        boolean resultA1 = mi_ols.isObsoleteID( idA );
-        boolean resultA2 = mi_ols.isObsoleteID( idA );
-        boolean resultA3 = mi_ols.isObsoleteIDUncached( idA );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA1, resultA2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA2, resultA3 );
-        Assert.assertTrue( "Term '" + idA + "'is obsolete!", resultA1 );
-
-        String idB = "MI:0428"; // non obsolete
-        boolean resultB1 = mi_ols.isObsoleteID( idB );
-        boolean resultB2 = mi_ols.isObsoleteID( idB );
-        boolean resultB3 = mi_ols.isObsoleteIDUncached( idB );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB1, resultB2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB2, resultB3 );
-        Assert.assertFalse( "Term '" + idB + "' is NOT obsolete!", resultB1 );
-    }
-
-    @Test
-    public void isObsoleteWithGO() {
-        String idA = "GO:0015428"; // obsolete term: GO:0015428 : type I protein secretor activity
-        boolean resultA1 = go_ols.isObsoleteID( idA );
-        boolean resultA2 = go_ols.isObsoleteID( idA );
-        boolean resultA3 = go_ols.isObsoleteIDUncached( idA );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA1, resultA2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA2, resultA3 );
-        Assert.assertTrue( "Term '" + idA + "'is obsolete!", resultA1 );
-
-        String idB = "GO:0042277"; // non obsolete term: GO:0042277 : peptide binding
-        boolean resultB1 = go_ols.isObsoleteID( idB );
-        boolean resultB2 = go_ols.isObsoleteID( idB );
-        boolean resultB3 = go_ols.isObsoleteIDUncached( idB );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB1, resultB2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB2, resultB3 );
-        Assert.assertFalse( "Term '" + idB + "' is NOT obsolete!", resultB1 );
-    }
-
-    @Test
-    public void getTermNameByIDWithMI() {
-        String idA = "MI:0616"; // MI accession for term: example
-        String resultA1 = mi_ols.getTermNameByID( idA );
-        String resultA2 = mi_ols.getTermNameByID( idA );
-        String resultA3 = mi_ols.getTermNameByIDUncached( idA );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA1, resultA2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA2, resultA3 );
-        Assert.assertEquals( "example", resultA1);
-
-        String idB = "MI:0403"; // MI accession for term: colocalization
-        String resultB1 = mi_ols.getTermNameByID( idB );
-        String resultB2 = mi_ols.getTermNameByID( idB );
-        String resultB3 = mi_ols.getTermNameByIDUncached( idB );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB1, resultB2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB2, resultB3 );
-        Assert.assertEquals( "colocalization", resultB1);
-    }
-
-    @Test
-    public void getTermNameByIDWithGO() {
-        String resultA1 = go_ols.getTermNameByID( "GO:0005623" ); // GO accession for term: cell
-        String resultA2 = go_ols.getTermNameByID( "GO:0005623" );
-        String resultA3 = go_ols.getTermNameByIDUncached( "GO:0005623" );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA1, resultA2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultA2, resultA3 );
-        Assert.assertEquals( "cell", resultA1);
-
-        String resultB1 = go_ols.getTermNameByID( "GO:0043226" ); // GO accession for term: organelle
-        String resultB2 = go_ols.getTermNameByID( "GO:0043226" );
-        String resultB3 = go_ols.getTermNameByIDUncached( "GO:0043226" );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB1, resultB2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", resultB2, resultB3 );
-        Assert.assertEquals( "organelle", resultB1);
-    }
-
-    @Test
-    public void getDirectParentsIDsWithMI() {
-        String idA = "MI:0362"; // MI:0362 = 'inference' has 3 direct parents
-        Set<String> result1 = mi_ols.getDirectParentsIDs( idA ); // not yet cached
-        Set<String> result2 = mi_ols.getDirectParentsIDs( idA ); // now cached
-        Set<String> result3 = mi_ols.getDirectParentsIDsUncached( idA ); // result without using cache
-        Assert.assertEquals( "Cached and uncached results have to be the same!", result1, result2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", result2, result3 );
-        Assert.assertEquals( "This set should contain 3 result terms!", 3, result1.size() ); // on: 20. Aug. 2007
-    }
-
-    @Test
-    public void getDirectParentsIDsWithGO() {
-        String idB = "GO:0044464"; // GO:0044464 = 'cell part' has 2 direct parents
-        Set<String> result1 = go_ols.getDirectParentsIDs( idB ); // not yet cached
-        Set<String> result2 = go_ols.getDirectParentsIDs( idB ); // now cached
-        Set<String> result3 = go_ols.getDirectParentsIDsUncached( idB ); // result without using cache
-        Assert.assertEquals( "Cached and uncached results have to be the same!", result1, result2 );
-        Assert.assertEquals( "Cached and uncached results have to be the same!", result2, result3 );
-        Assert.assertEquals( "This set should contain 2 result terms!", 2, result1.size() ); // on: 20. Aug. 2007
-    }
-
-    @Test
-    public void unknownIDQuery() {
-        String id = "GO:0055044"; // check on empty string as id
-
-        // check getValidIDs
-        Set<String> result1 = mi_ols.getValidIDs( id, true, false );
-        Assert.assertNotNull(result1);
-        Assert.assertEquals( "The result set must be empty, since we don't expect any " +
-                "results from empty queries!", 0, result1.size() );
-
-        // check isObsoleteID
-        try {
-            mi_ols.isObsoleteID( id );
-        } catch ( Exception e) {
-            // calling isObsoleteID on non existing id causes IllegalStateException
-            Assert.assertTrue( e instanceof IllegalStateException );
-        }
-
-        // check getTermNameByID
-        String result3 = mi_ols.getTermNameByID( id );
-        // if no name is found, the specified id is returned
-        Assert.assertEquals( id, result3);
-
-        // check getDirectParentsIDs
-        Set<String> result4 = mi_ols.getDirectParentsIDs( id );
-        Assert.assertNotNull( result4 );
-        Assert.assertEquals( "The result set must be empty, since we don't expect any " +
-                "results from empty queries!", 0, result4.size() );
-    }
 }
