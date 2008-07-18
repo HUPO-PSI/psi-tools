@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2006 rel. 3 sp2 (http://www.altova.com) by Luisa Montecchi-Palazzi (EMBL-EBI) -->
+<!-- edited with XMLSpy v2006 rel. 3 U (http://www.altova.com) by Samuel Kerrien (EBI) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xs:element name="CvMapping">
 		<xs:annotation>
@@ -92,6 +92,16 @@
 						<xs:enumeration value="MAY"/>
 					</xs:restriction>
 				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="name" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>Name of this rule (can be used for reporting of errors)</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="id" type="xs:ID" use="required">
+				<xs:annotation>
+					<xs:documentation>Unique identifier of the rule in this mapping file.</xs:documentation>
+				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
