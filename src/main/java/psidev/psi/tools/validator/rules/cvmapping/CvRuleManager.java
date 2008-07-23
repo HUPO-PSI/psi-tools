@@ -190,7 +190,7 @@ public class CvRuleManager {
         // ToDo: !! RESTRUCTURE THIS !! 
 
         String ontologyID = (( CvReference ) cvTerm.getCvIdentifierRef()).getCvIdentifier();
-        System.out.println("##### DEBUG: Checking cvTerm " + cvTerm.getTermName() + " for ontology: " + ontologyID );
+        log.debug("Checking cvTerm " + cvTerm.getTermName() + " for ontology: " + ontologyID );
 
         // before anything else, check if the specified ontology was loaded in the ontology manager
         if ( !ontologyMngr.containsOntology( ontologyID ) ) {
