@@ -342,11 +342,23 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
             if ( log.isDebugEnabled() ) log.debug( "Matching term count: " + matchingCvTermCount );
 
+            // ToDo: should we not use the term2count here instead of the matchingCvTermCount?
+            // ToDo: the actual matching terms are not interesting for the boolean logic, only the CvTerms of the rule
+            // ToDo: we should use the term2count map and check if: at leat one (OR), all (AND) or only one (XOR) terms had matches  
             // Then check if have reach our target given the boolean operator specified on the current CvRule
             if ( "OR".equalsIgnoreCase( operator ) ) {
 
+                // The boolean combination logic (OR)requires that at least one of the CvTerms in the Rule has to be matched.
+                // So we check for each CvTerm associated with this rule if we have at least one match:
+                boolean match = false;
+                for (CV cv : term2count.keySet()) {
+                    if (term2count.get(cv) > 0) {
+                        match = true;
+                    }
+                }
+
                 // if any of the cvTerm got a hit, we are good
-                if ( matchingCvTermCount == 0 ) {
+                if ( !match ) {
                     StringBuilder sb = new StringBuilder( 256 );
                     // TODO generate a different message if there is a single result available
                     // TODO provide a way to describe the object that was checked on !! otherwise the message we are giving are meaningless !!
@@ -369,8 +381,17 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
             } else if ( "AND".equalsIgnoreCase( operator ) ) {
 
+                // The boolean combination logic (AND) requires that all of the CvTerms in the Rule have to be matched.
+                // So we check all CvTerms associated with this rule and if there is at least one without match, the rule failed
+                boolean match = true;
+                for ( CV cv : term2count.keySet() ) {
+                    if ( term2count.get(cv) < 1 ) {
+                        match = false;
+                    }
+                }
+
                 // if all of the cvTerm got at least a hit we are good
-                if ( matchingCvTermCount != getCVTerms().size() ) {
+                if ( !match ) {
                     if ( log.isDebugEnabled() ) {
                         log.debug( "Found only " + matchingCvTermCount + " matching terms while we were expecting " + getCVTerms().size() );
                     }
@@ -393,8 +414,17 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
             } else if ( "XOR".equalsIgnoreCase( operator ) ) {
 
+                // The boolean combination logic (XOR) requires that only one of the CvTerms in the Rule can be matched.
+                // So we check all CvTerms associated with this rule and if there is more than one match (or none), the rule failed
+                int match = 0;
+                for ( CV cv : term2count.keySet() ) {
+                    if ( term2count.get(cv) > 0 ) {
+                        match++;
+                    }
+                }
+
                 // if exactly one cv term got a hit we are good
-                if ( matchingCvTermCount != 1 ) {
+                if ( match != 1 ) {
                     StringBuilder sb = new StringBuilder( 256 );
                     sb.append("[XOR] Not exactly one of the ")
                             .append(resultCount).append(" ")

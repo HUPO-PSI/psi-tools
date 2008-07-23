@@ -14,6 +14,7 @@ import psidev.psi.tools.validator.ValidatorMessage;
 import psidev.psi.tools.validator.rules.cvmapping.house.Bike;
 import psidev.psi.tools.validator.rules.cvmapping.house.House;
 import psidev.psi.tools.validator.rules.cvmapping.house.HouseFactory;
+import psidev.psi.tools.validator.rules.cvmapping.house.BedRoom;
 import psidev.psi.tools.validator.rules.cvmapping.protein.Modification;
 import psidev.psi.tools.validator.rules.cvmapping.protein.Protein;
 import psidev.psi.tools.validator.util.ValidatorReport;
@@ -277,6 +278,51 @@ public class CvMappingRuleTest {
         Assert.assertNotNull( messages );
         print( messages );
         Assert.assertEquals( 1, messages.size() );
+    }
+
+    @Test
+    public void check_allowChildren_3() throws Exception {
+
+        // This test will check that the terms pointed out by the XPath are children of the one specified in the cvmapping.
+        // This will in particular check that multiple child terms of one rule CvTerm do not cause problems.
+        // more precisely, that MI:0301, MI:0302 and MI:0616 are children of MI:0300
+
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample10-house-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages0 );
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages0.size() );
+
+        House house = new House();
+
+        house.addBedroom( new BedRoom("MI:0301") ); // child of MI:0300
+        house.addBedroom( new BedRoom("MI:0302") ); // child of MI:0300
+        house.addBedroom( new BedRoom("MI:0616") ); // child of MI:0300
+        house.addBedroom( new BedRoom("MI:0828") ); 
+        
+        Collection<ValidatorMessage> messages = ruleMngr.check( house, "/house" );
+
+        Assert.assertNotNull( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+
+        // now we rename the only term that would match the second rule CvTerm so it will also match the first rule CvTerm
+        // there will now be 4 valid terms, bu they will all match only one of the 2 CvTerms of the rule!!
+        // so this should fail and we will get a ValidatorMessage accordingly
+        for (BedRoom bedRoom : house.getBedrooms()) {
+            if (bedRoom.getColor().equalsIgnoreCase("MI:0828")) {
+                bedRoom.setColor("MI:0303");
+            }
+        }
+        messages = ruleMngr.check( house, "/house" );
+
+        Assert.assertNotNull( messages );
+        Assert.assertEquals( 1, messages.size() );
+        print( messages );
+
     }
 
     @Test
