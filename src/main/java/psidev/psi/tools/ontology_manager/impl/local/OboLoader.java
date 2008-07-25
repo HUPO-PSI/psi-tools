@@ -107,7 +107,7 @@ public class OboLoader extends AbstractLoader {
 
             ontology.addTerm( ontologyTerm );
 
-            if( term.isObsolete() ) {
+            if ( term.isObsolete() ) {
                 ontology.addObsoleteTerm( ontologyTerm );
             }
         }
@@ -196,9 +196,10 @@ public class OboLoader extends AbstractLoader {
             throw new IllegalArgumentException( "Please give a non null URL." );
         }
 
-
-        log.info( "User work directory: " + ontologyDirectory.getAbsolutePath() );
-        log.info( "keepTemporaryFile: " + isKeepDownloadedOntologiesOnDisk() );
+        if ( log.isInfoEnabled() ) {
+            log.info( "User work directory: " + ontologyDirectory.getAbsolutePath() );
+            log.info( "keepTemporaryFile: " + isKeepDownloadedOntologiesOnDisk() );
+        }
 
         if ( ontologyDirectory == null ) {
             throw new IllegalStateException();
@@ -240,11 +241,13 @@ public class OboLoader extends AbstractLoader {
                             if ( ontologyFile.exists() && ontologyFile.canRead() ) {
 
                                 // Cool, find it ! use it instead of the provided URL
-                                log.info( "Reuse existing cache: " + ontologyFile.getAbsolutePath() );
+                                if ( log.isInfoEnabled() )
+                                    log.info( "Reuse existing cache: " + ontologyFile.getAbsolutePath() );
 
                             } else {
 
-                                log.info( "Could not find " + ontologyFile.getAbsolutePath() );
+                                if ( log.isInfoEnabled() )
+                                    log.info( "Could not find " + ontologyFile.getAbsolutePath() );
 
                                 // cleanup map
                                 registryMap.remove( url );
@@ -266,12 +269,10 @@ public class OboLoader extends AbstractLoader {
                 }
             } catch ( IOException e ) {
                 // optional, so just display message in the log
-                e.printStackTrace();
-                log.error( e );
+                log.error( "Error while deserializing the map", e );
             } catch ( ClassNotFoundException e ) {
                 // optional, so just display message in the log
-                e.printStackTrace();
-                log.error( e );
+                log.error( "Error while deserializing the map", e );
             }
         }
 
@@ -281,12 +282,12 @@ public class OboLoader extends AbstractLoader {
                 // if it is not defined, not there or not readable...
 
                 // Read URL content
-                log.info( "Loading URL: " + url );
+                if ( log.isInfoEnabled() )  log.info( "Loading URL: " + url );
 
                 URLConnection con = url.openConnection();
                 int size = con.getContentLength();        // -1 if not stat available
 
-                log.info( "size = " + size );
+                if ( log.isInfoEnabled() )  log.info( "size = " + size );
 
                 InputStream is = url.openStream();
 
@@ -314,7 +315,8 @@ public class OboLoader extends AbstractLoader {
                     ontologyFile.deleteOnExit();
                 }
 
-                log.info( "The OBO file will be temporary stored as: " + ontologyFile.getAbsolutePath() );
+                if ( log.isInfoEnabled() )
+                    log.info( "The OBO file will be temporary stored as: " + ontologyFile.getAbsolutePath() );
 
                 FileOutputStream out = new FileOutputStream( ontologyFile );
 
@@ -324,13 +326,13 @@ public class OboLoader extends AbstractLoader {
 
                 // TODO write a nicer text-progress-bar...
                 while ( ( length = is.read( buf ) ) != -1 ) {
-
                     current += length;
-
                     out.write( buf, 0, length );
 
-                    log.info( "length = " + length );
-                    log.info( "Percent: " + ( ( current / ( float ) size ) * 100 ) + "%" );
+                    if ( log.isInfoEnabled() ) {
+                        log.info( "length = " + length );
+                        log.info( "Percent: " + ( ( current / ( float ) size ) * 100 ) + "%" );
+                    }
                 }
 
                 is.close();
@@ -367,6 +369,4 @@ public class OboLoader extends AbstractLoader {
             throw new OntologyLoaderException( "Error while loading URL (" + url + ")", e );
         }
     }
-
-
 }
