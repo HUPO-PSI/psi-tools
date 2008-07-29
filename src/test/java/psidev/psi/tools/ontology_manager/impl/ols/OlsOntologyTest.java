@@ -13,6 +13,8 @@ import java.rmi.RemoteException;
 import java.io.InputStream;
 
 /**
+ * OlsOntology Tester.
+ *
  * @author Florian Reisinger
  * Date: 20-Aug-2007
  */
@@ -223,12 +225,11 @@ public class OlsOntologyTest {
         stop = System.currentTimeMillis();
         long time_cached = stop - start;
 
-        System.out.println("Comparing performance between cached and uncached method:");
-        System.out.println("uncached: " + time_uncached + "(ms) and cached: " + time_cached + "(ms).");
+//        System.out.println("Comparing performance between cached and uncached method:");
+//        System.out.println("uncached: " + time_uncached + "(ms) and cached: " + time_cached + "(ms).");
         Assert.assertEquals("Cached and uncached query have to return the same result!", result_uc, result_c );
-        // ToDo: in "mvn clean test" runns on the same speed -> why?
+        // ToDo: in "mvn clean test" runs on the same speed -> why?
+        // This is not a deterministic behavious as many factor can interfere with your running system. better not check on this in a unit test.
 //        Assert.assertFalse("Cached and uncached query should not take the same time to execute!", time_uncached == time_cached );
     }
-
-
 }
