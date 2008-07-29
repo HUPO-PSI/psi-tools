@@ -67,10 +67,7 @@ public class OntologyImpl implements Ontology {
         String id = term.getTermAccession();
         if ( id2ontologyTerm.containsKey( id ) ) {
             OntologyTermI old = id2ontologyTerm.get( id );
-
-            System.err.println( "WARNING: 2 Objects have the same ID (" + id + "), the old one is being replaced." );
-            System.err.println( "         old: '" + old.getPreferredName() + "'" );
-            System.err.println( "         new: '" + term.getPreferredName() + "'" );
+            log.error( "WARNING: 2 Objects have the same ID (" + id + "), the old one is being replaced. old: " + old.getPreferredName() + " new: " + term.getPreferredName() );
         }
 
         id2ontologyTerm.put( id, term );
