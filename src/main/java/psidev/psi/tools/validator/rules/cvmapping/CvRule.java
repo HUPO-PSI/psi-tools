@@ -42,4 +42,6 @@ public interface CvRule extends Rule {
     public ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Rule rule );
 
     public MappingRuleStatus getStatus();
+
+    public void resetStatus();
 }

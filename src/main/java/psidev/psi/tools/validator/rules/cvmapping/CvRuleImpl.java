@@ -77,6 +77,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return status;
     }
 
+    public void resetStatus() {
+        this.status = MappingRuleStatus.NOT_CHECKED;
+    }
+
     public String getId() {
         return cvMappingRule.getId();
     }
