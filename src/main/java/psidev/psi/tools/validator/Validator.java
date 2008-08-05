@@ -281,8 +281,6 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> checkCvMapping( Collection<?> col, String xPath ) throws ValidatorException {
-        // make sure the status of the rules is reset before we start with the cv checking
-        this.resetCvRuleStatus();
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         // Run cv mapping check
         if ( cvRuleManager != null ) {
@@ -309,8 +307,6 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> checkCvMapping( Object o, String xPath ) throws ValidatorException {
-        // make sure the status of the rules is reset before we start with the cv checking
-        this.resetCvRuleStatus();
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         // Run cv mapping check
         if ( cvRuleManager != null ) {
