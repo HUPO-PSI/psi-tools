@@ -65,9 +65,7 @@ public abstract class Validator {
         this( ontoConfig, cvRuleConfig );
 
         // if specified, load objectRules
-        if ( objectRuleConfig != null ) {
-            setObjectRules( objectRuleConfig );
-        }
+        setObjectRules( objectRuleConfig );
     }
 
     public Validator( InputStream ontoConfig, InputStream cvRuleConfig ) throws ValidatorException, OntologyLoaderException {
@@ -130,52 +128,30 @@ public abstract class Validator {
     public void setObjectRules( InputStream configFile ) throws ValidatorException {
         rules = new ArrayList<ObjectRule>(); // set -> replace whatever there might have been
 
-        ObjectRuleReader reader = new ObjectRuleReader();
-        String className = null;
-        try {
-            final ObjectRuleList rules = reader.read( configFile );
-            for ( Rule rule : rules.getRule() ) {
-                className = rule.getClazz();
-                Class ruleClass = Class.forName( className );
-                Constructor c = ruleClass.getConstructor( OntologyManager.class );
-                ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
-                this.rules.add( r );
-                if ( log.isInfoEnabled() ) {
-                    log.info( "Added rule: " + r.getClass() );
+        if( configFile != null ) {
+            ObjectRuleReader reader = new ObjectRuleReader();
+            String className = null;
+            try {
+                final ObjectRuleList rules = reader.read( configFile );
+                for ( Rule rule : rules.getRule() ) {
+                    className = rule.getClazz();
+                    Class ruleClass = Class.forName( className );
+                    Constructor c = ruleClass.getConstructor( OntologyManager.class );
+                    ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
+                    this.rules.add( r );
+                    if ( log.isInfoEnabled() ) {
+                        log.info( "Added rule: " + r.getClass() );
+                    }
+
                 }
-
+            } catch ( Exception e ) {
+                throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
             }
-        } catch ( Exception e ) {
-            throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
+        } else {
+            if ( log.isDebugEnabled() ) {
+                log.debug( "No Object rules were configured in this validator." );
+            }
         }
-
-//        // parse XML
-//        Document document;
-//        try {
-//            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//            DocumentBuilder builder = factory.newDocumentBuilder();
-//            document = builder.parse( configFile );
-//        } catch ( Exception e ) {
-//            throw new ValidatorException( "Error while parsing configuration file", e );
-//        }
-//
-//        // instantiate rules with ontologies
-//        NodeList rs = document.getElementsByTagName( "rule" );
-//        for ( int i = 0; i < rs.getLength(); i++ ) {
-//            NodeList texts = rs.item( i ).getChildNodes();
-//            String className = texts.item( 0 ).getNodeValue();
-//            try {
-//                Class rule = Class.forName( className );
-//                Constructor c = rule.getConstructor( OntologyManager.class );
-//                ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
-//                this.rules.add( r );
-//                if ( log.isInfoEnabled() ) {
-//                    log.info( "Added rule: " + r.getClass() );
-//                }
-//            } catch ( Exception e ) {
-//                throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
-//            }
-//        }
     }
 
     public UserPreferences getUserPreferences() {
