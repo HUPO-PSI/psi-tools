@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
- * @since <pre>22-Apr-2006</pre>
+ * @since 1.0
  */
 public class SaxReport {
 

@@ -17,6 +17,13 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.*;
 
+/**
+ * A simple Sax validator that interface with the PSI validator.
+ *
+ * @author Samuel Kerrien (skerrien@ebi.ac.uk)
+ * @version $Id$
+ * @since 1.0
+ */
 public class SaxValidatorHandler {
 
     /**
@@ -98,7 +105,7 @@ public class SaxValidatorHandler {
                 report.addMessage( message );
 
             } else {
-                StringBuffer sb = new StringBuffer( 150 );
+                StringBuilder sb = new StringBuilder( 150 );
                 sb.append( "   Public ID: " + e.getPublicId() ).append( "\n" );
                 sb.append( "   System ID: " + e.getSystemId() ).append( "\n" );
                 sb.append( "   Line number: " + e.getLineNumber() ).append( "\n" );
@@ -114,23 +121,23 @@ public class SaxValidatorHandler {
     ///////////////////////////
     // User interface
 
-    public static SaxReport validate( InputStream is ) {
+    public static SaxReport validate( InputStream is ) throws IOException, SAXException {
         InputSource inputSource = new InputSource( is );
         return validate( inputSource );
     }
 
-    public static SaxReport validate( File file ) throws FileNotFoundException {
+    public static SaxReport validate( File file ) throws IOException, SAXException {
         String filename = file.getAbsolutePath();
         InputSource inputSource = new InputSource( new FileReader( filename ) );
         return validate( inputSource );
     }
 
-    public static SaxReport validate( String xmlString ) {
+    public static SaxReport validate( String xmlString ) throws IOException, SAXException {
         InputSource inputSource = new InputSource( new StringReader( xmlString ) );
         return validate( inputSource );
     }
 
-    public static SaxReport validate( InputSource inputSource ) {
+    public static SaxReport validate( InputSource inputSource ) throws SAXException, IOException {
 
         String parserClass = SAXParser.class.getName();
         String validationFeature = "http://xml.org/sax/features/validation";
@@ -139,25 +146,12 @@ public class SaxValidatorHandler {
         SaxReport report = new SaxReport();
         MyErrorHandler handler = new MyErrorHandler( report );
 
-        try {
+        XMLReader r = XMLReaderFactory.createXMLReader( parserClass );
+        r.setFeature( validationFeature, true );
+        r.setFeature( schemaFeature, true );
 
-            XMLReader r = XMLReaderFactory.createXMLReader( parserClass );
-            r.setFeature( validationFeature, true );
-            r.setFeature( schemaFeature, true );
-
-            r.setErrorHandler( handler );
-            r.parse( inputSource );
-
-        } catch ( SAXException e ) {
-
-            // TODO handle that !
-            e.printStackTrace();
-
-        } catch ( IOException e ) {
-
-            // TODO handle that !
-            e.printStackTrace();
-        }
+        r.setErrorHandler( handler );
+        r.parse( inputSource );
 
         if ( handler.hasError() || handler.hasFatal() || handler.hasWarning() ) {
 
