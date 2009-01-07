@@ -146,7 +146,7 @@ public class SaxValidatorHandler {
         SaxReport report = new SaxReport();
         MyErrorHandler handler = new MyErrorHandler( report );
 
-        XMLReader r = XMLReaderFactory.createXMLReader( parserClass );
+        XMLReader r = XMLReaderFactory.createXMLReader();
         r.setFeature( validationFeature, true );
         r.setFeature( schemaFeature, true );
 
