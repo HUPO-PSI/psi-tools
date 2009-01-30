@@ -42,7 +42,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         cvMappingRule = new CvMappingRule();
     }
 
-    /////////////////
+    ////////////////////
     // Getter + Setter
 
     public CvMappingRule getCvMappingRule() {
@@ -364,22 +364,24 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                 // if any of the cvTerm got a hit, we are good
                 if ( !match ) {
                     StringBuilder sb = new StringBuilder( 256 );
-                    // TODO generate a different message if there is a single result available
                     // TODO provide a way to describe the object that was checked on !! otherwise the message we are giving are meaningless !!
                     // class ObjectPrinter<T extends Object> {
                     //       public String print( T object ){...}
                     // }
 
-                    sb.append("[OR] The result found at: ")
-                            .append(elementXpath)
-                            .append(" for which the values are '")
+                    sb.append( "The result found at: " )
+                            .append( elementXpath )
+                            .append( " for which the values " )
+                            .append( valueResults.size() > 1 ? "are " : "is " )
+                            .append( " '" )
                             .append(printObjectAccessions(valueResults))
-                            .append("' didn't match any of the ")
+                            .append("' didn't match " + (getCVTerms().size() > 1 ? "any of the " : "the ") )
                             .append(getCVTerms().size())
                             .append(" specified CV term")
                             .append(getCVTerms().size() > 1 ? "s" : "")
                             .append(":\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
+                    
                     messages.add( buildMessage( elementXpath, level, sb.toString() ) );
                 }
 
@@ -401,7 +403,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                     }
 
                     StringBuilder sb = new StringBuilder( 256 );
-                    sb.append("[AND] Not all of the ")
+                    sb.append("Not all of the ")
                             .append(resultCount)
                             .append(" values ")
                             .append(resultClassName)
@@ -413,6 +415,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(getCVTerms().size())
                             .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
+
                     messages.add( buildMessage( elementXpath, level, sb.toString() ) );
                 }
 
@@ -430,7 +433,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                 // if exactly one cv term got a hit we are good
                 if ( match != 1 ) {
                     StringBuilder sb = new StringBuilder( 256 );
-                    sb.append("[XOR] Not exactly one of the ")
+                    sb.append("Not exactly one of the ")
                             .append(resultCount).append(" ")
                             .append(resultClassName)
                             .append("'s CV terms [")
