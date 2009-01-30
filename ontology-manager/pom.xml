@@ -1,0 +1,118 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>psidev.psi.tools</groupId>
+        <artifactId>master-pom</artifactId>
+        <version>2</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>psidev.psi.tools</groupId>
+    <artifactId>ontology-manager</artifactId>
+    <packaging>jar</packaging>
+    <version>2.0.0</version>
+
+    <name>PSI :: Tools :: Ontology Manager</name>
+
+    <description>
+        The library intends to provide a generic framework for Ontology access and handling.
+    </description>
+
+    <scm>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/tags/ontology-manager-2.0.0</connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/tags/ontology-manager-2.0.0</developerConnection>
+        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/tags/ontology-manager-2.0.0</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>psidev.psi.tools</groupId>
+            <artifactId>ontology-config-reader</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.3.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- OBO parser -->
+        <dependency>
+            <groupId>org.geneontology</groupId>
+            <artifactId>oboedit</artifactId>
+            <version>1.101</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi</groupId>
+            <artifactId>ols</artifactId>
+            <version>1.14.1</version>
+        </dependency>
+        <dependency>
+            <groupId>proteomics</groupId>
+            <artifactId>proteomics-common</artifactId>
+            <version>1.5</version>
+        </dependency>
+
+        <!-- 3rd party -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.15</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.jms</groupId>
+                    <artifactId>jms</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.3</version>
+        </dependency>
+
+        <!-- caching -->
+        <dependency>
+            <groupId>opensymphony</groupId>
+            <artifactId>oscache</artifactId>
+            <version>2.3</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>ebi-repo</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ebi-repo-snapshots</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+</project>
