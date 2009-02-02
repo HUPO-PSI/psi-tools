@@ -5,13 +5,13 @@
     <groupId>psidev.psi.tools</groupId>
     <artifactId>validator-tutorial</artifactId>
     <packaging>pom</packaging>
-    <version>1</version>
+    <version>2-SNAPSHOT</version>
     <name>PSI :: Tools :: Validator Tutorial</name>
 
     <scm>
-        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/tutorial/tags/validator-tutorial-1</connection>
-        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/tutorial/tags/validator-tutorial-1</developerConnection>
-        <url>http://svn.sourceforge.net/viewcvs.cgi/psidev/psi/tools/current/tags/validator-tutorial-1</url>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/tutorial/trunk</connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/tutorial/trunk</developerConnection>
+        <url>http://svn.sourceforge.net/viewcvs.cgi/psidev/psi/tools/current</url>
     </scm>
 
     <modules>
