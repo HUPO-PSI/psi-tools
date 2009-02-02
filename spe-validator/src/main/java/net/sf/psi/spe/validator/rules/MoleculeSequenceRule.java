@@ -17,6 +17,8 @@ package net.sf.psi.spe.validator.rules;
 
 import net.sf.psi.spe.Molecule;
 import psidev.psi.tools.ontology_manager.OntologyManager;
+import psidev.psi.tools.ontology_manager.OntologyUtils;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.validator.MessageLevel;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
@@ -24,7 +26,6 @@ import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -44,7 +45,7 @@ public class MoleculeSequenceRule extends ObjectRule<Molecule> {
     public static final String SMALL_MOLECULE = "SPE:0328";
     public static final String PROTEIN = "SPE:0326";
     public static final String NUCLEIC_ACID = "SPE:0318";
-    public static final String RIBONUCLIEC_ACID = "SPE:0320";
+    public static final String RIBONUCLEIC_ACID = "SPE:0320";
 
     public MoleculeSequenceRule( OntologyManager ontologyManager ) {
         super( ontologyManager );
@@ -64,7 +65,9 @@ public class MoleculeSequenceRule extends ObjectRule<Molecule> {
             final String type = molecule.getType().getName();
             final String typeId = molecule.getType().getId();
 
-            Set<String> termIds = ontologyManager.getValidIDs( "SPE", PROTEIN, true, true ); // protein
+            final OntologyAccess speOntology = ontologyManager.getOntologyAccess( "SPE" );
+            Collection<String> termIds = OntologyUtils.getAccessions( speOntology.getValidTerms( PROTEIN, true, true ) );
+
             if ( termIds.contains( typeId ) ) {
                 if ( !AA_PATERN.matcher( sequence ).matches() ) {
                     messages.add( new ValidatorMessage( "Molecule '" + molecule.getName() + "' of type '" + type +
@@ -74,7 +77,7 @@ public class MoleculeSequenceRule extends ObjectRule<Molecule> {
                 }
             }
 
-            termIds = ontologyManager.getValidIDs( "SPE", NUCLEIC_ACID, true, true ); // nucleic acid
+            termIds = OntologyUtils.getAccessions( speOntology.getValidTerms( NUCLEIC_ACID, true, true ) );; // nucleic acid
             if ( termIds.contains( typeId ) ) {
                 messages.add( new ValidatorMessage( "Molecule '" + molecule.getName() + "' of type '" + type +
                                                     "' has a non valid nucleic acid sequence: "  + sequence,
@@ -83,7 +86,7 @@ public class MoleculeSequenceRule extends ObjectRule<Molecule> {
             }
 
 
-            termIds = ontologyManager.getValidIDs( "SPE", RIBONUCLIEC_ACID, true, true ); // ribonucleic acid
+            termIds = OntologyUtils.getAccessions( speOntology.getValidTerms( RIBONUCLEIC_ACID, true, true ) );; // ribonucleic acid
             if ( termIds.contains( typeId ) ) {
                 messages.add( new ValidatorMessage( "Molecule '" + molecule.getName() + "' of type '" + type +
                                                     "' has a non valid ribonucleic acid sequence: " + sequence,
