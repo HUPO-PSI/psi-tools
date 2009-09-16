@@ -57,8 +57,12 @@ public class OlsOntologyTest {
         final Set<OntologyTermI> terms5 = mod.getValidTerms( "", false, false );
         Assert.assertTrue( terms5.isEmpty() );
         // null accession = 0 valid term
-        final Set<OntologyTermI> terms6 = mod.getValidTerms( null, false, false );
-        Assert.assertTrue( terms6.isEmpty() );
+    }
+
+    @Test (expected = java.lang.IllegalStateException.class )
+    public void illegalQuery() throws Exception {
+        final OntologyAccess mod = manager.getOntologyAccess( "GO" );
+        mod.getValidTerms( null, false, false );
     }
 
     @Test
