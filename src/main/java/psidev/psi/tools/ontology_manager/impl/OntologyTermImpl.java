@@ -2,6 +2,9 @@ package psidev.psi.tools.ontology_manager.impl;
 
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
+import java.util.Collection;
+import java.util.ArrayList;
+
 /**
  * Representation of a cv term.
  *
@@ -15,6 +18,8 @@ public class OntologyTermImpl implements OntologyTermI {
     private String acc;
 
     private String name;
+
+    private Collection<String> nameSynonyms;
 
     //////////////////////////
     // Constructors
@@ -44,6 +49,17 @@ public class OntologyTermImpl implements OntologyTermI {
 
     public void setPreferredName( String preferredName ) {
         name = preferredName;
+    }
+
+    public Collection<String> getNameSynonyms() {
+        if ( nameSynonyms == null ) {
+            nameSynonyms = new ArrayList();
+        }
+        return nameSynonyms;
+    }
+
+    public void setNameSynonyms( Collection<String> nameSynonyms ) {
+        this.nameSynonyms = nameSynonyms;
     }
 
     public String getPreferredName() {

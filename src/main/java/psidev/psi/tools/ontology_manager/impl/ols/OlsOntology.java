@@ -154,6 +154,24 @@ public class OlsOntology implements OntologyAccess {
         OntologyTermI term;
         if ( termName != null && termName.length() > 0 && !termName.equals( accession ) ) {
             term = new OntologyTermImpl( accession, termName );
+
+            try {
+                final Map metadata = query.getTermMetadata( accession, ontologyID );
+                for ( Object o : metadata.entrySet() ) {
+                    Map.Entry e = ( Map.Entry ) o;
+                    final String key = (String) e.getKey();
+
+                    // That's the only way OLS provides to cach synonyms, all keys are diferent so we are fishing out keywords :(
+                    if( key.contains( "synonym" ) || key.contains( "Alternate label" ) ) {
+                       term.getNameSynonyms().add( (String) e.getValue() ); 
+                    }
+                }
+            } catch ( RemoteException e ) {
+                if ( log.isWarnEnabled() ) {
+                    log.warn( "Error while loading term synonyms from OLS for term: " + accession, e );
+                }
+            }
+
         } else {
             term = null;
         }
@@ -172,19 +190,19 @@ public class OlsOntology implements OntologyAccess {
      public OntologyTermI getTermForAccession( String accession ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
-        String myKey = GET_TERM_FOR_ACCESSION + '_' + ontologyID + '_' + accession;
+        final String myKey = GET_TERM_FOR_ACCESSION + '_' + ontologyID + '_' + accession;
 
         OntologyTermI result;
         // try to get the result from the cache
         try {
             result = ( OntologyTermI ) admin.getFromCache( myKey );
-            log.debug( "Using cached terms for key: " + myKey );
+            if ( log.isDebugEnabled() ) log.debug( "Using cached terms for key: " + myKey );
         } catch ( NeedsRefreshException nre ) {
             boolean updated = false;
             // if not found in cache, use uncached method and store result in cache
             try {
                 result = this.getTermForAccessionUncached( accession );
-                log.debug( "Storing uncached terms for key: " + myKey );
+                if ( log.isDebugEnabled() ) log.debug( "Storing uncached terms for key: " + myKey );
                 admin.putInCache( myKey, result );
                 updated = true;
             } finally {
@@ -449,14 +467,6 @@ public class OlsOntology implements OntologyAccess {
         }
         return terms;
     }
-
-
-
-
-
-
-
-
     // This has issues finding all the child terms if the tree changes relationship types -> use getValidIDs2
     @Deprecated
     public Set<String> getValidIDsOld( String id, boolean allowChildren, boolean useTerm ) {

@@ -58,6 +58,7 @@ public class OntologyUtils {
         Collection<String> names = new ArrayList<String>( terms.size() );
         for ( OntologyTermI term : terms ) {
             names.add( term.getPreferredName() );
+            names.addAll( term.getNameSynonyms() );
         }
         return names;
     }

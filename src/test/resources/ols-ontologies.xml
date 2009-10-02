@@ -12,4 +12,11 @@
               name="PSI-MI"
               identifier="MI"
               version="2.5"/>
+
+    <cvSource source="OLS"
+              uri=""
+              format="OBO"
+              name="PSI-MOD"
+              identifier="MOD"
+              version="current"/>
 </cvSourceList>

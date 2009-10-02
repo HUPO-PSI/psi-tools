@@ -46,6 +46,39 @@ public class LocalOntologyTest {
     }
 
     @Test
+    public void getMiTermSynonyms() throws OntologyLoaderException {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+        // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
+        final Set<OntologyTermI> terms = mi.getValidTerms( "MI:0018", false, true );
+        Assert.assertEquals( 1, terms.size() );
+        final OntologyTermI y2h = terms.iterator().next();
+
+        Assert.assertEquals( 8, y2h.getNameSynonyms().size() );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2h" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "classical two hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "Gal4 transcription regeneration" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2 hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "two-hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2H" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "yeast two hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2-hybrid" ) );
+    }
+
+    @Test
+    public void getModTermSynonyms() throws OntologyLoaderException {
+        final OntologyAccess mi = manager.getOntologyAccess( "MOD" );
+        // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
+        final Set<OntologyTermI> terms = mi.getValidTerms( "MOD:00007", false, true );
+        Assert.assertEquals( 1, terms.size() );
+        final OntologyTermI term = terms.iterator().next();
+
+        Assert.assertEquals( 3, term.getNameSynonyms().size() );
+        Assert.assertTrue( term.getNameSynonyms().contains( "Delta:S(-1)Se(1)" ) );
+        Assert.assertTrue( term.getNameSynonyms().contains( "Se(S)Res" ) );
+        Assert.assertTrue( term.getNameSynonyms().contains( "Selenium replaces sulphur" ) );
+    }
+
+    @Test
     public void isObsolete() throws Exception {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
         final OntologyTermI term = mi.getTermForAccession( "MI:0205" );
@@ -201,4 +234,12 @@ public class LocalOntologyTest {
             System.out.println( term );
         }
     }
+
+//    @Test
+//    public void getValidTerms_SO() throws OntologyLoaderException {
+//        final OntologyAccess so = manager.getOntologyAccess( "SO" );
+//        Assert.assertNotNull( so );
+//        final Set<OntologyTermI> terms = so.getValidTerms( "SO:0000769", false, false );
+//        Assert.assertEquals( 1, terms.size() );
+//    }
 }

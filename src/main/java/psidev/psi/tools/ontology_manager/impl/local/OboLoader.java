@@ -14,14 +14,12 @@ import uk.ac.ebi.ook.loader.impl.AbstractLoader;
 import uk.ac.ebi.ook.loader.parser.OBOFormatParser;
 import uk.ac.ebi.ook.model.interfaces.TermRelationship;
 import uk.ac.ebi.ook.model.ojb.TermBean;
+import uk.ac.ebi.ook.model.ojb.TermSynonymBean;
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Wrapper class that hides the way OLS handles OBO files.
@@ -104,6 +102,12 @@ public class OboLoader extends AbstractLoader {
 
             // convert term into a OboTerm
             OntologyTermI ontologyTerm = new OntologyTermImpl( term.getIdentifier(), term.getName() );
+            final Collection<TermSynonymBean> synonyms = (Collection<TermSynonymBean>) term.getSynonyms();
+            if( synonyms != null ) {
+                for ( TermSynonymBean synonym : synonyms ) {
+                    ontologyTerm.getNameSynonyms().add( synonym.getSynonym() );
+                }
+            }
 
             ontology.addTerm( ontologyTerm );
 

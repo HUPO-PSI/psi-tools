@@ -59,6 +59,37 @@ public class OlsOntologyTest {
         // null accession = 0 valid term
     }
 
+    @Test
+    public void getMiTermSynonyms() throws OntologyLoaderException {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+        final Set<OntologyTermI> terms = mi.getValidTerms( "MI:0018", false, true );
+        Assert.assertEquals( 1, terms.size() );
+        final OntologyTermI y2h = terms.iterator().next();
+
+        Assert.assertEquals( 8, y2h.getNameSynonyms().size() );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2h" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "classical two hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "Gal4 transcription regeneration" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2 hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "two-hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2H" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "yeast two hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2-hybrid" ) );
+    }
+
+    @Test
+    public void getModTermSynonyms() throws OntologyLoaderException {
+        final OntologyAccess mod = manager.getOntologyAccess( "MOD" );
+        final Set<OntologyTermI> terms = mod.getValidTerms( "MOD:00007", false, true );
+        Assert.assertEquals( 1, terms.size() );
+        final OntologyTermI term = terms.iterator().next();
+
+        Assert.assertEquals( 3, term.getNameSynonyms().size() );
+        Assert.assertTrue( term.getNameSynonyms().contains( "Delta:S(-1)Se(1)" ) );
+        Assert.assertTrue( term.getNameSynonyms().contains( "Se(S)Res" ) );
+        Assert.assertTrue( term.getNameSynonyms().contains( "Selenium replaces sulphur" ) );
+    }
+
     @Test (expected = java.lang.IllegalStateException.class )
     public void illegalQuery() throws Exception {
         final OntologyAccess mod = manager.getOntologyAccess( "GO" );
