@@ -74,7 +74,7 @@ public class OntologyManager {
     public OntologyManager( InputStream configFile ) throws OntologyLoaderException {
         ontologies = new HashMap<String, OntologyAccess>();
         loadOntologies( configFile );
-        if ( log.isDebugEnabled() ) log.info( "Successfully created and configured new OntologyManager." );
+        if ( log.isDebugEnabled() ) log.debug( "Successfully created and configured new OntologyManager." );
     }
 
     ////////////////////
@@ -90,7 +90,7 @@ public class OntologyManager {
      */
     public OntologyAccess putOntology( String ontologyID, OntologyAccess ontology ) {
         if ( ontologies.containsKey( ontologyID ) ) {
-            log.warn( "Ontology with the ID '" + ontologyID + "' already exists. Overwriting!" );
+            if ( log.isWarnEnabled() )log.warn( "Ontology with the ID '" + ontologyID + "' already exists. Overwriting!" );
         }
         return ontologies.put( ontologyID, ontology );
     }
