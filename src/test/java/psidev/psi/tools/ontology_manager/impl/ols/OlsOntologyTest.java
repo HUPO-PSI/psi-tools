@@ -8,6 +8,7 @@ import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
+import java.util.Collection;
 import java.util.Set;
 import java.rmi.RemoteException;
 import java.io.InputStream;
@@ -57,6 +58,15 @@ public class OlsOntologyTest {
         final Set<OntologyTermI> terms5 = mod.getValidTerms( "", false, false );
         Assert.assertTrue( terms5.isEmpty() );
         // null accession = 0 valid term
+    }
+
+    @Test
+    public void getValidTerms_so() throws OntologyLoaderException {
+        final OntologyAccess mod = manager.getOntologyAccess( "SO" );
+        // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
+        OntologyTermI parent = mod.getTermForAccession("SO:0000001");
+        Set<OntologyTermI> terms = mod.getAllChildren(parent);
+        Assert.assertEquals( 1236, terms.size() );
     }
 
     @Test

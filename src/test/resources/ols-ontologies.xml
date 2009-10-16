@@ -19,4 +19,10 @@
               name="PSI-MOD"
               identifier="MOD"
               version="current"/>
+    <cvSource source="OLS"
+              uri=""
+              format="OBO"
+              name="Sequence Ontology"
+              identifier="SO"
+              version="current"/>
 </cvSourceList>
