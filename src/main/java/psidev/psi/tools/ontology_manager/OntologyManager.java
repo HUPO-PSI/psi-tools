@@ -38,8 +38,6 @@ public class OntologyManager {
      */
     private Map<String, OntologyAccess> ontologies;
 
-    private File ontologyDirectory = null;
-
     public static final String CLASSPATH_PREFIX = "classpath:";
 
     /**
@@ -117,7 +115,7 @@ public class OntologyManager {
     }
 
     public void setOntologyDirectory( File ontologyDirectory ) {
-        this.ontologyDirectory = ontologyDirectory;
+        OntologyManagerContext.getInstance().setOntologyDirectory( ontologyDirectory );
     }
 
     /**
@@ -201,7 +199,7 @@ public class OntologyManager {
                     }
                     Constructor c = loader.getConstructor();
                     OntologyAccess oa = ( OntologyAccess ) c.newInstance();
-                    oa.setOntologyDirectory( ontologyDirectory );
+                    oa.setOntologyDirectory( OntologyManagerContext.getInstance().getOntologyDirectory() );
                     oa.loadOntology( id, name, version, format, uri );
                     ontologies.put( id, oa );
                 } catch ( Exception e ) {

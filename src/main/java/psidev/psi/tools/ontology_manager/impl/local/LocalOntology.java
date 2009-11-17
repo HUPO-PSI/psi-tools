@@ -2,6 +2,7 @@ package psidev.psi.tools.ontology_manager.impl.local;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.tools.ontology_manager.OntologyManagerContext;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
@@ -128,6 +129,7 @@ public class LocalOntology implements OntologyAccess {
      * @return the created directory, never null.
      */
     private File getOntologyDirectory() throws OntologyLoaderException {
+
         if ( ontologyDirectory != null ) {
             if ( !ontologyDirectory.exists() ) {
 
@@ -142,50 +144,56 @@ public class LocalOntology implements OntologyAccess {
                     return ontologyDirectory;
                 }
             }
-            log.warn( "Could not create or write to specified ontologies directory." );
+
+            log.warn( "Could not create or write to specified ontologies directory: " + ontologyDirectory.getAbsolutePath() );
         }
 
-        log.info( "Using default for ontology directory." );
-        String path = System.getProperty( "user.home" ) + File.separator + DEFAULT_ONTOLOGY_DIRECTORY;
+        if( OntologyManagerContext.getInstance().isStoreOntologiesLocally() ) {
 
-        File dir = new File( path );
+            String path = System.getProperty( "user.home" ) + File.separator + DEFAULT_ONTOLOGY_DIRECTORY;
+            log.info( "Using default for ontology directory: " + path );
 
-        if ( !dir.exists() ) {
+            File dir = new File( path );
 
-            if ( !dir.mkdirs() ) {
-                throw new OntologyLoaderException( "Cannot create home directory for ontologies: " + dir.getAbsolutePath() );
-            }
+            if ( !dir.exists() ) {
 
-            return dir;
+                if ( !dir.mkdirs() ) {
+                    throw new OntologyLoaderException( "Cannot create home directory for ontologies: " + dir.getAbsolutePath() );
+                }
 
-        } else {
-
-            if ( dir.canWrite() ) {
                 return dir;
+
             } else {
-                // TODO log error
-                dir = null;
-                path = System.getProperty( "java.io.tmpdir", "tmp" ) + File.separator + ontologyDirectory;
-                dir = new File( path );
 
-                if ( !dir.exists() ) {
-
-                    if ( !dir.mkdirs() ) {
-                        throw new OntologyLoaderException( "Cannot create home directory for ontologies: " + dir.getAbsolutePath() );
-                    }
-
+                if ( dir.canWrite() ) {
                     return dir;
-
                 } else {
+                    // TODO log error
+                    dir = null;
+                    path = System.getProperty( "java.io.tmpdir", "tmp" ) + File.separator + ontologyDirectory;
+                    dir = new File( path );
 
-                    if ( dir.canWrite() ) {
+                    if ( !dir.exists() ) {
+
+                        if ( !dir.mkdirs() ) {
+                            throw new OntologyLoaderException( "Cannot create home directory for ontologies: " + dir.getAbsolutePath() );
+                        }
+
                         return dir;
+
                     } else {
-                        // TODO log error
-                        throw new OntologyLoaderException( "Cannot create home directory for ontologies, pleast check your config." );
+
+                        if ( dir.canWrite() ) {
+                            return dir;
+                        } else {
+                            // TODO log error
+                            throw new OntologyLoaderException( "Cannot create home directory for ontologies, pleast check your config." );
+                        }
                     }
                 }
             }
         }
+
+        return null;
     }
 }
