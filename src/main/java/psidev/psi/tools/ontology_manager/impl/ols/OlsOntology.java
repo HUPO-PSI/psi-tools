@@ -150,6 +150,7 @@ public class OlsOntology implements OntologyAccess {
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
+        
         // check the result! ols returns the input accession if no matching entry was found
         OntologyTermI term;
         if ( termName != null && termName.length() > 0 && !termName.equals( accession ) ) {
@@ -157,13 +158,14 @@ public class OlsOntology implements OntologyAccess {
 
             try {
                 final Map metadata = query.getTermMetadata( accession, ontologyID );
-                for ( Object o : metadata.entrySet() ) {
-                    Map.Entry e = ( Map.Entry ) o;
-                    final String key = (String) e.getKey();
-
-                    // That's the only way OLS provides to cach synonyms, all keys are diferent so we are fishing out keywords :(
-                    if( key.contains( "synonym" ) || key.contains( "Alternate label" ) ) {
-                       term.getNameSynonyms().add( (String) e.getValue() ); 
+                for ( Object k : metadata.keySet() ) {
+                    final String key = (String) k;
+                    // That's the only way OLS provides synonyms, all keys are different so we are fishing out keywords :(
+                    if( key != null && (key.contains( "synonym" ) || key.contains( "Alternate label" )) ) {
+                    	String value = (String) metadata.get( k );
+                        if( value != null ) {
+                            term.getNameSynonyms().add(value.trim());
+                        }
                     }
                 }
             } catch ( RemoteException e ) {

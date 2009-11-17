@@ -1,8 +1,12 @@
 package psidev.psi.tools.ontology_manager.impl.local;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.*;
+
 import psidev.psi.tools.ontology_manager.OntologyManager;
+import psidev.psi.tools.ontology_manager.OntologyUtils;
 import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
@@ -64,6 +68,23 @@ public class LocalOntologyTest {
         Assert.assertTrue( y2h.getNameSynonyms().contains( "2-hybrid" ) );
     }
 
+    // there was a problem with this particular term!
+    @Test
+    public void getMiTermSynonyms0217() throws OntologyLoaderException {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+        final Set<OntologyTermI> terms = mi.getValidTerms( "MI:0217", false, true );
+        Assert.assertEquals( 1, terms.size() );
+        
+        final OntologyTermI phosphorylation = mi.getTermForAccession("MI:0217");
+        assertEquals(1, phosphorylation.getNameSynonyms().size());
+        
+        // different approach
+        Collection<String> names;
+        names = OntologyUtils.getTermNames(terms);
+        assertTrue(names.contains("phosphorylation"));
+        assertTrue(names.contains("phosphorylation reaction"));
+    }
+    
     @Test
     public void getModTermSynonyms() throws OntologyLoaderException {
         final OntologyAccess mi = manager.getOntologyAccess( "MOD" );
@@ -235,6 +256,16 @@ public class LocalOntologyTest {
         }
     }
 
+    @Ignore
+    @Test
+    public void getValidTerms_so() throws OntologyLoaderException {
+        final OntologyAccess mod = manager.getOntologyAccess( "SO" );
+        // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
+        OntologyTermI parent = mod.getTermForAccession("SO:0000001");
+        Set<OntologyTermI> terms = mod.getAllChildren(parent);
+        Assert.assertEquals( 1236, terms.size() );
+    }
+    
 //    @Test
 //    public void getValidTerms_SO() throws OntologyLoaderException {
 //        final OntologyAccess so = manager.getOntologyAccess( "SO" );

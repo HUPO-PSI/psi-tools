@@ -35,9 +35,9 @@ public class OntologyManagerTest {
         om.loadOntologies(is);
         is.close();
         Assert.assertNotNull( om );
-        for ( String id : om.getOntologyIDs() ) {
-            System.out.println( id );
-        }
+//        for ( String id : om.getOntologyIDs() ) {
+//            System.out.println( id );
+//        }
     }
 
     private File getTargetDirectory() {
