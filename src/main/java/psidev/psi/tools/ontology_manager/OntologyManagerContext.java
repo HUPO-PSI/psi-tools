@@ -36,6 +36,10 @@ public class OntologyManagerContext {
     private OntologyManagerContext() {
         // initialize here default configuration
         storeOntologiesLocally = false;
+        ontologyDirectory = new File( System.getProperty( "java.io.tmpdir" ) );
+        if ( log.isDebugEnabled() ) {
+            log.debug( "Default directory for storing ontologies set to " + ontologyDirectory.getAbsolutePath() );
+        }
     }
 
     ///////////////////////////
@@ -54,6 +58,9 @@ public class OntologyManagerContext {
     }
 
     public void setOntologyDirectory( File ontologyDirectory ) {
+        if ( ontologyDirectory == null ) {
+            throw new IllegalArgumentException( "You must give a non null ontologyDirectory, use setStoreOntologiesLocally(boolean) to disable the long term storing." );
+        }
         this.ontologyDirectory = ontologyDirectory;
     }
 }

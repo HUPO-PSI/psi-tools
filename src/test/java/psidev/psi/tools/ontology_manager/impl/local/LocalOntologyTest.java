@@ -256,21 +256,21 @@ public class LocalOntologyTest {
         }
     }
 
-    @Ignore
     @Test
-    public void getValidTerms_so() throws OntologyLoaderException {
+    public void getValidTerms_so_small() throws OntologyLoaderException {
+        final OntologyAccess mod = manager.getOntologyAccess( "SO" );
+        // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
+        OntologyTermI parent = mod.getTermForAccession("SO:0000805");
+        Set<OntologyTermI> terms = mod.getAllChildren(parent);
+        Assert.assertEquals( 4, terms.size() );
+    }
+
+    @Test
+    public void getValidTerms_so_large() throws OntologyLoaderException {
         final OntologyAccess mod = manager.getOntologyAccess( "SO" );
         // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000001");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 1236, terms.size() );
+        Assert.assertEquals( 1243, terms.size() );
     }
-    
-//    @Test
-//    public void getValidTerms_SO() throws OntologyLoaderException {
-//        final OntologyAccess so = manager.getOntologyAccess( "SO" );
-//        Assert.assertNotNull( so );
-//        final Set<OntologyTermI> terms = so.getValidTerms( "SO:0000769", false, false );
-//        Assert.assertEquals( 1, terms.size() );
-//    }
 }

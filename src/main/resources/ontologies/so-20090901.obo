@@ -8107,7 +8107,7 @@ name: sequence_replication_mode
 comment: This has been obsoleted as it represents a process.
 synonym: "sequence replication mode" EXACT []
 is_obsolete: true
-replaced_by: GO:0034961
+comment: GO:0034961
 
 [Term]
 id: SO:0000969
@@ -8116,7 +8116,7 @@ comment: This has been obsoleted as it represents a process.
 synonym: "rolling circle" EXACT []
 xref: http://en.wikipedia.org/wiki/Rolling_circle "wiki"
 is_obsolete: true
-replaced_by: GO:0070581
+comment: GO:0070581
 
 [Term]
 id: SO:0000970
@@ -8124,7 +8124,7 @@ name: theta_replication
 comment: This has been obsoleted as it represents a process.
 synonym: "theta replication" EXACT []
 is_obsolete: true
-replaced_by: GO:0070582
+comment: GO:0070582
 
 [Term]
 id: SO:0000971
@@ -8132,7 +8132,7 @@ name: DNA_replication_mode
 comment: This has been obsoleted as it represents a process.
 synonym: "DNA replication mode" EXACT []
 is_obsolete: true
-replaced_by: GO:0006260
+comment: GO:0006260
 
 [Term]
 id: SO:0000972
@@ -8140,7 +8140,7 @@ name: RNA_replication_mode
 comment: This has been obsoleted as it represents a process.
 synonym: "RNA replication mode" EXACT []
 is_obsolete: true
-replaced_by: GO:0034961
+comment: GO:0034961
 
 [Term]
 id: SO:0000973

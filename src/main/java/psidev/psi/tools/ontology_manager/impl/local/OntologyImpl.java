@@ -246,10 +246,21 @@ public class OntologyImpl implements Ontology {
     }
 
     private void getAllChildren( OntologyTermI term, Set<OntologyTermI> children ) {
+         getAllChildren( "", term, children, new HashSet(512) );
+    }
+
+    private void getAllChildren( String prefix, OntologyTermI term, Set<OntologyTermI> children, Set<String> traversedChildren ) {
+        if( traversedChildren.contains( term.getTermAccession() ) ) {
+//            System.out.println( prefix.replaceAll( " ", "#" )+" > "+ term.getTermAccession() +" / "+ term.getPreferredName() +" )" );
+            return;
+        } else {
+//            System.out.println( prefix +" > "+ term.getTermAccession() +" / "+ term.getPreferredName() +" )" );
+        }
         final Collection<OntologyTermI> directChildren = getDirectChildren( term );
+        traversedChildren.add( term.getTermAccession() );
         children.addAll( directChildren );
         for ( OntologyTermI child : directChildren ) {
-            getAllChildren( child, children );
+            getAllChildren( prefix+"     ", child, children, traversedChildren );
         }
     }
 

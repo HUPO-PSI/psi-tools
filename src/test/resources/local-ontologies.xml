@@ -13,10 +13,10 @@
               identifier="MI"
               version="2.5"/>
 
-    <!--<cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"-->
-              <!--uri="classpath:ontologies/so-20090901.obo"-->
-              <!--format="OBO"-->
-              <!--name="Sequence Ontology"-->
-              <!--identifier="SO"-->
-              <!--version="1.230"/>-->
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="classpath:ontologies/so-20090901.obo"
+              format="OBO"
+              name="Sequence Ontology"
+              identifier="SO"
+              version="1.230"/>
 </cvSourceList>

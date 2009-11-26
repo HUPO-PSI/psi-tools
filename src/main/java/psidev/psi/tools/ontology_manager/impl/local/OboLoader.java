@@ -8,6 +8,7 @@ package psidev.psi.tools.ontology_manager.impl.local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
+import psidev.psi.tools.ontology_manager.OntologyManagerContext;
 import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 import uk.ac.ebi.ook.loader.impl.AbstractLoader;
@@ -37,25 +38,7 @@ public class OboLoader extends AbstractLoader {
 
     private static final String ONTOLOGY_REGISTRY_NAME = "ontology.registry.map";
 
-    private File ontologyDirectory;
-
-    private boolean keepDownloadedOntologiesOnDisk = true;
-
-//    private UserPreferences userPreferences = new UserPreferences(); // set to default
-
     public OboLoader( File ontologyDirectory ) {
-        this.ontologyDirectory = ontologyDirectory;
-    }
-
-    ////////////////////
-    // Getter + Setter
-
-    public boolean isKeepDownloadedOntologiesOnDisk() {
-        return keepDownloadedOntologiesOnDisk;
-    }
-
-    public void setKeepDownloadedOntologiesOnDisk( boolean keepDownloadedOntologiesOnDisk ) {
-        this.keepDownloadedOntologiesOnDisk = keepDownloadedOntologiesOnDisk;
     }
 
     /////////////////////////////
@@ -162,8 +145,7 @@ public class OboLoader extends AbstractLoader {
     }
 
     private File getRegistryFile() throws OntologyLoaderException {
-
-        // hardcode
+        File ontologyDirectory = OntologyManagerContext.getInstance().getOntologyDirectory();
 
         File[] registry = ontologyDirectory.listFiles( new FileFilter() {
             public boolean accept( File pathname ) {
@@ -200,85 +182,92 @@ public class OboLoader extends AbstractLoader {
             throw new IllegalArgumentException( "Please give a non null URL." );
         }
 
-        if ( log.isInfoEnabled() ) {
-            log.info( "User work directory: " + ontologyDirectory.getAbsolutePath() );
-            log.info( "keepTemporaryFile: " + isKeepDownloadedOntologiesOnDisk() );
-        }
-
-        if ( ontologyDirectory == null ) {
-            throw new IllegalStateException();
-        }
-
-        if ( !ontologyDirectory.exists() ) {
-            throw new IllegalStateException();
-        }
-
-        if ( !ontologyDirectory.canWrite() ) {
-            throw new IllegalStateException();
-        }
 
         File ontologyFile = null;
+        File ontologyDirectory = OntologyManagerContext.getInstance().getOntologyDirectory();
+        boolean isKeepDownloadedOntologiesOnDisk = OntologyManagerContext.getInstance().isStoreOntologiesLocally();
         Map registryMap = null;
 
-        File registryFile = getRegistryFile();
+        if( isKeepDownloadedOntologiesOnDisk ) {
 
-        if ( null != registryFile ) {
+            if ( ontologyDirectory == null ) {
+                throw new IllegalArgumentException( "ontology directory cannot be null, please set it using OntologyManagerContext" );
+            }
 
-            // TODO replace Map by a properties file so it can be read/edited easily
-            // MI.file.path=
-            // MI.last.loaded=
-            // MI.refresh.after=
-            // TODO check on the length of the file and compare it to the length on the web site.
-            // MI.length=
+            if ( !ontologyDirectory.exists() ) {
+                throw new IllegalArgumentException( "ontology directory must exist" );
+            }
 
-            // deserialise the Map
-            try {
-                if ( registryFile.length() > 0 ) {
-                    // the file has some content
-                    ObjectInputStream ois = new ObjectInputStream( new FileInputStream( registryFile ) );
-                    registryMap = ( Map ) ois.readObject();
+            if ( !ontologyDirectory.canWrite() ) {
+                throw new IllegalArgumentException( "ontology directory must be writeable" );
+            }
 
-                    if ( registryMap != null ) {
-                        if ( registryMap.containsKey( url ) ) {
-                            ontologyFile = new File( ( String ) registryMap.get( url ) );
+            if ( log.isInfoEnabled() ) {
+                log.info( "User work directory: " + ontologyDirectory.getAbsolutePath() );
+                log.info( "keepTemporaryFile: " + OntologyManagerContext.getInstance().isStoreOntologiesLocally() );
+            }
 
-                            if ( ontologyFile.exists() && ontologyFile.canRead() ) {
+            File registryFile = getRegistryFile();
 
-                                // Cool, find it ! use it instead of the provided URL
-                                if ( log.isInfoEnabled() )
-                                    log.info( "Reuse existing cache: " + ontologyFile.getAbsolutePath() );
+            if ( null != registryFile ) {
 
-                            } else {
+                // TODO replace Map by a properties file so it can be read/edited easily
+                // MI.file.path=
+                // MI.last.loaded=
+                // MI.refresh.after=
+                // TODO check on the length of the file and compare it to the length on the web site.
+                // MI.length=
 
-                                if ( log.isInfoEnabled() )
-                                    log.info( "Could not find " + ontologyFile.getAbsolutePath() );
+                // deserialise the Map
+                try {
+                    if ( registryFile.length() > 0 ) {
+                        // the file has some content
+                        ObjectInputStream ois = new ObjectInputStream( new FileInputStream( registryFile ) );
+                        registryMap = ( Map ) ois.readObject();
 
-                                // cleanup map
-                                registryMap.remove( url );
+                        if ( registryMap != null ) {
+                            if ( registryMap.containsKey( url ) ) {
+                                ontologyFile = new File( ( String ) registryMap.get( url ) );
 
-                                // save map
-                                log.info( "Saving registry file..." );
-                                File f = getRegistryFile();
-                                ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream( f ) );
-                                oos.writeObject( registryMap );
-                                oos.flush();
-                                oos.close();
+                                if ( ontologyFile.exists() && ontologyFile.canRead() ) {
+
+                                    // Cool, find it ! use it instead of the provided URL
+                                    if ( log.isInfoEnabled() )
+                                        log.info( "Reuse existing cache: " + ontologyFile.getAbsolutePath() );
+
+                                } else {
+
+                                    if ( log.isInfoEnabled() )
+                                        log.info( "Could not find " + ontologyFile.getAbsolutePath() );
+
+                                    // cleanup map
+                                    registryMap.remove( url );
+
+                                    // save map
+                                    log.info( "Saving registry file..." );
+                                    File f = getRegistryFile();
+                                    ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream( f ) );
+                                    oos.writeObject( registryMap );
+                                    oos.flush();
+                                    oos.close();
+                                }
                             }
+                        } else {
+                            log.info( "could not deserialize the Map" );
                         }
                     } else {
-                        log.info( "could not deserialize the Map" );
+                        log.info( "The file is empty" );
                     }
-                } else {
-                    log.info( "The file is empty" );
+                } catch ( IOException e ) {
+                    // optional, so just display message in the log
+                    log.error( "Error while deserializing the map", e );
+                } catch ( ClassNotFoundException e ) {
+                    // optional, so just display message in the log
+                    log.error( "Error while deserializing the map", e );
                 }
-            } catch ( IOException e ) {
-                // optional, so just display message in the log
-                log.error( "Error while deserializing the map", e );
-            } catch ( ClassNotFoundException e ) {
-                // optional, so just display message in the log
-                log.error( "Error while deserializing the map", e );
             }
         }
+
 
         try {
             if ( ontologyFile == null || !ontologyFile.exists() || !ontologyFile.canRead() ) {
@@ -286,12 +275,12 @@ public class OboLoader extends AbstractLoader {
                 // if it is not defined, not there or not readable...
 
                 // Read URL content
-                if ( log.isInfoEnabled() )  log.info( "Loading URL: " + url );
+                if ( log.isInfoEnabled() ) log.info( "Loading URL: " + url );
 
                 URLConnection con = url.openConnection();
                 int size = con.getContentLength();        // -1 if not stat available
 
-                if ( log.isInfoEnabled() )  log.info( "size = " + size );
+                if ( log.isInfoEnabled() ) log.info( "size = " + size );
 
                 InputStream is = url.openStream();
 
@@ -314,13 +303,13 @@ public class OboLoader extends AbstractLoader {
 
                 // build the file
                 ontologyFile = new File( ontologyDirectory + File.separator + name + System.currentTimeMillis() + ".obo" );
-                if ( !isKeepDownloadedOntologiesOnDisk() ) {
+                if ( ! isKeepDownloadedOntologiesOnDisk ) {
                     log.info( "Request file to be deleted on exit." );
                     ontologyFile.deleteOnExit();
                 }
 
-                if ( log.isInfoEnabled() )
-                    log.info( "The OBO file will be temporary stored as: " + ontologyFile.getAbsolutePath() );
+                if ( log.isDebugEnabled() )
+                    log.debug( "The OBO file will be temporary stored as: " + ontologyFile.getAbsolutePath() );
 
                 FileOutputStream out = new FileOutputStream( ontologyFile );
 
@@ -344,7 +333,7 @@ public class OboLoader extends AbstractLoader {
                 out.flush();
                 out.close();
 
-                if ( isKeepDownloadedOntologiesOnDisk() ) {
+                if ( isKeepDownloadedOntologiesOnDisk ) {
                     // if the user has requested for the ontology file to be kept, store file reference in the registry
                     if ( registryMap == null ) {
                         registryMap = new HashMap();
@@ -353,7 +342,7 @@ public class OboLoader extends AbstractLoader {
                     registryMap.put( url, ontologyFile.getAbsolutePath() );
 
                     // serialize the map
-                    log.info( "Serializing Map" );
+                    if ( log.isInfoEnabled() ) log.info( "Serializing Map" );
                     File f = getRegistryFile();
                     ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream( f ) );
                     oos.writeObject( registryMap );
