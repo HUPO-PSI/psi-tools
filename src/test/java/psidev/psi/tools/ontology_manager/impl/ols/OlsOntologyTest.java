@@ -92,7 +92,6 @@ public class OlsOntologyTest {
         
     }
     
-    // there was a problem with this particular term!
     @Test
     public void getMiTermSynonyms0217() throws OntologyLoaderException {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
@@ -109,6 +108,22 @@ public class OlsOntologyTest {
         assertTrue(names.contains("phosphorylation reaction"));
     }
 
+    @Test
+    public void getMiChildTermSynonyms0190() throws OntologyLoaderException {
+        OntologyAccess mi = manager.getOntologyAccess( "MI" );
+        Set<OntologyTermI> terms = mi.getValidTerms( "MI:0190", true, false );
+        Assert.assertFalse(terms.isEmpty());
+        
+        // different approach
+        Collection<String> names;
+        names = OntologyUtils.getTermNames(terms);
+        // preferred name
+        assertTrue(names.contains("phosphorylation reaction"));
+        
+        // how about synonym?
+        assertTrue(names.contains("phosphorylation"));
+    }
+    
     @Test
     public void getModTermSynonyms() throws OntologyLoaderException {
         final OntologyAccess mod = manager.getOntologyAccess( "MOD" );

@@ -155,30 +155,32 @@ public class OlsOntology implements OntologyAccess {
         OntologyTermI term;
         if ( termName != null && termName.length() > 0 && !termName.equals( accession ) ) {
             term = new OntologyTermImpl( accession, termName );
-
-            try {
-                final Map metadata = query.getTermMetadata( accession, ontologyID );
-                for ( Object k : metadata.keySet() ) {
-                    final String key = (String) k;
-                    // That's the only way OLS provides synonyms, all keys are different so we are fishing out keywords :(
-                    if( key != null && (key.contains( "synonym" ) || key.contains( "Alternate label" )) ) {
-                    	String value = (String) metadata.get( k );
-                        if( value != null ) {
-                            term.getNameSynonyms().add(value.trim());
-                        }
-                    }
-                }
-            } catch ( RemoteException e ) {
-                if ( log.isWarnEnabled() ) {
-                    log.warn( "Error while loading term synonyms from OLS for term: " + accession, e );
-                }
-            }
-
+            fetchTermSynonyms( term );
         } else {
             term = null;
         }
 
         return term;
+    }
+
+    private void fetchTermSynonyms( OntologyTermI term ) {
+        try {
+            final Map metadata = query.getTermMetadata( term.getTermAccession(), ontologyID );
+            for ( Object k : metadata.keySet() ) {
+                final String key = (String) k;
+                // That's the only way OLS provides synonyms, all keys are different so we are fishing out keywords :(
+                if( key != null && (key.contains( "synonym" ) || key.contains( "Alternate label" )) ) {
+                    String value = (String) metadata.get( k );
+                    if( value != null ) {
+                        term.getNameSynonyms().add(value.trim());
+                    }
+                }
+            }
+        } catch ( RemoteException e ) {
+            if ( log.isWarnEnabled() ) {
+                log.warn( "Error while loading term synonyms from OLS for term: " + term.getTermAccession(), e );
+            }
+        }
     }
 
     /**
@@ -459,7 +461,9 @@ public class OlsOntology implements OntologyAccess {
         for ( Object o : results.keySet() ) {
             Object v = results.get( o );
             if ( o instanceof String && v instanceof String ) {
-                terms.add( new OntologyTermImpl( ( String ) o, ( String ) v ) );
+                final OntologyTermImpl term = new OntologyTermImpl( ( String ) o, ( String ) v );
+                fetchTermSynonyms( term );
+                terms.add( term );
             } else {
                 throw new IllegalStateException( "OLS query returned unexpected result!" +
                                                  " Expected Map with key and value of class String," +
@@ -469,6 +473,7 @@ public class OlsOntology implements OntologyAccess {
         }
         return terms;
     }
+
     // This has issues finding all the child terms if the tree changes relationship types -> use getValidIDs2
     @Deprecated
     public Set<String> getValidIDsOld( String id, boolean allowChildren, boolean useTerm ) {
