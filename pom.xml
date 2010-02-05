@@ -3,7 +3,7 @@
     <parent>
         <groupId>psidev.psi.tools</groupId>
         <artifactId>master-pom</artifactId>
-        <version>2</version>
+        <version>3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
