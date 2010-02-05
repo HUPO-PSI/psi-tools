@@ -84,7 +84,7 @@ public abstract class Validator {
 
     public Validator( InputStream ontoConfig ) throws OntologyLoaderException {
         // load the ontologies
-        ontologyMngr = new OntologyManager( ontoConfig );
+        setOntologyManager( ontoConfig );
     }
 
     ////////////////////////
@@ -94,7 +94,7 @@ public abstract class Validator {
         return ontologyMngr;
     }
 
-    public void setOntologyManager( InputStream ontoConfig ) throws ValidatorException, OntologyLoaderException {
+    public void setOntologyManager( InputStream ontoConfig ) throws OntologyLoaderException {
         ontologyMngr = new OntologyManager( ontoConfig );
     }
 
