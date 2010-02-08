@@ -85,14 +85,14 @@ public class ObjectRuleReaderTest {
     private void checkContent( ObjectRuleList config ) {
         Assert.assertNotNull( config );
 
-        Assert.assertEquals( 2, config.getRule().size() );
-        final Iterator<Rule> it = config.getRule().iterator();
+        Assert.assertEquals( 2, config.getImportRuleListAndRule().size() );
+        final Iterator<Object> it = config.getImportRuleListAndRule().iterator();
 
-        Rule or = it.next();
+        Rule or = (Rule) it.next();
         Assert.assertNotNull( or );
         Assert.assertEquals( "net.sf.psi.validator.rules.Rule1", or.getClazz());
 
-        or = it.next();
+        or = (Rule)it.next();
         Assert.assertNotNull( or );
         Assert.assertEquals( "net.sf.psi.validator.rules.Rule2", or.getClazz());
     }

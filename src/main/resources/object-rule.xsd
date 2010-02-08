@@ -1,19 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2006 rel. 3 U (http://www.altova.com) by Samuel Kerrien (EBI) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:element name="objectRuleList">
-		<xs:annotation>
-			<xs:documentation>Comment describing your root element</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence maxOccurs="unbounded">
-				<xs:element ref="rule" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="rule">
-		<xs:complexType>
-			<xs:attribute name="class" type="xs:string" use="required"/>
-		</xs:complexType>
-	</xs:element>
+    <xs:element name="objectRuleList">
+        <xs:annotation>
+            <xs:documentation>Comment describing your root element</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+                <xs:element ref="importRuleList" minOccurs="0"/>
+                <xs:element ref="rule" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rule">
+        <xs:complexType>
+            <xs:attribute name="class" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="importRuleList">
+        <xs:annotation>
+            <xs:documentation>Comment describing your import list</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+                <xs:element ref="import" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="import">
+        <xs:complexType>
+            <xs:attribute name="rules" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
 </xs:schema>
