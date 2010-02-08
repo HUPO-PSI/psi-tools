@@ -5,6 +5,9 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.cvrReader.CvRuleReader;
 import psidev.psi.tools.cvrReader.CvRuleReaderException;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
+import psidev.psi.tools.objectRuleReader.ObjectRuleReaderException;
+import psidev.psi.tools.objectRuleReader.mapping.jaxb.Import;
+import psidev.psi.tools.objectRuleReader.mapping.jaxb.ImportRuleList;
 import psidev.psi.tools.objectRuleReader.mapping.jaxb.ObjectRuleList;
 import psidev.psi.tools.objectRuleReader.mapping.jaxb.Rule;
 import psidev.psi.tools.ontology_manager.OntologyManager;
@@ -15,11 +18,13 @@ import psidev.psi.tools.validator.rules.cvmapping.CvRule;
 import psidev.psi.tools.validator.rules.cvmapping.CvRuleManager;
 import psidev.psi.tools.validator.util.ValidatorReport;
 
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.*;
 
 /**
  * <b>Semantic XML Validator</b>.
@@ -51,7 +56,12 @@ public abstract class Validator {
      * The set of rules specific to that Validator.
      * List of ObjectRuleS
      */
-    private List<ObjectRule> rules;
+    private List<ObjectRule> rules = new ArrayList<ObjectRule> ();
+
+    /**
+     * Contains the URL for the rules to import
+     */
+    private Set<String> urlsForTheImportedRules = new HashSet<String>();
 
     /**
      * List holding the CvRuleS.
@@ -118,6 +128,108 @@ public abstract class Validator {
     }
 
     /**
+     *
+     * @param className
+     * @return  true if the className matches a the class name of one of the ObjectRules in the list of instantiated rules.
+     */
+    private boolean isTheRuleAlreadyInstantiated(String className){
+
+        for (ObjectRule rule : this.rules){
+            if (rule.getClass().getName().equals(className)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Instantiates the appropriate Rule from the jaxb Rule 'rule' and add it to the list of rules.
+     * @param rule
+     * @throws ValidatorException
+     */
+    private void addRule(Rule rule) throws ValidatorException {
+        String className = null;
+        Class ruleClass = null;
+        try {
+            className = rule.getClazz();
+            if (!isTheRuleAlreadyInstantiated(className)){
+                ruleClass = Class.forName( className );
+                Constructor c = ruleClass.getConstructor( OntologyManager.class );
+                ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
+                this.rules.add( r );
+                if ( log.isInfoEnabled() ) {
+                    log.info( "Added rule: " + r.getClass() );
+                }
+            }
+
+        } catch (Exception e) {
+            throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
+        }
+
+    }
+
+    /**
+     * First look if there is a local file, then look on internet
+     * @param urlName
+     * @throws FileNotFoundException
+     * @throws ValidatorException
+     * @throws IOException
+     */
+    private void loadFileFrom(String urlName) throws FileNotFoundException, ValidatorException, IOException {
+
+        File file = new File(urlName);
+
+        if (file.exists()){
+            FileInputStream is = new FileInputStream(file);
+
+            setObjectRules(is);
+        }
+        else{
+            URL url = new URL(urlName);
+
+            InputStream is = url.openStream();
+            setObjectRules(is);
+        }
+    }
+
+    /**
+     * First look for a resource file of Validator, then a local file and finally a file on internet.
+     * @param urlName
+     * @throws ValidatorException
+     */
+    private void importRulesFromFile(String urlName) throws ValidatorException{
+        try {
+
+            //URL url = Validator.class.getClassLoader().getResource( urlName );
+            URL url = this.getClass().getClass().getResource( urlName );
+
+            if (url != null){
+                File file = new File(url.toURI());
+
+                if (file.exists()){
+                    FileInputStream is = new FileInputStream(file);
+                    setObjectRules(is);
+                }
+                else {
+                    loadFileFrom(urlName);
+                }
+            }
+            else{
+                loadFileFrom(urlName);
+            }
+
+        } catch (MalformedURLException e) {
+            throw new ValidatorException("The URL " + urlName + " is malformed and can't be read",e);
+        }
+        catch (IOException e){
+            throw new ValidatorException("The URL " + urlName + " can't be read",e);
+        }
+        catch (URISyntaxException e){
+            throw new ValidatorException("The URI " + urlName + " doesn't have a valid syntax",e);
+        }
+    }
+
+    /**
      * Parse the configuration file and update the list of Rule of the current Validator.
      * <p/>
      * Each Rule is initialised with a Map of Ontologies that have been read from the config file.
@@ -126,26 +238,32 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public void setObjectRules( InputStream configFile ) throws ValidatorException {
-        rules = new ArrayList<ObjectRule>(); // set -> replace whatever there might have been
-
+        // set -> replace whatever there might have been
+        Set<String> URLsForImport = new HashSet<String>();
+        URLsForImport.add(configFile.toString());
         if( configFile != null ) {
             ObjectRuleReader reader = new ObjectRuleReader();
-            String className = null;
             try {
                 final ObjectRuleList rules = reader.read( configFile );
-                for ( Rule rule : rules.getRule() ) {
-                    className = rule.getClazz();
-                    Class ruleClass = Class.forName( className );
-                    Constructor c = ruleClass.getConstructor( OntologyManager.class );
-                    ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
-                    this.rules.add( r );
-                    if ( log.isInfoEnabled() ) {
-                        log.info( "Added rule: " + r.getClass() );
-                    }
+                for ( Object object : rules.getImportRuleListAndRule() ) {
 
+                    if (object instanceof  Rule){
+                        Rule rule = (Rule) object;
+                        addRule(rule);
+                    }
+                    else if (object instanceof ImportRuleList){
+                        ImportRuleList rulesToImport = (ImportRuleList) object;
+                        for (Import importedRules : rulesToImport.getImport()){
+                            String linkToRules = importedRules.getRules();
+
+                            if (this.urlsForTheImportedRules.add(linkToRules)){
+                                importRulesFromFile(linkToRules);
+                            }
+                        }
+                    }
                 }
-            } catch ( Exception e ) {
-                throw new ValidatorException( "Error instantiating rule (" + className + ")", e );
+            } catch ( ObjectRuleReaderException e ) {
+                throw new ValidatorException( "Error during the parsing of "+ configFile.toString(), e );
             }
         } else {
             if ( log.isDebugEnabled() ) {
