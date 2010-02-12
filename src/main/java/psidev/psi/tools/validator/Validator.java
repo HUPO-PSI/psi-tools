@@ -56,12 +56,27 @@ public abstract class Validator {
      * The set of rules specific to that Validator.
      * List of ObjectRuleS
      */
-    private List<ObjectRule> rules = new ArrayList<ObjectRule> ();
+    private Set<ObjectRule> rules = new HashSet<ObjectRule> ();
 
     /**
      * Contains the URL for the rules to import
      */
-    private Set<String> urlsForTheImportedRules = new HashSet<String>();
+    private HashMap<String, String> urlsForTheImportedRules = new HashMap<String, String>();
+
+    /**
+     * The type of the file to import in the object-rule config file is a resource
+     */
+    private static final String RESOURCE = "resource";
+
+    /**
+     * The type of the file to import in the object-rule config file is a local file
+     */
+    private static final String LOCAL_FILE = "file";
+
+    /**
+     * The type of the file to import in the object-rule config file is a file
+     */
+    private static final String FILE = "url";
 
     /**
      * List holding the CvRuleS.
@@ -123,7 +138,7 @@ public abstract class Validator {
         cvRuleManager = new CvRuleManager( ontologyMngr, reader.read( cvIs ) );
     }
 
-    public List<ObjectRule> getObjectRules() {
+    public Set<ObjectRule> getObjectRules() {
         return rules;
     }
 
@@ -132,14 +147,14 @@ public abstract class Validator {
      * @param className
      * @return  true if the className matches a the class name of one of the ObjectRules in the list of instantiated rules.
      */
-    private boolean isTheRuleAlreadyInstantiated(String className){
+    private ObjectRule isTheRuleAlreadyInstantiated(String className){
 
         for (ObjectRule rule : this.rules){
             if (rule.getClass().getName().equals(className)){
-                return true;
+                return rule;
             }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -147,19 +162,28 @@ public abstract class Validator {
      * @param rule
      * @throws ValidatorException
      */
-    private void addRule(Rule rule) throws ValidatorException {
+    private void addRule(Rule rule, String name) throws ValidatorException {
         String className = null;
         Class ruleClass = null;
         try {
             className = rule.getClazz();
-            if (!isTheRuleAlreadyInstantiated(className)){
+            ObjectRule alreadyImportedRule = isTheRuleAlreadyInstantiated(className);
+            if (alreadyImportedRule == null){
                 ruleClass = Class.forName( className );
                 Constructor c = ruleClass.getConstructor( OntologyManager.class );
                 ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
+
+                if (name != null){
+                    r.setName(name);
+                }
+
                 this.rules.add( r );
                 if ( log.isInfoEnabled() ) {
                     log.info( "Added rule: " + r.getClass() );
                 }
+            }
+            else{
+                log.info( "The rule " + className + " has already been added with a label " + alreadyImportedRule.getName() + " and will not be reimported with a label " + name);
             }
 
         } catch (Exception e) {
@@ -169,25 +193,51 @@ public abstract class Validator {
     }
 
     /**
-     * First look if there is a local file, then look on internet
+     * Load a file from a URL
      * @param urlName
      * @throws FileNotFoundException
      * @throws ValidatorException
      * @throws IOException
      */
-    private void loadFileFrom(String urlName) throws FileNotFoundException, ValidatorException, IOException {
+    private void loadFileFrom(String urlName) throws ValidatorException, IOException {
+
+        URL url = new URL(urlName);
+
+        InputStream is = url.openStream();
+        setObjectRules(is);
+    }
+
+    /**
+     * Look if this file is a local file
+     * @param urlName
+     * @throws FileNotFoundException
+     * @throws ValidatorException
+     * @throws IOException
+     */
+    private boolean isALocalFile(String urlName) {
+
+        File file = new File(urlName);
+
+        if (file.exists()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Load a local file
+     * @param urlName
+     * @throws FileNotFoundException
+     * @throws ValidatorException
+     * @throws IOException
+     */
+    private void loadLocalFileFrom(String urlName) throws ValidatorException, IOException {
 
         File file = new File(urlName);
 
         if (file.exists()){
             FileInputStream is = new FileInputStream(file);
 
-            setObjectRules(is);
-        }
-        else{
-            URL url = new URL(urlName);
-
-            InputStream is = url.openStream();
             setObjectRules(is);
         }
     }
@@ -197,27 +247,85 @@ public abstract class Validator {
      * @param urlName
      * @throws ValidatorException
      */
-    private void importRulesFromFile(String urlName) throws ValidatorException{
+    private void importRulesFromFile(String urlName, String typeOfImport) throws ValidatorException{
         try {
+            boolean isImportDone = false;
 
-            //URL url = Validator.class.getClassLoader().getResource( urlName );
-            URL url = this.getClass().getClass().getResource( urlName );
+            if (typeOfImport != null){
 
-            if (url != null){
-                File file = new File(url.toURI());
+                if (typeOfImport.toLowerCase().equals(RESOURCE)){
+                    //URL url = Validator.class.getClassLoader().getResource( urlName );
+                    URL url = this.getClass().getResource( urlName );
 
-                if (file.exists()){
-                    FileInputStream is = new FileInputStream(file);
-                    setObjectRules(is);
+                    if (url != null){
+                        File file = new File(url.toURI());
+
+                        if (file.exists()){
+                            FileInputStream is = new FileInputStream(file);
+                            setObjectRules(is);
+                            isImportDone = true;
+                        }
+                        else {
+                            log.warn(" The file to import is a resource (" + typeOfImport + ") but doesn't exist. Try to load this url as a local file and if not, try to read the url on internet.");
+                        }
+                    }
+                    else{
+                        log.warn(" The file to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
+                    }
+                }
+                else if (typeOfImport.toLowerCase().equals(LOCAL_FILE)){
+                    if (isALocalFile(urlName)){
+                        loadLocalFileFrom(urlName);
+                        isImportDone = true;
+                    }
+                    else {
+                        log.warn(" The file to import is a local file (" + typeOfImport + ") but was not found. Try to read the url on internet.");
+                    }
+                }
+                else if (typeOfImport.toLowerCase().equals(FILE)){
+                    loadFileFrom(urlName);
+                    isImportDone = true;
                 }
                 else {
-                    loadFileFrom(urlName);
+                    log.warn(" The type of the file to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'local' (local file on your machine), or 'file' (look on internet)." +
+                            " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
                 }
             }
-            else{
-                loadFileFrom(urlName);
+            else {
+                log.warn(" The type of the file to import " + typeOfImport + " is not precised. You can choose 'resource' (resource of the validator), 'local' (local file on your machine), or 'file' (look on internet)." +
+                        " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
             }
 
+            if (!isImportDone){
+                //URL url = Validator.class.getClassLoader().getResource( urlName );
+                URL url = this.getClass().getResource( urlName );
+
+                if (url != null){
+                    File file = new File(url.toURI());
+
+                    if (file.exists()){
+                        FileInputStream is = new FileInputStream(file);
+                        setObjectRules(is);
+                    }
+                    else {
+                        if (isALocalFile(urlName)){
+                            loadLocalFileFrom(urlName);
+                        }
+                        else {
+                            loadFileFrom(urlName);
+                        }
+                    }
+                }
+                else{
+                    if (isALocalFile(urlName)){
+                        loadLocalFileFrom(urlName);
+                    }
+                    else {
+                        loadFileFrom(urlName);
+                    };
+                }
+
+            }
         } catch (MalformedURLException e) {
             throw new ValidatorException("The URL " + urlName + " is malformed and can't be read",e);
         }
@@ -239,26 +347,31 @@ public abstract class Validator {
      */
     public void setObjectRules( InputStream configFile ) throws ValidatorException {
         // set -> replace whatever there might have been
-        Set<String> URLsForImport = new HashSet<String>();
-        URLsForImport.add(configFile.toString());
+
+        String name = null;
+
         if( configFile != null ) {
             ObjectRuleReader reader = new ObjectRuleReader();
             try {
                 final ObjectRuleList rules = reader.read( configFile );
-                for ( Object object : rules.getImportRuleListAndRule() ) {
+                name = rules.getName();
 
-                    if (object instanceof  Rule){
-                        Rule rule = (Rule) object;
-                        addRule(rule);
-                    }
-                    else if (object instanceof ImportRuleList){
-                        ImportRuleList rulesToImport = (ImportRuleList) object;
-                        for (Import importedRules : rulesToImport.getImport()){
-                            String linkToRules = importedRules.getRules();
+                for ( Rule rule : rules.getRule() ) {
+                    addRule(rule, name);
+                }
 
-                            if (this.urlsForTheImportedRules.add(linkToRules)){
-                                importRulesFromFile(linkToRules);
-                            }
+                ImportRuleList rulesToImport = rules.getImportRuleList();
+                if(rulesToImport != null){
+                    for (Import importedRules : rulesToImport.getImport()){
+                        String linkToRules = importedRules.getRules();
+                        String typeOfImport = importedRules.getType();
+
+                        if (!this.urlsForTheImportedRules.containsKey(linkToRules)){
+                            importRulesFromFile(linkToRules, typeOfImport);
+                            this.urlsForTheImportedRules.put(linkToRules, name);
+                        }
+                        else{
+                            log.warn("The " + name != null ? name : "" + " rules from the url " + linkToRules + " have already been imported in a previous file (name = " + this.urlsForTheImportedRules.get(linkToRules) + "). We cannot do the import twice.");
                         }
                     }
                 }

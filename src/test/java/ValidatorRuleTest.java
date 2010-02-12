@@ -48,6 +48,29 @@ public class ValidatorRuleTest {
     }
 
     @Test
+    public void check_RuleObject_Loading_FromOtherResource_ok() throws Exception {
+
+        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
+        File objectRules = new File( ValidatorRuleTest.class.getResource("/xmlRuleSets/object-rule-2.xml").getFile() );
+
+
+        SPEValidator validator = new SPEValidator( new FileInputStream( ontologyFile ),
+                null,
+                new FileInputStream( objectRules ) );
+
+        Object experiment = new Object( );
+
+        final Collection<ValidatorMessage> messages = validator.validate( experiment );
+
+        System.out.println( "Validation run collected " + messages.size() + " message(s):" );
+        for ( ValidatorMessage message : messages ) {
+            System.out.println( message );
+        }
+
+        Assert.assertEquals( 2, validator.getObjectRules().size() );
+    }
+
+    @Test
     public void check_RuleObject_Loading_FromValidatorResource_With_several_imports() throws Exception {
 
         File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
