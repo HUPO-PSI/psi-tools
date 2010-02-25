@@ -70,29 +70,6 @@ public class ValidatorRuleTest {
         Assert.assertEquals( 4, validator.getObjectRules().size() );
     }
 
-    @Test
-    public void check_RuleObject_Loading_FromFile_ok() throws Exception {
-
-        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
-        File objectRules = new File( ValidatorRuleTest.class.getResource("/xmlRuleSets/object-rules-3.xml").getFile() );
-
-
-        SPEValidator validator = new SPEValidator( new FileInputStream( ontologyFile ),
-                null,
-                new FileInputStream( objectRules ) );
-
-        Object experiment = new Object( );
-
-        final Collection<ValidatorMessage> messages = validator.validate( experiment );
-
-        System.out.println( "Validation run collected " + messages.size() + " message(s):" );
-        for ( ValidatorMessage message : messages ) {
-            System.out.println( message );
-        }
-
-        Assert.assertEquals( 4, validator.getObjectRules().size() );
-    }
-
 }
 
 
