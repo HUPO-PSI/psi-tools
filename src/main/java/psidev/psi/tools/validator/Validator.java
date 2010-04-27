@@ -23,7 +23,6 @@ import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -42,6 +41,8 @@ public abstract class Validator {
      * Sets up a logger for that class.
      */
     public static final Log log = LogFactory.getLog( Validator.class );
+
+    protected ValidatorContext validatorContext;
 
     /**
      * User preferences.
@@ -125,6 +126,10 @@ public abstract class Validator {
 
     public CvRuleManager getCvRuleManager() {
         return cvRuleManager;
+    }
+
+    public ValidatorContext getValidatorContext() {
+        return validatorContext;
     }
 
     /**
