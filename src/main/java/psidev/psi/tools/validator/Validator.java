@@ -292,12 +292,12 @@ public abstract class Validator {
                     isImportDone = true;
                 }
                 else {
-                    log.warn(" The type of the file to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'local' (local file on your machine), or 'file' (look on internet)." +
+                    log.warn(" The type of the file to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
                             " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
                 }
             }
             else {
-                log.warn(" The type of the file to import " + typeOfImport + " is not precised. You can choose 'resource' (resource of the validator), 'local' (local file on your machine), or 'file' (look on internet)." +
+                log.warn(" The type of the file to import " + typeOfImport + " is not precised. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
                         " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
             }
 
