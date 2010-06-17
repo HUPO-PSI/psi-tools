@@ -21,7 +21,6 @@ import psidev.psi.tools.validator.util.ValidatorReport;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
@@ -263,16 +262,9 @@ public abstract class Validator {
                     URL url = this.getClass().getResource( urlName );
 
                     if (url != null){
-                        File file = new File(url.toURI());
-
-                        if (file.exists()){
-                            FileInputStream is = new FileInputStream(file);
-                            setObjectRules(is);
-                            isImportDone = true;
-                        }
-                        else {
-                            log.warn(" The file to import is a resource (" + typeOfImport + ") but doesn't exist. Try to load this url as a local file and if not, try to read the url on internet.");
-                        }
+                        InputStream is = url.openStream();
+                        setObjectRules(is);
+                        isImportDone = true;
                     }
                     else{
                         log.warn(" The file to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
@@ -306,20 +298,8 @@ public abstract class Validator {
                 URL url = this.getClass().getResource( urlName );
 
                 if (url != null){
-                    File file = new File(url.toURI());
-
-                    if (file.exists()){
-                        FileInputStream is = new FileInputStream(file);
-                        setObjectRules(is);
-                    }
-                    else {
-                        if (isALocalFile(urlName)){
-                            loadLocalFileFrom(urlName);
-                        }
-                        else {
-                            loadFileFrom(urlName);
-                        }
-                    }
+                    InputStream is = url.openStream();
+                    setObjectRules(is);
                 }
                 else{
                     if (isALocalFile(urlName)){
@@ -336,9 +316,6 @@ public abstract class Validator {
         }
         catch (IOException e){
             throw new ValidatorException("The URL " + urlName + " can't be read",e);
-        }
-        catch (URISyntaxException e){
-            throw new ValidatorException("The URI " + urlName + " doesn't have a valid syntax",e);
         }
     }
 
