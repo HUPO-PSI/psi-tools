@@ -178,7 +178,8 @@ public abstract class Validator {
                 ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
 
                 if (name != null){
-                    r.setName(name);
+                    String oldName = r.getName();
+                    r.setName(name + ": " + oldName);
                 }
 
                 this.rules.add( r );
