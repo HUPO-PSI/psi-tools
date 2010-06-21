@@ -259,7 +259,7 @@ public abstract class Validator {
 
                 if (typeOfImport.toLowerCase().equals(RESOURCE)){
                     //URL url = Validator.class.getClassLoader().getResource( urlName );
-                    URL url = this.getClass().getResource( urlName );
+                    URL url = this.getClass().getClassLoader().getResource( urlName );
 
                     if (url != null){
                         InputStream is = url.openStream();
