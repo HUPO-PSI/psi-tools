@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-import psidev.psi.tools.validator.Validator;
-import psidev.psi.tools.validator.ValidatorMessage;
-import psidev.psi.tools.validator.ValidatorException;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
+import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
+import psidev.psi.tools.validator.Validator;
+import psidev.psi.tools.validator.ValidatorException;
+import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.rules.codedrule.ObjectRule;
 
-import java.util.Collection;
-import java.util.ArrayList;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SPEValidator extends Validator {
 
@@ -38,6 +41,10 @@ public class SPEValidator extends Validator {
 
     public SPEValidator( InputStream ontoConfig ) throws OntologyLoaderException {
         super( ontoConfig );
+    }
+
+    public SPEValidator(OntologyManager ontologyManager, CvMapping cvMappingRules, Collection<ObjectRule> objectRules){
+        super(ontologyManager, cvMappingRules, objectRules);
     }
 
 

@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.cvrReader.CvRuleReader;
 import psidev.psi.tools.cvrReader.CvRuleReaderException;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReaderException;
 import psidev.psi.tools.objectRuleReader.mapping.jaxb.Import;
@@ -40,8 +41,6 @@ public abstract class Validator {
      * Sets up a logger for that class.
      */
     public static final Log log = LogFactory.getLog( Validator.class );
-
-    protected ValidatorContext validatorContext;
 
     /**
      * User preferences.
@@ -112,6 +111,18 @@ public abstract class Validator {
         setOntologyManager( ontoConfig );
     }
 
+    /**
+     * Create a new Validator with preinstantiated OntlogyManager, cvMapping rules and object rules
+     * @param ontologyManager : a preinstantiated OntologyManager. Can't be null
+     * @param cvMappingRules : the CvMapping rules
+     * @param objectRules : the collection of preinstantiated ObjectRules
+     */
+    public Validator (OntologyManager ontologyManager, CvMapping cvMappingRules, Collection<ObjectRule> objectRules){
+        setOntologyManager(ontologyManager);
+        setCvMappingRules(cvMappingRules);
+        setObjectRules(objectRules);
+    }
+
     ////////////////////////
     // Getters and Setters
 
@@ -123,12 +134,21 @@ public abstract class Validator {
         ontologyMngr = new OntologyManager( ontoConfig );
     }
 
-    public CvRuleManager getCvRuleManager() {
-        return cvRuleManager;
+    /**
+     * Set the ontology manager of this object. If the ontologyManager is null, throws an IllegalArgumentException.
+     * @param ontoManager : the preinstantiated ontology manager. Can't be null
+     */
+    public void setOntologyManager( OntologyManager ontoManager ){
+
+        if (ontoManager == null){
+            throw new IllegalArgumentException("The OntologyManager of a Validator can't be null.");
+        }
+
+        ontologyMngr = ontoManager;
     }
 
-    public ValidatorContext getValidatorContext() {
-        return validatorContext;
+    public CvRuleManager getCvRuleManager() {
+        return cvRuleManager;
     }
 
     /**
@@ -142,8 +162,64 @@ public abstract class Validator {
         cvRuleManager = new CvRuleManager( ontologyMngr, reader.read( cvIs ) );
     }
 
+    /**
+     *  Set the CVRules of the CVRuleManager. If cvMappingRules is null or its list of cvRules is empty, log a warning message.
+     * If the cvMappingRules doesn't contain any CVMappingRuleList object, throws an IllegalArgumentException
+     * @param cvMappingRules : the cvmapping rules
+     */
+    public void setCvMappingRules( CvMapping cvMappingRules ) {
+
+        if (cvMappingRules != null){
+            if (cvMappingRules.getCvMappingRuleList() == null){
+                throw new IllegalArgumentException("The collection of cvMapping rules is empty.");
+            }
+            else if (cvMappingRules.getCvMappingRuleList().getCvMappingRule() == null){
+                throw new IllegalArgumentException("The collection of cvMapping rules is empty.");
+            }
+            else if (cvMappingRules.getCvMappingRuleList().getCvMappingRule().isEmpty()){
+                log.warn("The collection of cvMapping rules is empty.");
+            }
+
+            if (this.cvRuleManager != null){
+                this.cvRuleManager.getCvRules().clear();
+
+                this.cvRuleManager.setCvMappingRules(cvMappingRules);
+            }
+            else {
+                this.cvRuleManager = new CvRuleManager(this.ontologyMngr, cvMappingRules);
+            }
+        }
+        else {
+            log.info("No CvMapping rule has been loaded.");
+        }
+    }
+
     public Set<ObjectRule> getObjectRules() {
         return rules;
+    }
+
+    /**
+     *  Set the object rules of this validator.
+     * @param objectRules : the preinstantiated object rules
+     */
+    public void setObjectRules(Collection<ObjectRule> objectRules){
+
+        if (objectRules != null){
+            this.rules.clear();
+            
+            for (ObjectRule rule : objectRules){
+                if (rule != null){
+                    this.rules.add(rule);
+                }
+            }
+        }
+        else {
+            log.info("No object rule has been loaded.");
+        }
+
+        if (this.rules.isEmpty()){
+            log.info("The list of object rules is empty.");
+        }
     }
 
     /**

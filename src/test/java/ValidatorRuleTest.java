@@ -16,6 +16,7 @@
 
 import org.junit.Assert;
 import org.junit.Test;
+import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.validator.ValidatorMessage;
 
 import java.io.File;
@@ -45,6 +46,20 @@ public class ValidatorRuleTest {
         }
 
         Assert.assertEquals( 4, validator.getObjectRules().size() );
+    }
+
+    @Test
+    public void check_RuleObject_Loading_InstantiatedOntologyManager_ok() throws Exception {
+        OntologyManager ontologyManager = new OntologyManager(ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).openStream());
+
+        SPEValidator validator = new SPEValidator( ontologyManager, null, null);
+
+        Object experiment = new Object( );
+
+        final Collection<ValidatorMessage> messages = validator.validate( experiment );
+
+        Assert.assertNotNull(validator.getOntologyMngr());
+        Assert.assertTrue(messages.isEmpty());
     }
 
     @Test

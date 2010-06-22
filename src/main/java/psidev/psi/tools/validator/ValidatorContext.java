@@ -8,15 +8,27 @@ package psidev.psi.tools.validator;
  * @since <pre>27-Apr-2010</pre>
  */
 
-public abstract class ValidatorContext {
+public class ValidatorContext {
     
-    protected ValidatorConfig validatorConfig;
+    private ValidatorConfig validatorConfig;
 
-    protected ValidatorContext(){
-        
+    private static ThreadLocal<ValidatorContext> instance = new
+            ThreadLocal<ValidatorContext>() {
+                @Override
+                protected ValidatorContext initialValue() {
+                    return new ValidatorContext();
+                }
+            };
+
+    private ValidatorContext(){
+         this.validatorConfig = new ValidatorConfig();
     }
 
     public ValidatorConfig getValidatorConfig() {
         return validatorConfig;
+    }
+
+    public static ValidatorContext getCurrentInstance() {
+        return instance.get();
     }
 }
