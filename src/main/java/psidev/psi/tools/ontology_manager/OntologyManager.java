@@ -210,7 +210,11 @@ public class OntologyManager {
         }
     }
 
-
+    /**
+     *
+     * @return the date of the last ontology update. Format YYYY-MM-DD
+     * @throws OntologyLoaderException
+     */
     public String getLastOntologyUpdate() throws OntologyLoaderException {
         OlsOntology ols = null;
         try {
