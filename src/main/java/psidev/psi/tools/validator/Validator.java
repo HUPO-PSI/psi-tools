@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.cvrReader.CvRuleReader;
 import psidev.psi.tools.cvrReader.CvRuleReaderException;
-import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReaderException;
 import psidev.psi.tools.objectRuleReader.mapping.jaxb.Import;
@@ -114,12 +113,12 @@ public abstract class Validator {
     /**
      * Create a new Validator with preinstantiated OntlogyManager, cvMapping rules and object rules
      * @param ontologyManager : a preinstantiated OntologyManager. Can't be null
-     * @param cvMappingRules : the CvMapping rules
+     * @param ruleManager : the Cvrules  manager
      * @param objectRules : the collection of preinstantiated ObjectRules
      */
-    public Validator (OntologyManager ontologyManager, CvMapping cvMappingRules, Collection<ObjectRule> objectRules){
+    public Validator (OntologyManager ontologyManager, CvRuleManager ruleManager, Collection<ObjectRule> objectRules){
         setOntologyManager(ontologyManager);
-        setCvMappingRules(cvMappingRules);
+        setCvMappingRules(ruleManager);
         setObjectRules(objectRules);
     }
 
@@ -165,29 +164,13 @@ public abstract class Validator {
     /**
      *  Set the CVRules of the CVRuleManager. If cvMappingRules is null or its list of cvRules is empty, log a warning message.
      * If the cvMappingRules doesn't contain any CVMappingRuleList object, throws an IllegalArgumentException
-     * @param cvMappingRules : the cvmapping rules
+     * @param cvManager : the cvRuleManager
      */
-    public void setCvMappingRules( CvMapping cvMappingRules ) {
+    public void setCvMappingRules( CvRuleManager cvManager ) {
+        this.cvRuleManager = null;
 
-        if (cvMappingRules != null){
-            if (cvMappingRules.getCvMappingRuleList() == null){
-                throw new IllegalArgumentException("The collection of cvMapping rules is empty.");
-            }
-            else if (cvMappingRules.getCvMappingRuleList().getCvMappingRule() == null){
-                throw new IllegalArgumentException("The collection of cvMapping rules is empty.");
-            }
-            else if (cvMappingRules.getCvMappingRuleList().getCvMappingRule().isEmpty()){
-                log.warn("The collection of cvMapping rules is empty.");
-            }
-
-            if (this.cvRuleManager != null){
-                this.cvRuleManager.getCvRules().clear();
-
-                this.cvRuleManager.setCvMappingRules(cvMappingRules);
-            }
-            else {
-                this.cvRuleManager = new CvRuleManager(this.ontologyMngr, cvMappingRules);
-            }
+        if (cvManager != null){
+            this.cvRuleManager = cvManager;
         }
         else {
             log.info("No CvMapping rule has been loaded.");
