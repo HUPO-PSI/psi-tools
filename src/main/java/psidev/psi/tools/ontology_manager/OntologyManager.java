@@ -18,6 +18,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -212,17 +216,22 @@ public class OntologyManager {
 
     /**
      *
-     * @return the date of the last ontology update. Format YYYY-MM-DD
+     * @return the date of the last ontology update.
      * @throws OntologyLoaderException
      */
-    public String getLastOntologyUpdate() throws OntologyLoaderException {
+    public Date getLastOntologyUpdate(String ontologyName) throws OntologyLoaderException {
         OlsOntology ols = null;
         try {
             ols = new OlsOntology();
-            return  ols.getLastOntologyUpdate();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String dateString = ols.getLastOntologyUpdate(ontologyName);
+            Date date = dateFormat.parse(dateString);
+            return  date;
 
         } catch (RemoteException e) {
             throw new OntologyLoaderException("We can't access the date of the last ontology update.", e);
+        } catch (ParseException e) {
+            throw new OntologyLoaderException("The date of the last ontology update cannot be parsed.", e);
         }
     }
 }

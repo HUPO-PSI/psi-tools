@@ -793,7 +793,7 @@ public class OlsOntology implements OntologyAccess {
      * @return the date of the last ontology update. Format YYYY-MM-DD
      * @throws RemoteException
      */
-    public String getLastOntologyUpdate() throws RemoteException {
-        return query.getOntologyLoadDate("MI");
+    public String getLastOntologyUpdate(String ontologyName) throws RemoteException {
+        return query.getOntologyLoadDate(ontologyName);
     }
 }
