@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -789,5 +788,7 @@ public class OlsOntology implements OntologyAccess {
         return result;
     }
 
-
+    public String getLastOntologyUpdate() throws RemoteException {
+        return query.getOntologyLoadDate("MI");
+    }
 }

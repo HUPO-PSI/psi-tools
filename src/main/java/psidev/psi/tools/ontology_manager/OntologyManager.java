@@ -17,6 +17,7 @@ import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -178,12 +179,12 @@ public class OntologyManager {
 
                 } catch ( URISyntaxException e ) {
                     throw new IllegalArgumentException( "The specified uri '" + sourceUri + "' " +
-                                                        "for ontology '" + id + "' has an invalid syntax.", e );
+                            "for ontology '" + id + "' has an invalid syntax.", e );
                 }
 
                 if ( log.isInfoEnabled() ) {
                     log.info( "Loading ontology: name=" + name + ", ID= " + id + ", format=" + format
-                              + ", version=" + version + ", uri=" + uri + " using source: " + loaderClass );
+                            + ", version=" + version + ", uri=" + uri + " using source: " + loaderClass );
                 }
 
                 Class loader;
@@ -206,6 +207,18 @@ public class OntologyManager {
                     throw new OntologyLoaderException( "Failed loading ontology source: " + loaderClass, e );
                 }
             }
+        }
+    }
+
+
+    public String getLastOntologyUpdate() throws OntologyLoaderException {
+        OlsOntology ols = null;
+        try {
+            ols = new OlsOntology();
+            return  ols.getLastOntologyUpdate();
+
+        } catch (RemoteException e) {
+            throw new OntologyLoaderException("We can't access the date of the last ontology update.", e);
         }
     }
 }
