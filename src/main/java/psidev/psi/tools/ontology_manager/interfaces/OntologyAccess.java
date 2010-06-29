@@ -92,4 +92,11 @@ public interface OntologyAccess {
      * @return a non null set of ontology terms.
      */
     public Set<OntologyTermI> getAllChildren( OntologyTermI term );
+
+    /**
+     *
+     * @return false if a new update of the ontology has been done recently and the date of the last ontology upload is before the date of the last ontology update
+     * @throws OntologyLoaderException
+     */
+    public boolean isOntologyUpToDate() throws OntologyLoaderException;
 }

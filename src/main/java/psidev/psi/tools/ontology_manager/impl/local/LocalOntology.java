@@ -123,6 +123,16 @@ public class LocalOntology implements OntologyAccess {
     }
 
     /**
+     * 
+     * @return
+     * @throws OntologyLoaderException
+     */
+    public boolean isOntologyUpToDate() throws OntologyLoaderException {
+        // TODO : To implement. To have the date of the last update
+        return true;
+    }
+
+    /**
      * Create a directory for the validator either in the user's home directory or if it cannot, in the system's temp
      * directory.
      *

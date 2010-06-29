@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.rmi.RemoteException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -27,11 +30,13 @@ public class OlsOntology implements OntologyAccess {
 
     public static final Log log = LogFactory.getLog( OlsOntology.class );
 
-    protected static GeneralCacheAdministrator admin;
-    private static String cacheConfig = "olsontology-oscache.properties";
-    static Query query;
+    private GeneralCacheAdministrator admin;
+    private String cacheConfig = "olsontology-oscache.properties";
+    private Query query;
     String ontologyID;
     Set<String> rootAccs;
+
+    private Date lastOntologyUpload;
 
     // methods that use the cache, use the method name to as part of the cache key
     private final byte GET_VALID_IDS = 1;
@@ -44,13 +49,13 @@ public class OlsOntology implements OntologyAccess {
     private final byte IS_OBSOLETE = 8;
     private final byte GET_TERM_FOR_ACCESSION = 9;
 
-    private final boolean useByteCodeGroup = true;
-
     public OlsOntology() throws OntologyLoaderException {
         log.info( "Creating new OlsOntology..." );
 
         // preparing cache
         if ( admin == null ) {
+            lastOntologyUpload = new Date(System.currentTimeMillis());
+            
             log.info( "Setting up cache administrator..." );
             Properties cacheProps;
             InputStream is = this.getClass().getClassLoader().getResourceAsStream( cacheConfig );
@@ -190,7 +195,7 @@ public class OlsOntology implements OntologyAccess {
       * @param accession the ontology term accession for which to look up the term.
       * @return the OntologyTermI for the specified accession.
       */
-     public OntologyTermI getTermForAccession( String accession ) {
+     public synchronized OntologyTermI getTermForAccession( String accession ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         final String myKey = GET_TERM_FOR_ACCESSION + '_' + ontologyID + '_' + accession;
@@ -246,7 +251,7 @@ public class OlsOntology implements OntologyAccess {
      * @param term the ontology term to check for being obsolete.
      * @return true if the term is flagged obolete, false otherwise.
      */
-    public boolean isObsolete( OntologyTermI term ) {
+    public synchronized boolean isObsolete( OntologyTermI term ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         String myKey = IS_OBSOLETE + '_' + ontologyID + '_' + term.getTermAccession();
@@ -301,7 +306,7 @@ public class OlsOntology implements OntologyAccess {
      * @param term the OntologyTermI for which to look up its direct parents.
      * @return a Set of OntologyTermIs of the direct parents of the given term.
      */
-    public Set<OntologyTermI> getDirectParents( OntologyTermI term ) {
+    public synchronized Set<OntologyTermI> getDirectParents( OntologyTermI term ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         String myKey = GET_DIRECT_PARENTS + '_' + ontologyID + '_' + term.getTermAccession();
@@ -405,7 +410,7 @@ public class OlsOntology implements OntologyAccess {
      * @param level up to which level in depth to search for children (note: -1 will get ALL children)
      * @return a Set containing the child terms of the specified term.
      */
-    public Set<OntologyTermI> getChildren( OntologyTermI term, int level ) {
+    public synchronized Set<OntologyTermI> getChildren( OntologyTermI term, int level ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         String myKey = GET_CHILDREN + '_' + ontologyID + '_' + term.getTermAccession() + '_' + level;
@@ -540,17 +545,13 @@ public class OlsOntology implements OntologyAccess {
     }
 
     @Deprecated
-    public Set<String> getValidIDs( String queryTerm, boolean allowChildren, boolean useTerm ) {
+    public synchronized Set<String> getValidIDs( String queryTerm, boolean allowChildren, boolean useTerm ) {
         Set<String> terms; // to store the results
 
         // create unique string for this query
         String queryGroup = "getValidIDs_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = GET_VALID_IDS + '_' + ontologyID + '_' + queryTerm + '_' + allowChildren + '_' + useTerm;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + queryTerm + "_" + allowChildren + "_" + useTerm;
-        }
+        String myKey = queryGroup + "_" + ontologyID + "_" + queryTerm + "_" + allowChildren + "_" + useTerm;
+
         String[] groups = {queryGroup};
         try {
             // Get from the cache
@@ -595,17 +596,13 @@ public class OlsOntology implements OntologyAccess {
     }
 
     @Deprecated
-    public boolean isObsoleteID( String id ) {
+    public synchronized boolean isObsoleteID( String id ) {
         Boolean result;
 
         // create unique string for this query
         String queryGroup = "isObsoleteID_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = IS_OBSOLETE_ID + '_' + ontologyID + '_' + id;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + id;
-        }
+        String myKey = queryGroup + "_" + ontologyID + "_" + id;
+
         String[] groups = {queryGroup};
         try {
             // Get from the cache
@@ -644,17 +641,13 @@ public class OlsOntology implements OntologyAccess {
     }
 
     @Deprecated
-    public String getTermNameByID( String id ) {
+    public synchronized String getTermNameByID( String id ) {
         String result;
 
         // create unique string for this query
         String queryGroup = "getTermNameByID_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = GET_TERM_NAME_BY_ID + '_' + ontologyID + '_' + id;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + id;
-        }
+        String myKey = queryGroup + "_" + ontologyID + "_" + id;
+
         String[] groups = {queryGroup};
         try {
             // Get from the cache
@@ -692,17 +685,13 @@ public class OlsOntology implements OntologyAccess {
     }
 
     @Deprecated
-    public Set<String> getDirectParentsIDs( String id ) {
+    public synchronized Set<String> getDirectParentsIDs( String id ) {
         Set<String> result;
 
         // create unique string for this query
         String queryGroup = "getDirectParentsIDs_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = GET_DIRECT_PARENTS_IDS + '_' + ontologyID + '_' + id;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + id;
-        }
+        String myKey = queryGroup + "_" + ontologyID + "_" + id;
+
         String[] groups = {queryGroup};
         try {
             // Get from the cache
@@ -752,17 +741,13 @@ public class OlsOntology implements OntologyAccess {
     }
 
     @Deprecated
-    private Set<String> getChildTerms( String id ) throws RemoteException {
+    private synchronized Set<String> getChildTerms( String id ) throws RemoteException {
         Set<String> result;
 
         // create unique string for this query
         String queryGroup = "getChildTerms_query";
-        String myKey;
-        if ( useByteCodeGroup ) {
-            myKey = GET_CHILD_TERMS + '_' + ontologyID + '_' + id;
-        } else {
-            myKey = queryGroup + "_" + ontologyID + "_" + id;
-        }
+        String myKey = queryGroup + "_" + ontologyID + "_" + id;
+
         String[] groups = {queryGroup};
         try {
             // Get from the cache
@@ -786,6 +771,30 @@ public class OlsOntology implements OntologyAccess {
             }
         }
         return result;
+    }
+
+    /**
+     *
+     * @return true if the date of the last ontology upload is after the date of the last OLS update
+     * @throws OntologyLoaderException
+     */
+    public boolean isOntologyUpToDate() throws OntologyLoaderException {
+
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String dateString = query.getOntologyLoadDate(ontologyID);
+            Date lastUpdate = dateFormat.parse(dateString);
+
+            if (lastUpdate.after(lastOntologyUpload)){
+                return true;
+            }
+
+        } catch (RemoteException e) {
+            throw new OntologyLoaderException("We can't access the date of the last ontology update.", e);
+        } catch (ParseException e) {
+            throw new OntologyLoaderException("The date of the last ontology update cannot be parsed.", e);
+        }
+        return false;
     }
 
     /**

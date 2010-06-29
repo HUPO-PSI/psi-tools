@@ -17,11 +17,6 @@ import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.rmi.RemoteException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -216,22 +211,19 @@ public class OntologyManager {
 
     /**
      *
-     * @return the date of the last ontology update.
+     * @return false if one of the OntologyAccess instances doesn't have an up-to-date ontology uploaded.
      * @throws OntologyLoaderException
      */
-    public Date getLastOntologyUpdate(String ontologyName) throws OntologyLoaderException {
-        OlsOntology ols = null;
-        try {
-            ols = new OlsOntology();
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String dateString = ols.getLastOntologyUpdate(ontologyName);
-            Date date = dateFormat.parse(dateString);
-            return  date;
-
-        } catch (RemoteException e) {
-            throw new OntologyLoaderException("We can't access the date of the last ontology update.", e);
-        } catch (ParseException e) {
-            throw new OntologyLoaderException("The date of the last ontology update cannot be parsed.", e);
+    public boolean isUpToDate() throws OntologyLoaderException {
+        
+        for (Map.Entry<String, OntologyAccess> entry : this.ontologies.entrySet()){
+            if (entry.getValue() != null){
+                if (!entry.getValue().isOntologyUpToDate()){
+                    return false;
+                }
+            }
         }
+
+        return true;
     }
 }

@@ -1,18 +1,22 @@
 package psidev.psi.tools.ontology_manager.impl.ols;
 
-import static org.junit.Assert.*;
-
-import org.junit.*;
-import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
-import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.OntologyUtils;
+import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
+import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Set;
-import java.io.InputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * OlsOntology Tester.
@@ -70,7 +74,7 @@ public class OlsOntologyTest {
         // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000001");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 1236, terms.size() );
+        Assert.assertEquals( 1317, terms.size() );
     }
 
     @Test
