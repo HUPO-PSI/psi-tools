@@ -10,6 +10,13 @@ import java.util.Collection;
 /**
  * Rule intended to perform custom check on a object of type T.
  *
+ * A rule is not thread safe so if the ontologyManager or the rule itself is shared in a web application, it is not recommended to
+ * create a rule which will modify the ontologyManager or one of the variables of the rule itself.
+ *
+ * A valid object rule should only use and read the variables of the ontologyManager when needed and never changes any of its variables.
+ * Indeed, during a validation, there is no order for executing an object rule so if the environment of the rules set at the beginning is changing during
+ * the validation, we can't predict the effect on the other rules.
+ *
  * @author florian Reisinger
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$

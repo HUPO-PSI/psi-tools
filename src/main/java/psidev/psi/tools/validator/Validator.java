@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.cvrReader.CvRuleReader;
 import psidev.psi.tools.cvrReader.CvRuleReaderException;
+import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReaderException;
 import psidev.psi.tools.objectRuleReader.mapping.jaxb.Import;
@@ -113,12 +114,12 @@ public abstract class Validator {
     /**
      * Create a new Validator with preinstantiated OntlogyManager, cvMapping rules and object rules
      * @param ontologyManager : a preinstantiated OntologyManager. Can't be null
-     * @param ruleManager : the Cvrules  manager
+     * @param cvMapping : the cvMapping
      * @param objectRules : the collection of preinstantiated ObjectRules
      */
-    public Validator (OntologyManager ontologyManager, CvRuleManager ruleManager, Collection<ObjectRule> objectRules){
+    public Validator (OntologyManager ontologyManager, CvMapping cvMapping, Collection<ObjectRule> objectRules){
         setOntologyManager(ontologyManager);
-        setCvMappingRules(ruleManager);
+        setCvMappingRules(ontologyManager, cvMapping);
         setObjectRules(objectRules);
     }
 
@@ -162,15 +163,18 @@ public abstract class Validator {
     }
 
     /**
-     *  Set the CVRules of the CVRuleManager. If cvMappingRules is null or its list of cvRules is empty, log a warning message.
+     *  Set the CVRules of the CVRuleManager. If cvMappingRules is null log a warning message.
      * If the cvMappingRules doesn't contain any CVMappingRuleList object, throws an IllegalArgumentException
-     * @param cvManager : the cvRuleManager
+     * @param cvMapping : the cvMapping
+     * @param ontologymanager : the ontologyManager
      */
-    public void setCvMappingRules( CvRuleManager cvManager ) {
-        this.cvRuleManager = null;
+    public void setCvMappingRules( OntologyManager ontologymanager, CvMapping cvMapping ) {
 
-        if (cvManager != null){
-            this.cvRuleManager = cvManager;
+        if (cvMapping != null && ontologymanager != null){
+            this.cvRuleManager = new CvRuleManager(ontologymanager, cvMapping);
+        }
+        else if (ontologymanager == null){
+            throw new IllegalArgumentException("The OntologyManager is null, we can't create a new CvRuleManager.");
         }
         else {
             log.info("No CvMapping rule has been loaded.");

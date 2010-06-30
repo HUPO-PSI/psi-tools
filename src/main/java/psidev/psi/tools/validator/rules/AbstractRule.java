@@ -76,7 +76,7 @@ public abstract class AbstractRule implements Rule {
 
     public String toString() {
 
-        StringBuffer sb = new StringBuffer( 256 );
+        StringBuilder sb = new StringBuilder( 256 );
 
         if ( name != null ) {
             sb.append( "Rule name: " ).append( name ).append( NEW_LINE );
