@@ -8,9 +8,9 @@ import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.ontology_manager.impl.ols.OlsOntology;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.File;
 import java.util.Collection;
 
 /**
@@ -55,6 +55,16 @@ public class OntologyManagerTest {
     @Test
     public void ontologyDirectory() {
         Assert.assertTrue(ontologyDirectory.exists());
+    }
+
+    @Test
+    public void isUpToDate() {
+        try {
+            Assert.assertTrue(om.isUpToDate());
+        } catch (OntologyLoaderException e) {
+            e.printStackTrace();
+            Assert.assertFalse(true);
+        }
     }
 
     @Test

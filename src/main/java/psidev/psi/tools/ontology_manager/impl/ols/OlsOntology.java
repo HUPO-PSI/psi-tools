@@ -30,7 +30,7 @@ public class OlsOntology implements OntologyAccess {
 
     public static final Log log = LogFactory.getLog( OlsOntology.class );
 
-    private GeneralCacheAdministrator admin;
+    protected GeneralCacheAdministrator admin;
     private String cacheConfig = "olsontology-oscache.properties";
     private Query query;
     String ontologyID;
@@ -53,44 +53,35 @@ public class OlsOntology implements OntologyAccess {
         log.info( "Creating new OlsOntology..." );
 
         // preparing cache
-        if ( admin == null ) {
-            lastOntologyUpload = new Date(System.currentTimeMillis());
-            
-            log.info( "Setting up cache administrator..." );
-            Properties cacheProps;
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream( cacheConfig );
-            cacheProps = new Properties();
-            try {
-                cacheProps.load( is );
-            } catch ( IOException e ) {
-                log.error( "Failed to load cache configuration properties: " + cacheConfig, e );
-            }
-            if ( cacheProps.isEmpty() ) {
-                log.warn( "Using default cache configuration!" );
-                admin = new GeneralCacheAdministrator();
-            } else {
-                log.info( "Using custom cache configuration from file: " + cacheConfig );
-                admin = new GeneralCacheAdministrator( cacheProps );
-            }
+        lastOntologyUpload = new Date(System.currentTimeMillis());
+
+        log.info( "Setting up cache administrator..." );
+        Properties cacheProps;
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream( cacheConfig );
+        cacheProps = new Properties();
+        try {
+            cacheProps.load( is );
+        } catch ( IOException e ) {
+            log.error( "Failed to load cache configuration properties: " + cacheConfig, e );
+        }
+        if ( cacheProps.isEmpty() ) {
+            log.warn( "Using default cache configuration!" );
+            admin = new GeneralCacheAdministrator();
         } else {
-            log.info( "Cache administrator already set-up." );
+            log.info( "Using custom cache configuration from file: " + cacheConfig );
+            admin = new GeneralCacheAdministrator( cacheProps );
         }
 
         // preparing OLS access
-        if ( query == null ) {
-            log.info( "Creating new OLS query client." );
-            try {
-                QueryService locator = new QueryServiceLocator();
-                query = locator.getOntologyQuery();
-            } catch ( Exception e ) {
-                log.error( "Exception setting up OLS query client!", e );
-                throw new OntologyLoaderException( "Exception setting up OLS query client!", e );
-            }
-        } else {
-            log.info( "Reusing statically created OLS query client." );
+        log.info( "Creating new OLS query client." );
+        try {
+            QueryService locator = new QueryServiceLocator();
+            query = locator.getOntologyQuery();
+        } catch ( Exception e ) {
+            log.error( "Exception setting up OLS query client!", e );
+            throw new OntologyLoaderException( "Exception setting up OLS query client!", e );
         }
     }
-
 
     public void loadOntology( String ontologyID, String name, String version, String format, URI uri ) {
         this.ontologyID = ontologyID;
@@ -102,7 +93,7 @@ public class OlsOntology implements OntologyAccess {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
         log.info( "Successfully created OlsOntology from values: ontology=" + ontologyID + " name=" + name
-                  + " version=" + version + " format=" + format + " location=" + uri );
+                + " version=" + version + " format=" + format + " location=" + uri );
     }
 
     /**
@@ -154,7 +145,7 @@ public class OlsOntology implements OntologyAccess {
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
-        
+
         // check the result! ols returns the input accession if no matching entry was found
         OntologyTermI term;
         if ( termName != null && termName.length() > 0 && !termName.equals( accession ) ) {
@@ -188,14 +179,46 @@ public class OlsOntology implements OntologyAccess {
     }
 
     /**
-      * This method is used to create a full OntologyTermI
-      * from the given accession via using the OLS service.
-      * Note: this is method uses a cache.
-      *
-      * @param accession the ontology term accession for which to look up the term.
-      * @return the OntologyTermI for the specified accession.
-      */
-     public synchronized OntologyTermI getTermForAccession( String accession ) {
+     * The method is synchronized to avoid concurrent access/modification when accessing the cache
+     * @param myKey : the key to find in the cache
+     * @return the object associated with this key in the cache.
+     * @throws NeedsRefreshException : the key doesn't exist in the cache or is outdated
+     */
+    private synchronized Object getFromCache( String myKey ) throws NeedsRefreshException {
+        
+        Object result = admin.getFromCache( myKey );
+
+        return result;
+    }
+
+    /**
+     * The method will put the key associated with an object in the cache of this OlsOntology
+     * The method is synchronized to avoid concurrent access/modification when accessing the cache
+     * @param myKey : the key to put in the cache
+     * @param result : the associated object to put in the cache
+     */
+    private synchronized void putInCache( String myKey, Object result ) {
+        admin.putInCache( myKey, result );
+    }
+
+    /**
+     * Cancel any update for this key in the cache
+     * The method is synchronized to avoid concurrent access/modification when accessing the cache
+     * @param myKey : the key to find in the cache
+     */
+    private synchronized void cancelUpdate(String myKey){
+        admin.cancelUpdate( myKey );
+    }
+
+    /**
+     * This method is used to create a full OntologyTermI
+     * from the given accession via using the OLS service.
+     * Note: this is method uses a cache.
+     *
+     * @param accession the ontology term accession for which to look up the term.
+     * @return the OntologyTermI for the specified accession.
+     */
+    public OntologyTermI getTermForAccession( String accession ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         final String myKey = GET_TERM_FOR_ACCESSION + '_' + ontologyID + '_' + accession;
@@ -203,7 +226,7 @@ public class OlsOntology implements OntologyAccess {
         OntologyTermI result;
         // try to get the result from the cache
         try {
-            result = ( OntologyTermI ) admin.getFromCache( myKey );
+            result = (OntologyTermI) getFromCache(myKey);
             if ( log.isDebugEnabled() ) log.debug( "Using cached terms for key: " + myKey );
         } catch ( NeedsRefreshException nre ) {
             boolean updated = false;
@@ -211,12 +234,12 @@ public class OlsOntology implements OntologyAccess {
             try {
                 result = this.getTermForAccessionUncached( accession );
                 if ( log.isDebugEnabled() ) log.debug( "Storing uncached terms for key: " + myKey );
-                admin.putInCache( myKey, result );
+                putInCache( myKey, result );
                 updated = true;
             } finally {
                 if ( !updated ) {
                     // It is essential that cancelUpdate is called if the cached content could not be rebuilt
-                    admin.cancelUpdate( myKey );
+                    cancelUpdate( myKey );
                 }
             }
         }
@@ -251,7 +274,7 @@ public class OlsOntology implements OntologyAccess {
      * @param term the ontology term to check for being obsolete.
      * @return true if the term is flagged obolete, false otherwise.
      */
-    public synchronized boolean isObsolete( OntologyTermI term ) {
+    public boolean isObsolete( OntologyTermI term ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         String myKey = IS_OBSOLETE + '_' + ontologyID + '_' + term.getTermAccession();
@@ -259,7 +282,7 @@ public class OlsOntology implements OntologyAccess {
         boolean result;
         // try to get the result from the cache
         try {
-            result = ( Boolean ) admin.getFromCache( myKey );
+            result = ( Boolean ) getFromCache( myKey );
             log.debug( "Using cached terms for key: " + myKey );
         } catch ( NeedsRefreshException nre ) {
             boolean updated = false;
@@ -267,12 +290,12 @@ public class OlsOntology implements OntologyAccess {
             try {
                 result = this.isObsoleteUncached( term );
                 log.debug( "Storing uncached terms for key: " + myKey );
-                admin.putInCache( myKey, result );
+                putInCache( myKey, result );
                 updated = true;
             } finally {
                 if ( !updated ) {
                     // It is essential that cancelUpdate is called if the cached content could not be rebuilt
-                    admin.cancelUpdate( myKey );
+                    cancelUpdate( myKey );
                 }
             }
         }
@@ -306,7 +329,7 @@ public class OlsOntology implements OntologyAccess {
      * @param term the OntologyTermI for which to look up its direct parents.
      * @return a Set of OntologyTermIs of the direct parents of the given term.
      */
-    public synchronized Set<OntologyTermI> getDirectParents( OntologyTermI term ) {
+    public Set<OntologyTermI> getDirectParents( OntologyTermI term ) {
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         String myKey = GET_DIRECT_PARENTS + '_' + ontologyID + '_' + term.getTermAccession();
@@ -314,7 +337,7 @@ public class OlsOntology implements OntologyAccess {
         Set<OntologyTermI> result;
         // try to get the result from the cache
         try {
-            result = ( Set<OntologyTermI> ) admin.getFromCache( myKey );
+            result = ( Set<OntologyTermI> ) getFromCache( myKey );
             log.debug( "Using cached terms for key: " + myKey );
         } catch ( NeedsRefreshException nre ) {
             boolean updated = false;
@@ -322,12 +345,12 @@ public class OlsOntology implements OntologyAccess {
             try {
                 result = this.getDirectParentsUncached( term );
                 log.debug( "Storing uncached terms for key: " + myKey );
-                admin.putInCache( myKey, result );
+                putInCache( myKey, result );
                 updated = true;
             } finally {
                 if ( !updated ) {
                     // It is essential that cancelUpdate is called if the cached content could not be rebuilt
-                    admin.cancelUpdate( myKey );
+                    cancelUpdate( myKey );
                 }
             }
         }
@@ -470,9 +493,9 @@ public class OlsOntology implements OntologyAccess {
                 terms.add( term );
             } else {
                 throw new IllegalStateException( "OLS query returned unexpected result!" +
-                                                 " Expected Map with key and value of class String," +
-                                                 " but found key class: " + o.getClass().getName() +
-                                                 " and value class: " + v.getClass().getName() );
+                        " Expected Map with key and value of class String," +
+                        " but found key class: " + o.getClass().getName() +
+                        " and value class: " + v.getClass().getName() );
             }
         }
         return terms;
@@ -506,7 +529,7 @@ public class OlsOntology implements OntologyAccess {
                 if ( resultMap == null ) { // should not happen, but just in case ...
                 } else {
                     log.debug( "Found " + resultMap.keySet().size()
-                               + " child terms of id: " + id + " in ontology: " + ontologyID );
+                            + " child terms of id: " + id + " in ontology: " + ontologyID );
                     terms.addAll( resultMap.keySet() );
                 }
             }
@@ -534,7 +557,7 @@ public class OlsOntology implements OntologyAccess {
             if ( allowChildren ) { // get all children
                 Set<String> children = getAllChildTerms( id );
                 log.debug( "Found " + children.size()
-                           + " child terms of id: " + id + " in ontology: " + ontologyID );
+                        + " child terms of id: " + id + " in ontology: " + ontologyID );
                 terms.addAll( children );
             }
         } catch ( RemoteException e ) {
@@ -586,7 +609,7 @@ public class OlsOntology implements OntologyAccess {
             if ( s.equalsIgnoreCase( id ) ) {
                 // term not in database (if instead of the term name the accession is returned)
                 throw new IllegalStateException( "Checking obsolete on term '" + id
-                                                 + "' which does not exist in '" + ontologyID + "'!" );
+                        + "' which does not exist in '" + ontologyID + "'!" );
             }
             result = query.isObsolete( id, ontologyID );
         } catch ( RemoteException e ) {
@@ -635,7 +658,7 @@ public class OlsOntology implements OntologyAccess {
             result = query.getTermById( id, ontologyID );
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to query OLS for: "
-                                             + id + " in ontology: " + ontologyID );
+                    + id + " in ontology: " + ontologyID );
         }
         return result;
     }
@@ -785,7 +808,7 @@ public class OlsOntology implements OntologyAccess {
             String dateString = query.getOntologyLoadDate(ontologyID);
             Date lastUpdate = dateFormat.parse(dateString);
 
-            if (lastUpdate.after(lastOntologyUpload)){
+            if (lastOntologyUpload.after(lastUpdate)){
                 return true;
             }
 
@@ -795,14 +818,5 @@ public class OlsOntology implements OntologyAccess {
             throw new OntologyLoaderException("The date of the last ontology update cannot be parsed.", e);
         }
         return false;
-    }
-
-    /**
-     *
-     * @return the date of the last ontology update. Format YYYY-MM-DD
-     * @throws RemoteException
-     */
-    public String getLastOntologyUpdate(String ontologyName) throws RemoteException {
-        return query.getOntologyLoadDate(ontologyName);
     }
 }
