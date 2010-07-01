@@ -13,9 +13,9 @@ import psidev.psi.tools.validator.Context;
 import psidev.psi.tools.validator.MessageLevel;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
-import psidev.psi.tools.validator.util.XpathValidator;
 import psidev.psi.tools.validator.rules.AbstractRule;
 import psidev.psi.tools.validator.rules.Rule;
+import psidev.psi.tools.validator.util.XpathValidator;
 import psidev.psi.tools.validator.xpath.XPathHelper;
 import psidev.psi.tools.validator.xpath.XPathResult;
 
@@ -35,11 +35,14 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
     private CvMappingRule cvMappingRule;
 
+    private static final String cvScope = "cv-only";
+
     private MappingRuleStatus status = MappingRuleStatus.NOT_CHECKED;
 
     public CvRuleImpl( OntologyManager ontologyManager ) {
         super( ontologyManager );
         cvMappingRule = new CvMappingRule();
+        setScope(cvScope);
     }
 
     ////////////////////

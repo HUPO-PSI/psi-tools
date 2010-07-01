@@ -24,19 +24,6 @@ import java.util.Collection;
  */
 public abstract class ObjectRule<T> extends AbstractRule {
 
-    /**
-     * The label of this rule. (mimix, imex, etc...)
-     */
-    private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public ObjectRule( OntologyManager ontologyManager ) {
         super( ontologyManager );
     }

@@ -31,6 +31,11 @@ public abstract class AbstractRule implements Rule {
     private String description;
 
     /**
+     * The scope of the rule
+     */
+    private String scope;
+
+    /**
      * A collection of tips.
      */
     private Collection<String> howToFixTips = new ArrayList<String>( 1 );
@@ -68,6 +73,14 @@ public abstract class AbstractRule implements Rule {
 
     public void addTip( String tip ) {
         howToFixTips.add( tip );
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
     public Collection<String> getHowToFixTips() {

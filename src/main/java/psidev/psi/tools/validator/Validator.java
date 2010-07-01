@@ -241,8 +241,7 @@ public abstract class Validator {
                 ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
 
                 if (name != null){
-                    String oldName = r.getName();
-                    r.setName(name + ": " + oldName);
+                    r.setScope(name);
                 }
 
                 this.rules.add( r );
@@ -251,7 +250,7 @@ public abstract class Validator {
                 }
             }
             else{
-                log.info( "The rule " + className + " has already been added with a label " + alreadyImportedRule.getName() + " and will not be reimported with a label " + name);
+                log.info( "The rule " + className + " has already been added with a scope " + alreadyImportedRule.getScope() + " and will not be reimported with a label " + name);
             }
 
         } catch (Exception e) {
