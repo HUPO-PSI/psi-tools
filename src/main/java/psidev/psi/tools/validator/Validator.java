@@ -7,10 +7,7 @@ import psidev.psi.tools.cvrReader.CvRuleReaderException;
 import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReader;
 import psidev.psi.tools.objectRuleReader.ObjectRuleReaderException;
-import psidev.psi.tools.objectRuleReader.mapping.jaxb.Import;
-import psidev.psi.tools.objectRuleReader.mapping.jaxb.ImportRuleList;
-import psidev.psi.tools.objectRuleReader.mapping.jaxb.ObjectRuleList;
-import psidev.psi.tools.objectRuleReader.mapping.jaxb.Rule;
+import psidev.psi.tools.objectRuleReader.mapping.jaxb.*;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.validator.preferences.UserPreferences;
@@ -56,6 +53,16 @@ public abstract class Validator {
      * List of ObjectRuleS
      */
     private Set<ObjectRule> rules = new HashSet<ObjectRule> ();
+
+    /**
+     * The map containing the set of Rules excluded by each imported object rule file
+     */
+    private Map<String, Set<String>> excludedRules = new HashMap<String, Set<String>>();
+
+    /**
+     * The list contains all the excluded rules (recursively) for one import. It will be cleaned at each time we start the first import
+     */
+    private Stack<Set<String>> stackOfExcludedRulesPerImport = new Stack<Set<String>>();
 
     /**
      * Contains the URL for the rules to import
@@ -193,7 +200,7 @@ public abstract class Validator {
 
         if (objectRules != null){
             this.rules.clear();
-            
+
             for (ObjectRule rule : objectRules){
                 if (rule != null){
                     this.rules.add(rule);
@@ -224,6 +231,22 @@ public abstract class Validator {
         return null;
     }
 
+    private boolean isTheRuleExcludedFromImport(String className){
+
+        if (!this.stackOfExcludedRulesPerImport.isEmpty()){
+            Set<String> excludedRules = this.stackOfExcludedRulesPerImport.peek();
+
+            for (String rule : excludedRules){
+
+                if (rule.equals(className)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Instantiates the appropriate Rule from the jaxb Rule 'rule' and add it to the list of rules.
      * @param rule
@@ -236,21 +259,26 @@ public abstract class Validator {
             className = rule.getClazz();
             ObjectRule alreadyImportedRule = isTheRuleAlreadyInstantiated(className);
             if (alreadyImportedRule == null){
-                ruleClass = Class.forName( className );
-                Constructor c = ruleClass.getConstructor( OntologyManager.class );
-                ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
+                if (!isTheRuleExcludedFromImport(className)){
+                    ruleClass = Class.forName( className );
+                    Constructor c = ruleClass.getConstructor( OntologyManager.class );
+                    ObjectRule r = ( ObjectRule ) c.newInstance( ontologyMngr );
 
-                if (name != null){
-                    r.setScope(name);
+                    if (name != null){
+                        r.setScope(name);
+                    }
+
+                    this.rules.add( r );
+                    if ( log.isInfoEnabled() ) {
+                        log.trace( "Added rule: " + r.getClass() );
+                    }
                 }
-
-                this.rules.add( r );
-                if ( log.isInfoEnabled() ) {
-                    log.info( "Added rule: " + r.getClass() );
+                else {
+                    log.trace("Excluded Rule: " + className);
                 }
             }
             else{
-                log.info( "The rule " + className + " has already been added with a scope " + alreadyImportedRule.getScope() + " and will not be reimported with a label " + name);
+                log.trace( "The rule " + className + " has already been added with a scope " + alreadyImportedRule.getScope() + " and will not be reimported with a label " + name);
             }
 
         } catch (Exception e) {
@@ -309,12 +337,50 @@ public abstract class Validator {
         }
     }
 
+    private boolean processExcludedRulesDuringImport(Import importedRules){
+        if (importedRules.getExclude() != null){
+            Exclude exclusion = importedRules.getExclude();
+
+            if (exclusion.getRule() != null){
+                Set<String> excludedRulesDuringImport = new HashSet<String>();
+
+                if (!this.stackOfExcludedRulesPerImport.isEmpty()){
+                    excludedRulesDuringImport.addAll(this.stackOfExcludedRulesPerImport.peek());
+                }
+                
+                String fileName = importedRules.getRules();
+
+                if (!this.excludedRules.containsKey(fileName)){
+                    this.excludedRules.put(fileName, excludedRulesDuringImport);
+                }
+
+                for (Rule rule : exclusion.getRule()){
+                    excludedRulesDuringImport.add(rule.getClazz());
+                }
+
+                this.stackOfExcludedRulesPerImport.push(excludedRulesDuringImport);
+
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
     /**
      * First look for a resource file of Validator, then a local file and finally a file on internet.
+     *
+     * If some of the imported rules are excluded, return true.
      * @param urlName
+     * @param typeOfImport
      * @throws ValidatorException
      */
     private void importRulesFromFile(String urlName, String typeOfImport) throws ValidatorException{
+
         try {
             boolean isImportDone = false;
 
@@ -370,7 +436,7 @@ public abstract class Validator {
                     }
                     else {
                         loadFileFrom(urlName);
-                    };
+                    }
                 }
 
             }
@@ -401,25 +467,42 @@ public abstract class Validator {
                 final ObjectRuleList rules = reader.read( configFile );
                 name = rules.getName();
 
-                for ( Rule rule : rules.getRule() ) {
-                    addRule(rule, name);
-                }
-
                 ImportRuleList rulesToImport = rules.getImportRuleList();
                 if(rulesToImport != null){
+
                     for (Import importedRules : rulesToImport.getImport()){
+                        boolean hasExcludedARule = false;
+
                         String linkToRules = importedRules.getRules();
                         String typeOfImport = importedRules.getType();
 
                         if (!this.urlsForTheImportedRules.containsKey(linkToRules)){
+                            hasExcludedARule = processExcludedRulesDuringImport(importedRules);
+
                             importRulesFromFile(linkToRules, typeOfImport);
                             this.urlsForTheImportedRules.put(linkToRules, name);
+
+                            if (!this.stackOfExcludedRulesPerImport.isEmpty() && hasExcludedARule){
+                                this.stackOfExcludedRulesPerImport.pop();
+                            }
                         }
                         else{
                             log.warn("The " + name != null ? name : "" + " rules from the url " + linkToRules + " have already been imported in a previous file (name = " + this.urlsForTheImportedRules.get(linkToRules) + "). We cannot do the import twice.");
                         }
+
                     }
                 }
+
+                for ( Rule rule : rules.getRule() ) {
+                    addRule(rule, name);
+                }
+
+                if (this.stackOfExcludedRulesPerImport.isEmpty() && !this.excludedRules.isEmpty()){
+
+                     checkAllExcludedRules();
+                     this.excludedRules.clear();
+                }
+
             } catch ( ObjectRuleReaderException e ) {
                 throw new ValidatorException( "Error during the parsing of "+ configFile.toString(), e );
             }
@@ -428,6 +511,19 @@ public abstract class Validator {
                 log.debug( "No Object rules were configured in this validator." );
             }
         }
+    }
+
+    private void checkAllExcludedRules(){
+
+         for (Map.Entry<String, Set<String>> entry : this.excludedRules.entrySet()){
+              for (String rule : entry.getValue()){
+                   for (ObjectRule objectRule : this.rules){
+                       if (objectRule.getClass().getName().equals(rule)){
+                           log.warn("The object rule " + rule + " were excluded from the file " + entry.getKey() + " but was imported from another file. It is maybe not what you want.");
+                       }
+                   }
+              }
+         }
     }
 
     public UserPreferences getUserPreferences() {

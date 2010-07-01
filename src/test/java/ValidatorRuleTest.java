@@ -85,6 +85,34 @@ public class ValidatorRuleTest {
         Assert.assertEquals( 4, validator.getObjectRules().size() );
     }
 
+    @Test
+    public void check_RuleObject_Loading_FromValidatorResource_With_several_imports_one_exclusion() throws Exception {
+
+        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
+        File objectRules = new File( ValidatorRuleTest.class.getResource("/xmlRuleSets/object-rules-5.xml").getFile() );
+
+
+        SPEValidator validator = new SPEValidator( new FileInputStream( ontologyFile ),
+                null,
+                new FileInputStream( objectRules ) );
+
+        Assert.assertEquals( 3, validator.getObjectRules().size() );
+    }
+
+    @Test
+    public void check_RuleObject_Loading_FromValidatorResource_With_several_imports_one_exclusion_one_included() throws Exception {
+
+        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
+        File objectRules = new File( ValidatorRuleTest.class.getResource("/xmlRuleSets/object-rules-6.xml").getFile() );
+
+
+        SPEValidator validator = new SPEValidator( new FileInputStream( ontologyFile ),
+                null,
+                new FileInputStream( objectRules ) );
+
+        Assert.assertEquals( 3, validator.getObjectRules().size() );
+    }
+
 }
 
 
