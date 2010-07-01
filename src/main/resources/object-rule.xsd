@@ -32,7 +32,7 @@
     <xs:element name="import">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="exclude" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="exclude" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="rules" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="optional"/>
