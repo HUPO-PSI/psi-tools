@@ -31,8 +31,18 @@
     </xs:element>
     <xs:element name="import">
         <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="exclude" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
             <xs:attribute name="rules" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="exclude">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="rule" maxOccurs="unbounded"/>
+            </xs:sequence>
         </xs:complexType>
     </xs:element>
 </xs:schema>
