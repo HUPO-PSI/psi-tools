@@ -48,6 +48,7 @@ public class OlsOntology implements OntologyAccess {
     private final byte GET_DIRECT_PARENTS = 7;
     private final byte IS_OBSOLETE = 8;
     private final byte GET_TERM_FOR_ACCESSION = 9;
+    private final byte GET_METADATA_FOR_ACCESSION = 10;
 
     public OlsOntology() throws OntologyLoaderException {
         log.info( "Creating new OlsOntology..." );
@@ -159,23 +160,56 @@ public class OlsOntology implements OntologyAccess {
     }
 
     private void fetchTermSynonyms( OntologyTermI term ) {
+        // create a unique string for this query
+        // generate from from method specific ID, the ontology ID and the input parameter
+        final String myKey = GET_METADATA_FOR_ACCESSION + '_' + ontologyID + '_' + term.getTermAccession();
+        Map metadata;
+
         try {
-            final Map metadata = query.getTermMetadata( term.getTermAccession(), ontologyID );
-            for ( Object k : metadata.keySet() ) {
-                final String key = (String) k;
-                // That's the only way OLS provides synonyms, all keys are different so we are fishing out keywords :(
-                if( key != null && (key.contains( "synonym" ) || key.contains( "Alternate label" )) ) {
-                    String value = (String) metadata.get( k );
-                    if( value != null ) {
-                        term.getNameSynonyms().add(value.trim());
-                    }
+            metadata = (Map) getFromCache(myKey);
+            if ( log.isDebugEnabled() ) log.debug( "Using cached terms for key: " + myKey );
+        } catch (NeedsRefreshException e) {
+            boolean updated = false;
+            // if not found in cache, use uncached method and store result in cache
+            try {
+                metadata = this.getTermMetadataUncached( term.getTermAccession() );
+                if ( log.isDebugEnabled() ) log.debug( "Storing uncached terms for key: " + myKey );
+                putInCache( myKey, metadata );
+                updated = true;
+            } finally {
+                if ( !updated ) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    cancelUpdate( myKey );
                 }
             }
-        } catch ( RemoteException e ) {
-            if ( log.isWarnEnabled() ) {
-                log.warn( "Error while loading term synonyms from OLS for term: " + term.getTermAccession(), e );
+        }
+
+        for ( Object k : metadata.keySet() ) {
+            final String key = (String) k;
+            // That's the only way OLS provides synonyms, all keys are different so we are fishing out keywords :(
+            if( key != null && (key.contains( "synonym" ) || key.contains( "Alternate label" )) ) {
+                String value = (String) metadata.get( k );
+                if( value != null ) {
+                    term.getNameSynonyms().add(value.trim());
+                }
             }
         }
+    }
+
+    private Map getTermMetadataUncached(String termAccession){
+        final Map metadata;
+        try {
+            metadata = query.getTermMetadata( termAccession, ontologyID );
+
+            return metadata;
+
+        } catch ( RemoteException e ) {
+            if ( log.isWarnEnabled() ) {
+                log.warn( "Error while loading term synonyms from OLS for term: " + termAccession, e );
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -185,7 +219,7 @@ public class OlsOntology implements OntologyAccess {
      * @throws NeedsRefreshException : the key doesn't exist in the cache or is outdated
      */
     private synchronized Object getFromCache( String myKey ) throws NeedsRefreshException {
-        
+
         Object result = admin.getFromCache( myKey );
 
         return result;
