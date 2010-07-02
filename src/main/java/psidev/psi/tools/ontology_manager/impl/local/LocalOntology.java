@@ -7,9 +7,15 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +37,12 @@ public class LocalOntology implements OntologyAccess {
     private File ontologyDirectory = null;
 
     private String ontologyID;
+
+    private String md5Signature;
+
+    private int contentSize = -1;
+
+    private URL fileUrl;
 
     public LocalOntology() {
         log.info( "Creating new LocalOntology..." );
@@ -55,6 +67,15 @@ public class LocalOntology implements OntologyAccess {
                     throw new IllegalArgumentException( "The given CvSource doesn't have a valid URL: " + uri );
                 }
 
+                // Compute the MD5 signature of the file to load
+                this.md5Signature = computeMD5SignatureFor(url);
+
+                // Get the size of the file to load
+                this.contentSize = getSizeOfFile(url);
+
+                // We need to store the url to know if an update has been done later
+                this.fileUrl = url;
+
                 // parse the URL and load the ontology
                 OboLoader loader = new OboLoader( getOntologyDirectory() );
                 try {
@@ -73,7 +94,7 @@ public class LocalOntology implements OntologyAccess {
 
         if ( log.isInfoEnabled() ) {
             log.info( "Successfully created LocalOntology from values: ontology="
-                      + ontologyID + " name=" + name + " version=" + version + " format=" + format + " location=" + uri );
+                    + ontologyID + " name=" + name + " version=" + version + " format=" + format + " location=" + uri );
         }
     }
 
@@ -123,13 +144,122 @@ public class LocalOntology implements OntologyAccess {
     }
 
     /**
-     * 
-     * @return
+     * Check if the ontology is up to date
+     * @return true if the md5 signature is still the same and/or if the size of the file is still the same
      * @throws OntologyLoaderException
      */
     public boolean isOntologyUpToDate() throws OntologyLoaderException {
-        // TODO : To implement. To have the date of the last update
-        return true;
+
+        if (this.fileUrl != null){
+            if (md5Signature != null){
+                boolean isMd5UpToDate = checkUpToDateMd5Signature();
+                boolean isContentSizeUpToDate = checkUpToDateContentSize();
+
+                if (isMd5UpToDate && isContentSizeUpToDate){
+                    return true;
+                }
+                else if (!isContentSizeUpToDate && isMd5UpToDate && this.contentSize == -1){
+                    return true;
+                }
+                else if (isContentSizeUpToDate && !isMd5UpToDate && this.md5Signature == null){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     * @return true if the MD5 signature of the file containing the ontologies is still the same
+     * @throws OntologyLoaderException
+     */
+    private boolean checkUpToDateMd5Signature() throws OntologyLoaderException {
+        if (md5Signature != null){
+            String newMd5Signature = computeMD5SignatureFor(this.fileUrl);
+
+            return md5Signature.equals(newMd5Signature);
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @return true if the content size of the file containing the ontologies is still the same
+     * @throws OntologyLoaderException
+     */
+    private boolean checkUpToDateContentSize() throws OntologyLoaderException {
+        if (this.contentSize != -1){
+            int newContentSize = getSizeOfFile(this.fileUrl);
+            return newContentSize == this.contentSize;
+        }
+
+        return false;
+    }
+
+    /**
+     * Computes the md5 signature of the URL
+     * @param url
+     * @return
+     * @throws OntologyLoaderException
+     */
+    private String computeMD5SignatureFor(URL url) throws OntologyLoaderException {
+        InputStream is = null;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+
+            is = url.openStream();
+            byte[] buffer = new byte[8192];
+            int read = 0;
+
+            while( (read = is.read(buffer)) > 0) {
+                digest.update(buffer, 0, read);
+
+            }
+
+            byte[] md5sum = digest.digest();
+            BigInteger bigInt = new BigInteger(1, md5sum);
+            String output = bigInt.toString(16);
+
+            return output;
+
+        }
+        catch(IOException e) {
+            throw new OntologyLoaderException("Unable to process file for MD5", e);
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new OntologyLoaderException("Unable to compute file MD5 signature for the file " + url.getFile(), e);
+        } finally {
+            try {
+                if (is != null){
+                    is.close();
+                }
+            }
+            catch(IOException e) {
+                throw new OntologyLoaderException("Unable to close input stream for MD5 calculation", e);
+            }
+        }
+
+    }
+
+    /**
+     * Get the size of a file at a given url
+     * @param url
+     * @return
+     * @throws OntologyLoaderException
+     */
+    private int getSizeOfFile(URL url) throws OntologyLoaderException {
+        URLConnection con = null;
+
+        try {
+            con = url.openConnection();
+            int size = con.getContentLength();
+
+            return size;
+        } catch (IOException e) {
+            throw new OntologyLoaderException("Unable to open the url", e);
+        }
     }
 
     /**

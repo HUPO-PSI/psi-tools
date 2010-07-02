@@ -831,6 +831,29 @@ public class OlsOntology implements OntologyAccess {
     }
 
     /**
+     * put in the cache all the terms of the ontology
+     */
+    public void preLoadAllOntologyTerms(){
+        for (String accession : this.rootAccs){
+            OntologyTermI term = getTermForAccessionUncached(accession);
+
+            preLoadAllChildrenOf(term);
+        }
+    }
+
+    /**
+     * Put in cache the ontology term with all its children
+     * @param termToPreLoad : the ontology term to put in cache with all its children
+     */
+    private void preLoadAllChildrenOf(OntologyTermI termToPreLoad){
+        Set<OntologyTermI> children = getAllChildren(termToPreLoad);
+
+        for (OntologyTermI child : children){
+            getTermForAccessionUncached(child.getTermAccession());
+        }
+    }
+
+    /**
      *
      * @return true if the date of the last ontology upload is after the date of the last OLS update
      * @throws OntologyLoaderException
