@@ -300,6 +300,7 @@ public abstract class Validator {
 
         InputStream is = url.openStream();
         setObjectRules(is);
+        is.close();
     }
 
     /**
@@ -334,6 +335,8 @@ public abstract class Validator {
             FileInputStream is = new FileInputStream(file);
 
             setObjectRules(is);
+
+            is.close();
         }
     }
 
@@ -394,6 +397,7 @@ public abstract class Validator {
                         InputStream is = url.openStream();
                         setObjectRules(is);
                         isImportDone = true;
+                        is.close();
                     }
                     else{
                         log.warn(" The file to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
@@ -429,6 +433,7 @@ public abstract class Validator {
                 if (url != null){
                     InputStream is = url.openStream();
                     setObjectRules(is);
+                    is.close();
                 }
                 else{
                     if (isALocalFile(urlName)){
