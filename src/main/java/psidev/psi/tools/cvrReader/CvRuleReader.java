@@ -9,12 +9,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
-import javax.xml.validation.Validator;
-import javax.xml.validation.ValidatorHandler;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 
 /**
@@ -42,15 +40,18 @@ public class CvRuleReader {
         final Unmarshaller unmarshaller = jc.createUnmarshaller();
         SchemaFactory sf = SchemaFactory
                 .newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = null;
+        final URL url;
         try {
-            final URL url = CvRuleReader.class.getResource( "/CvMapping.xsd" );
-            if( url == null ) {
-                throw new IllegalArgumentException( "null schema " );
-            }
+            url = new URL("http://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/xml-schemas/CvMappingRules.xsd");
+        } catch (MalformedURLException e) {
+            // the URL is correct and tested! So this should never happen!
+            throw new IllegalStateException("Error constructing CvMapping schema URL!!");
+        }
+        Schema schema;
+        try {
             schema = sf.newSchema(url);
-        } catch ( Exception e ) {
-            throw new JAXBException( e );
+        } catch ( SAXException e ) {
+            throw new JAXBException( "Error creating schema instance from schema " + url, e );
         }
         unmarshaller.setSchema( schema );
         return unmarshaller;
