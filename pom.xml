@@ -40,6 +40,14 @@
             <organizationUrl>http://www.ebi.ac.uk/intact</organizationUrl>
             <timezone>0</timezone>
         </developer>
+        <developer>
+            <id>marine</id>
+            <name>Marine Dumousseau</name>
+            <email>marine@ebi.ac.uk</email>
+            <organization>Proteomics Services Team - EBI</organization>
+            <organizationUrl>http://www.ebi.ac.uk/intact</organizationUrl>
+            <timezone>0</timezone>
+        </developer>
     </developers>
 
     <licenses>
