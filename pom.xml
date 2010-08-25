@@ -5,14 +5,14 @@
     <groupId>psidev.psi.tools</groupId>
     <artifactId>master-pom</artifactId>
     <packaging>pom</packaging>
-    <version>3-SNAPSHOT</version>
+    <version>3</version>
  
     <name>master-pom</name>
 
     <scm>
-        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/trunk</connection>
-        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/trunk</developerConnection>
-        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/trunk</url>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/tags/master-pom-3</connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/tags/master-pom-3</developerConnection>
+        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/master-pom/tags/master-pom-3</url>
     </scm>
 
     <developers>
@@ -36,6 +36,14 @@
             <id>baranda</id>
             <name>Bruno Aranda</name>
             <email>baranda@ebi.ac.uk</email>
+            <organization>Proteomics Services Team - EBI</organization>
+            <organizationUrl>http://www.ebi.ac.uk/intact</organizationUrl>
+            <timezone>0</timezone>
+        </developer>
+        <developer>
+            <id>marine</id>
+            <name>Marine Dumousseau</name>
+            <email>marine@ebi.ac.uk</email>
             <organization>Proteomics Services Team - EBI</organization>
             <organizationUrl>http://www.ebi.ac.uk/intact</organizationUrl>
             <timezone>0</timezone>
