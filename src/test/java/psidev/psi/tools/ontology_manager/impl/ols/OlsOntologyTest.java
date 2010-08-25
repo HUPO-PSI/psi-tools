@@ -74,7 +74,7 @@ public class OlsOntologyTest {
         // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000001");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 1317, terms.size() );
+        Assert.assertEquals( 1322, terms.size() );
     }
 
     @Test
