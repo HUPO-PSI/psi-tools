@@ -31,7 +31,7 @@ public class OlsOntology implements OntologyAccess {
     public static final Log log = LogFactory.getLog( OlsOntology.class );
 
     protected GeneralCacheAdministrator admin;
-    private String cacheConfig = "olsontology-oscache.properties";
+    private static final String cacheConfig = "olsontology-oscache.properties";
     private Query query;
     String ontologyID;
     Set<String> rootAccs;
@@ -99,7 +99,7 @@ public class OlsOntology implements OntologyAccess {
 
     /**
      * This method is not applicable for this implementation of the OntologyAccess interface.
-     * @param directory
+     * @param directory irrelevant.
      */
     public void setOntologyDirectory( File directory ) {
         // not applicable
@@ -140,6 +140,9 @@ public class OlsOntology implements OntologyAccess {
      * @return the OntologyTermI for the specified accession.
      */
     public OntologyTermI getTermForAccessionUncached( String accession ) {
+        // if we don't even have a valid input, there is no point in trying to query OLS
+        if (accession == null) { return null; }
+        
         String termName;
         try {
             termName = query.getTermById( accession, ontologyID );
@@ -160,6 +163,7 @@ public class OlsOntology implements OntologyAccess {
     }
 
     private void fetchTermSynonyms( OntologyTermI term ) {
+        if (term == null) { return; }
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         final String myKey = GET_METADATA_FOR_ACCESSION + '_' + ontologyID + '_' + term.getTermAccession();
@@ -197,6 +201,7 @@ public class OlsOntology implements OntologyAccess {
     }
 
     private Map getTermMetadataUncached(String termAccession){
+        if (termAccession == null) { return null; }
         final Map metadata;
         try {
             metadata = query.getTermMetadata( termAccession, ontologyID );
@@ -219,10 +224,7 @@ public class OlsOntology implements OntologyAccess {
      * @throws NeedsRefreshException : the key doesn't exist in the cache or is outdated
      */
     private synchronized Object getFromCache( String myKey ) throws NeedsRefreshException {
-
-        Object result = admin.getFromCache( myKey );
-
-        return result;
+        return admin.getFromCache( myKey );
     }
 
     /**
@@ -253,6 +255,7 @@ public class OlsOntology implements OntologyAccess {
      * @return the OntologyTermI for the specified accession.
      */
     public OntologyTermI getTermForAccession( String accession ) {
+        if (accession == null) { return null; }
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         final String myKey = GET_TERM_FOR_ACCESSION + '_' + ontologyID + '_' + accession;
@@ -341,9 +344,10 @@ public class OlsOntology implements OntologyAccess {
      * Note: this method is uncached and operates directly on OLS.
      *
      * @param term the OntologyTermI for which to look up its direct parents.
-     * @return a Set of OntologyTermIs of the direct parents of the given term.
+     * @return a Set of OntologyTermIs of the direct parents of the given term or null if the term is invalid.
      */
     public Set<OntologyTermI> getDirectParentsUncached( OntologyTermI term ) {
+        if (term == null) { return null; }
         Map results;
         try {
             results = query.getTermParents( term.getTermAccession(), ontologyID );
@@ -364,6 +368,7 @@ public class OlsOntology implements OntologyAccess {
      * @return a Set of OntologyTermIs of the direct parents of the given term.
      */
     public Set<OntologyTermI> getDirectParents( OntologyTermI term ) {
+        if (term == null) { return null; }
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         String myKey = GET_DIRECT_PARENTS + '_' + ontologyID + '_' + term.getTermAccession();
@@ -412,6 +417,7 @@ public class OlsOntology implements OntologyAccess {
      * @param parents Set of OntologyTermIs to which to add the found parents.
      */
     private void addParents( OntologyTermI term, Set<OntologyTermI> parents ) {
+        if (term == null) { return; }
         Set<OntologyTermI> dps = getDirectParents( term );
         for ( OntologyTermI dp : dps ) {
             // if the parent is not already contained in the list: add it
@@ -431,9 +437,10 @@ public class OlsOntology implements OntologyAccess {
      *
      * @param term  the ontology term to get the child terms for.
      * @param level up to which level in depth to search (note: -1 will get ALL children)
-     * @return a Set containing the child terms of the specified term.
+     * @return a Set containing the child terms of the specified term or null if the term is invalid.
      */
     public Set<OntologyTermI> getChildrenUncached( OntologyTermI term, int level ) {
+        if (term == null) { return null; }
         int[] relationshipTypes = {1, 2, 3, 4};
         Map results;
         try {
@@ -465,9 +472,10 @@ public class OlsOntology implements OntologyAccess {
      *
      * @param term  the ontology term to get the child terms for.
      * @param level up to which level in depth to search for children (note: -1 will get ALL children)
-     * @return a Set containing the child terms of the specified term.
+     * @return a Set containing the child terms of the specified term or null if the term is invalid.
      */
     public synchronized Set<OntologyTermI> getChildren( OntologyTermI term, int level ) {
+        if (term == null) { return null; }
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         String myKey = GET_CHILDREN + '_' + ontologyID + '_' + term.getTermAccession() + '_' + level;
