@@ -143,13 +143,9 @@ public class OlsOntologyTest {
 
     @Test
     public void illegalQuery() throws Exception {
-        try {
-            final OntologyAccess mod = manager.getOntologyAccess( "GO" );
-            mod.getValidTerms( null, false, false );
-            Assert.fail( "Expected a java.lang.IllegalStateException to be thrown." );
-        } catch ( Exception e ) {
-            // ok !
-        }
+        final OntologyAccess mod = manager.getOntologyAccess( "GO" );
+        Set<OntologyTermI> result = mod.getValidTerms( null, false, false );
+        Assert.assertTrue("Did not expect results for accession 'null'!", (result.size() == 0));
     }
 
     @Test

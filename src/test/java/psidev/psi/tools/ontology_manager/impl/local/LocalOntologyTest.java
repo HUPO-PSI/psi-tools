@@ -214,6 +214,15 @@ public class LocalOntologyTest {
     }
 
     @Test
+    public void getTermForNullAccession() throws Exception {
+        final OntologyAccess mi = manager.getOntologyAccess( "MI" );
+
+        final OntologyTermI term = mi.getTermForAccession( null );
+        Assert.assertNull( term );
+
+    }
+
+    @Test
     public void getDirectParents_unknown_accession() throws Exception {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
 
