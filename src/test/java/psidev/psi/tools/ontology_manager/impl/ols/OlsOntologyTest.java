@@ -141,10 +141,15 @@ public class OlsOntologyTest {
         Assert.assertTrue( term.getNameSynonyms().contains( "Selenium replaces sulphur" ) );
     }
 
-    @Test (expected = java.lang.IllegalStateException.class )
+    @Test
     public void illegalQuery() throws Exception {
-        final OntologyAccess mod = manager.getOntologyAccess( "GO" );
-        mod.getValidTerms( null, false, false );
+        try {
+            final OntologyAccess mod = manager.getOntologyAccess( "GO" );
+            mod.getValidTerms( null, false, false );
+            Assert.fail( "Expected a java.lang.IllegalStateException to be thrown." );
+        } catch ( Exception e ) {
+            // ok !
+        }
     }
 
     @Test
