@@ -99,4 +99,21 @@ public interface OntologyAccess {
      * @throws OntologyLoaderException
      */
     public boolean isOntologyUpToDate() throws OntologyLoaderException;
+
+    /**
+     * Note: Implementations of OntologyAccess should by default handle synonyms, so this method
+     * should return 'true' on freshly instantiated OntologyAccess implementations.
+     *
+     * @return a boolean denoting whether the OntologyAccess handles synonyms for ontology terms.
+     */
+    public boolean isUseTermSynonyms();
+
+    /**
+     * Set this flag to 'false' if the OntologyAccess does not need
+     * to handle synonyms for ontology terms.
+     *
+     * @param useTermSynonyms flag to toggle handling of ontology term synonyms.
+     */
+    public void setUseTermSynonyms(boolean useTermSynonyms);
+
 }

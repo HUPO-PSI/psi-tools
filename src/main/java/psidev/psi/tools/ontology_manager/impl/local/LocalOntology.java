@@ -170,6 +170,17 @@ public class LocalOntology implements OntologyAccess {
         return false;
     }
 
+    public boolean isUseTermSynonyms() {
+        return true;
+    }
+
+    public void setUseTermSynonyms(boolean useTermSynonyms) {
+        if (!useTermSynonyms) {
+            throw new UnsupportedOperationException("This implementation of the OntologyAccess " +
+                    "does not support this feature. Synonym handling cannot be turned off.");
+        }
+    }
+
     /**
      *
      * @return true if the MD5 signature of the file containing the ontologies is still the same

@@ -30,8 +30,9 @@ public class OlsOntology implements OntologyAccess {
 
     public static final Log log = LogFactory.getLog( OlsOntology.class );
 
-    protected GeneralCacheAdministrator admin;
+    protected GeneralCacheAdministrator admin; // the cache
     private static final String cacheConfig = "olsontology-oscache.properties";
+    private boolean useTermSynonyms = true; // flag whether term synonyms should be recorded
     private Query query;
     String ontologyID;
     Set<String> rootAccs;
@@ -56,6 +57,24 @@ public class OlsOntology implements OntologyAccess {
         // preparing cache
         lastOntologyUpload = new Date(System.currentTimeMillis());
 
+        // set up the cache for the ontology terms
+        initCache();
+
+        // preparing OLS access
+        log.info( "Creating new OLS query client." );
+        try {
+            QueryService locator = new QueryServiceLocator();
+            query = locator.getOntologyQuery();
+        } catch ( Exception e ) {
+            log.error( "Exception setting up OLS query client!", e );
+            throw new OntologyLoaderException( "Exception setting up OLS query client!", e );
+        }
+    }
+
+    /**
+     * This will read the cache configuration file and initialise the cache.
+     */
+    private void initCache() {
         log.info( "Setting up cache administrator..." );
         Properties cacheProps;
         InputStream is = this.getClass().getClassLoader().getResourceAsStream( cacheConfig );
@@ -72,16 +91,27 @@ public class OlsOntology implements OntologyAccess {
             log.info( "Using custom cache configuration from file: " + cacheConfig );
             admin = new GeneralCacheAdministrator( cacheProps );
         }
+    }
 
-        // preparing OLS access
-        log.info( "Creating new OLS query client." );
-        try {
-            QueryService locator = new QueryServiceLocator();
-            query = locator.getOntologyQuery();
-        } catch ( Exception e ) {
-            log.error( "Exception setting up OLS query client!", e );
-            throw new OntologyLoaderException( "Exception setting up OLS query client!", e );
+    /**
+     * @return true if synonyms for ontology terms are taken into account, false if not.
+     */
+    public boolean isUseTermSynonyms() {
+        return useTermSynonyms;
+    }
+
+    /**
+     * @param useTermSynonyms flag to toggle handling of ontology term synonyms.
+     */
+    public void setUseTermSynonyms(boolean useTermSynonyms) {
+        // if we did not record the term synonyms before, but now we are supposed to,
+        // then we have to reset the cache, so all terms get loaded again including synonyms.
+        if (!isUseTermSynonyms() && useTermSynonyms) {
+            admin.destroy();
+            initCache();
         }
+        // in the other cases (using synonyms or switching off synonyms) we don't need to touch the cache
+        this.useTermSynonyms = useTermSynonyms;
     }
 
     public void loadOntology( String ontologyID, String name, String version, String format, URI uri ) {
@@ -154,7 +184,9 @@ public class OlsOntology implements OntologyAccess {
         OntologyTermI term;
         if ( termName != null && termName.length() > 0 && !termName.equals( accession ) ) {
             term = new OntologyTermImpl( accession, termName );
-            fetchTermSynonyms( term );
+            if (useTermSynonyms) {
+                fetchTermSynonyms( term );
+            }
         } else {
             term = null;
         }
@@ -531,7 +563,9 @@ public class OlsOntology implements OntologyAccess {
             Object v = results.get( o );
             if ( o instanceof String && v instanceof String ) {
                 final OntologyTermImpl term = new OntologyTermImpl( ( String ) o, ( String ) v );
-                fetchTermSynonyms( term );
+                if (useTermSynonyms) {
+                    fetchTermSynonyms( term );
+                }
                 terms.add( term );
             } else {
                 throw new IllegalStateException( "OLS query returned unexpected result!" +

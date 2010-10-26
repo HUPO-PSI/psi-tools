@@ -71,10 +71,11 @@ public class OlsOntologyTest {
     @Test
     public void getValidTerms_so() throws OntologyLoaderException {
         final OntologyAccess mod = manager.getOntologyAccess( "SO" );
-        // GO:0055044 has 7 children (OLS 17 July 2008) = 7 valid terms
-        OntologyTermI parent = mod.getTermForAccession("SO:0000001");
+//        OntologyTermI parent = mod.getTermForAccession("SO:0000001"); // no good for testing!
+        // SO:0000336 has 6 children (OLS 26 Dec 2010) = 6 valid terms
+        OntologyTermI parent = mod.getTermForAccession("SO:0000336");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 1322, terms.size() );
+        Assert.assertEquals( 6, terms.size() );
     }
 
     @Test
