@@ -9,10 +9,7 @@ import psidev.psi.tools.cvrReader.mapping.jaxb.CvTerm;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.OntologyUtils;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
-import psidev.psi.tools.validator.Context;
-import psidev.psi.tools.validator.MessageLevel;
-import psidev.psi.tools.validator.ValidatorException;
-import psidev.psi.tools.validator.ValidatorMessage;
+import psidev.psi.tools.validator.*;
 import psidev.psi.tools.validator.rules.AbstractRule;
 import psidev.psi.tools.validator.rules.Rule;
 import psidev.psi.tools.validator.util.XpathValidator;
@@ -239,11 +236,11 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                                     String elementXpath,
                                     String valueXpath,
                                     Collection<ValidatorMessage> messages,
-                                    Recommendation level ) throws ValidatorException {// Retrieve the values to check against CvTerms specified in the rule
-
+                                    Recommendation level ) throws ValidatorException {
+        
         String resultClassName = objectToCheck.getClass().getSimpleName();
 
-        // 1. Retrieve the values to be checked against the CvTerms from the objectToCheck
+        // 1. from the objectToCheck retrieve the values to be checked against the CvTerms of the rule
         List<XPathResult> valueResults;
         try {
             valueResults = XPathHelper.evaluateXPath( valueXpath, objectToCheck );
@@ -284,6 +281,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         }
 
 
+        // 2. examine the retrieved terms
         final int resultCount = valueResults.size();
 
         if ( resultCount == 0 ) {
@@ -320,7 +318,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                 operator = operator.trim();
             }
 
-            // Calculates how many term in valueResults have at least one CV match.
+            // Calculates how many terms in valueResults have at least one CV match.
             final int matchingCvTermCount = calculateMatchingResultCount( result2termCount );
 
             // computes CV usage statistics for checking on repeatability
@@ -378,7 +376,8 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append( valueResults.size() > 1 ? "are " : "is " )
                             .append( " '" )
                             .append(printObjectAccessions(valueResults))
-                            .append("' didn't match " + (getCVTerms().size() > 1 ? "any of the " : "the ") )
+                            .append("' didn't match ")
+                            .append((getCVTerms().size() > 1 ? "any of the " : "the ") )
                             .append(getCVTerms().size())
                             .append(" specified CV term")
                             .append(getCVTerms().size() > 1 ? "s" : "")
@@ -453,7 +452,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                 // This should not happened as the incoming data are validated by XML schema ... so just in case ...
                 throw new UnsupportedOperationException( "CvRule count not handle boolean operator: '" + operator + "'" );
             }
-        } // else -- at least 1 result to process
+        }
     }
 
     /**
@@ -471,8 +470,8 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         Map<XPathResult, Map<CvTerm, Integer>> result2termCount =
                 new HashMap<XPathResult, Map<CvTerm, Integer>>( valueResults.size() );
 
-        // check that each match has at least one matching CV term amongst those specified.
-        for ( XPathResult valueResult : valueResults ) {
+        // check that each match (term used in the XML) has at least one matching CV term amongst those specified.
+        for ( XPathResult valueResult : valueResults ) { // for each term used in the XML
 
             Map<CvTerm, Integer> term2count = new HashMap<CvTerm, Integer>( getCVTerms().size() );
             result2termCount.put( valueResult, term2count );
@@ -482,11 +481,13 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                 log.debug( "Processing value: " + valueResult.getResult() );
             }
 
+            boolean hasMatch = false;
             // check each specified CvTerm in this CvRule (and potentially child terms)
             for ( CvTerm cvTerm : getCVTerms() ) {
 
                 // Note: isMatchingCv is updating the term2count map
                 if ( isMatchingCv( cvTerm, valueResult, messages, level, term2count ) ) {
+                    hasMatch = true;
                     if ( log.isDebugEnabled() ) {
                         log.debug( "Match between '" + valueResult.getResult() + "' and " + printCvTerm( cvTerm ) );
                     }
@@ -496,6 +497,29 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                     }
                 }
             } // for
+
+            // try a WhiteList hack to find terms that were used in a location were we have a CvRule,
+            // but did not match any terms defined by any CvRule for this location
+            // ToDo: check that, especially with rules which define terms that should not be used!
+            ValidatorCvContext vc = ValidatorCvContext.getInstance();
+            if (hasMatch) {
+                // the current term has at least one match in this CvRule,
+                // so add it to the set of recognised terms
+                vc.addRecognised( getElementPath(), (String) valueResult.getResult() );
+                // if it was not recognised by a previous rule, then we have
+                // to remove it from the notRecognised set
+                vc.removeNotRecognised( getElementPath(), (String) valueResult.getResult() );
+            } else {
+                // this term was not matched by any CvTerm specified in the
+                // current rule, so we add it to the notRecognised terms, but
+                // only if it is not already a recognised term (from previous rules)
+                if ( !vc.isRecognised(getElementPath(), (String) valueResult.getResult() ) ) {
+                    vc.addNotRecognised( getElementPath(), (String) valueResult.getResult() );
+                }
+
+            }
+
+
         } // results
 
         if ( log.isDebugEnabled() ) {
@@ -530,7 +554,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             // Message explaining that the xpath doesn't describe a CV term accession
             messages.add( buildMessage( getElementPath(), level,
                                         "The object pointed to by the XPath(" + getElementPath() +
-                                        ") was not a CV term accession (String) as " + "expected, instead: " +
+                                        ") was not a CV term accession (String) as expected, instead: " +
                                         xpResult.getResult().getClass().getName() ) );
         }
 
@@ -572,7 +596,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             // Flag successful validation for this term.
             isMatching = true;
         } else {
-            // insert 0 in the map
+            // insert 0 in the map (if it does not already contain some values for this term)
             if ( !term2count.containsKey( cvTerm ) ) {
                 term2count.put( cvTerm, 0 );
             }
