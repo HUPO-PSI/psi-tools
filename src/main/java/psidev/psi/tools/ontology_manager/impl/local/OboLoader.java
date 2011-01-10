@@ -108,7 +108,7 @@ public class OboLoader extends AbstractLoader {
                     TermRelationship relation = ( TermRelationship ) iterator1.next();
 
                     ontology.addLink( relation.getObjectTerm().getIdentifier(),
-                                      relation.getSubjectTerm().getIdentifier() );
+                            relation.getSubjectTerm().getIdentifier() );
                 }
             }
         }
@@ -278,6 +278,9 @@ public class OboLoader extends AbstractLoader {
                 if ( log.isInfoEnabled() ) log.info( "Loading URL: " + url );
 
                 URLConnection con = url.openConnection();
+                con.setConnectTimeout(60000);
+                con.setReadTimeout(60000);
+
                 int size = con.getContentLength();        // -1 if not stat available
 
                 if ( log.isInfoEnabled() ) log.info( "size = " + size );
