@@ -8,7 +8,7 @@
     <groupId>psidev.psi.tools</groupId>
     <artifactId>validator-tutorial</artifactId>
     <packaging>pom</packaging>
-    <version>1</version>
+    <version>3-SNAPSHOT</version>
     <name>PSI :: Tools :: Validator Tutorial</name>
 
     <scm>
@@ -24,16 +24,10 @@
 
     <distributionManagement>
         <repository>
-            <id>ebi-repo</id>
-            <name>EBI Repository</name>
-            <url>scp://bark.ebi.ac.uk/homes/maven/public_html/m2repo</url>
+            <id>intact.nexus</id>
+            <name>IntAct Nexus</name>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
         </repository>
-        <snapshotRepository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>ebi-repo-snapshots</id>
-            <name>EBI Snapshots Repository</name>
-            <url>scp://bark.ebi.ac.uk/homes/maven/public_html/m2repo_snapshots</url>
-        </snapshotRepository>
     </distributionManagement>
 
 </project>
