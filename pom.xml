@@ -42,7 +42,7 @@
                 <configuration>
                     <generatePackage>psidev.psi.tools.cvrReader.mapping.jaxb</generatePackage>
                     <includeSchemas>
-                        <includeSchema>CvMapping.xsd</includeSchema>
+                        <includeSchema>CvMappingRules.xsd</includeSchema>
                     </includeSchemas>
                     <strict>true</strict>
                     <verbose>true</verbose>
