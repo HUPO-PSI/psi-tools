@@ -11,7 +11,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 
@@ -35,25 +34,24 @@ public class CvRuleReader {
         JAXBContext jc = JAXBContext.newInstance( "psidev.psi.tools.cvrReader.mapping.jaxb" );
 
         // create and return Unmarshaller
-
-        // TODO enable/disable validation use setSchema( s ) on Marshaller
         final Unmarshaller unmarshaller = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory
-                .newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        final URL url;
-        try {
-            url = new URL("http://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/xml-schemas/CvMappingRules.xsd");
-        } catch (MalformedURLException e) {
-            // the URL is correct and tested! So this should never happen!
-            throw new IllegalStateException("Error constructing CvMapping schema URL!!");
+
+        SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        final URL url = this.getClass().getClassLoader().getResource("CvMappingRules.xsd");
+        if (url == null) {
+            throw new IllegalStateException("Could not find CvMappingRules.xsd, the jar file seems corrupted!");
         }
+
         Schema schema;
         try {
             schema = sf.newSchema(url);
         } catch ( SAXException e ) {
             throw new JAXBException( "Error creating schema instance from schema " + url, e );
         }
-        unmarshaller.setSchema( schema );
+
+        unmarshaller.setSchema(schema);
+
         return unmarshaller;
     }
 
