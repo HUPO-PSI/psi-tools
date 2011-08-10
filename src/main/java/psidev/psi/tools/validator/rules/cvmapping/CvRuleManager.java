@@ -220,7 +220,7 @@ public class CvRuleManager {
         // check if the used term is obsolete
         if ( ontoAccess.isObsolete(ontoAccess.getTermForAccession(ruleTermAcc)) ) {
             // this term should not be in use here
-            String msg = "The term " + printSimpleCvTerm( cvTerm ) + " is obsolote in the ontology " +
+            String msg = "The term " + printSimpleCvTerm( cvTerm ) + " is obsolete in the ontology " +
                          ontologyID + ". The CvTerm will be removed.";
             messages.add( rule.buildMessage( rule.getElementPath(),
                                         Recommendation.forName( rule.getRequirementLevel() ),
@@ -229,8 +229,8 @@ public class CvRuleManager {
         }
 
         // ToDo: restructure this
-        // check if the specified term has children if it was specified to use children and not the term itself
-        validTerms = ontoAccess.getValidTerms( ruleTermAcc, true, false );
+        // check if the specified term has children, if it was specified to use children and not the term itself
+        validTerms = ontoAccess.getDirectChildren( ontoAccess.getTermForAccession(ruleTermAcc) );
         validAccs = OntologyUtils.getAccessions(validTerms);
         // if validAccs == 0, then there were no children
         if ( (validAccs.size() == 0) && !cvTerm.isUseTerm() && cvTerm.isAllowChildren() ) {
@@ -284,7 +284,7 @@ public class CvRuleManager {
                                             msg, rule ) );
                 return false;
             }
-        } 
+        }
 
         return true;
     }
