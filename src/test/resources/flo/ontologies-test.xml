@@ -5,7 +5,7 @@
               uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mi.obo"
               format="OBO" name="PSI-MI" identifier="MI" version="1.154"/>
     <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
-              uri="http://psidev.sourceforge.net/ms/xml/mzdata/psi-ms-cv-latest.obo"
+              uri="http://psidev.cvs.sourceforge.net/viewvc/*checkout*/psidev/psi/psi-ms/mzML/controlledVocabulary/psi-ms.obo"
               format="OBO" name="PSI-MS" identifier="MS" version="1.01"/>
     <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
               uri="http://pride-proteome.cvs.sourceforge.net/*checkout*/pride-proteome/PRIDE/schema/pride_cv.obo"
@@ -13,7 +13,13 @@
     <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
               uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo"
               format="OBO" name="Phenotypic qualities (properties)" identifier="PATO" version="NA"/>
-    <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
               uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mod.obo"
               format="OBO" name="PSI-MOD" identifier="MOD" version="1.260"/>
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="http://obo.cvs.sourceforge.net/obo/obo/ontology/genomic-proteomic/gene_ontology.obo"
+              format="OBO" name="GO" identifier="GO" version="1.1708"/>
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+              uri="http://www.brenda-enzymes.info/ontology/tissue/tree/update/update_files/BrendaTissueOBO"
+              format="OBO" name="Brenda Tissue Ontology" identifier="BTO" version=""/>
 </cvSourceList>
