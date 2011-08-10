@@ -72,10 +72,10 @@ public class OlsOntologyTest {
     public void getValidTerms_so() throws OntologyLoaderException {
         final OntologyAccess mod = manager.getOntologyAccess( "SO" );
 //        OntologyTermI parent = mod.getTermForAccession("SO:0000001"); // no good for testing!
-        // SO:0000336 has 6 children (OLS 26 Dec 2010) = 6 valid terms
+        // SO:0000336 has 9 children (OLS 10 Aug 2011) = 9 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000336");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 6, terms.size() );
+        Assert.assertEquals( 9, terms.size() );
     }
 
     @Test
@@ -85,16 +85,18 @@ public class OlsOntologyTest {
         Assert.assertEquals( 1, terms.size() );
         final OntologyTermI y2h = terms.iterator().next();
 
-        Assert.assertEquals( 8, y2h.getNameSynonyms().size() );
-        Assert.assertTrue( y2h.getNameSynonyms().contains( "2h" ) );
+        // OLS check: 9 synonyms (10 Aug 2011)
+        Assert.assertEquals( 9, y2h.getNameSynonyms().size() );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "classical two hybrid" ) );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "Gal4 transcription regeneration" ) );
-        Assert.assertTrue( y2h.getNameSynonyms().contains( "2 hybrid" ) );
-        Assert.assertTrue( y2h.getNameSynonyms().contains( "two-hybrid" ) );
-        Assert.assertTrue( y2h.getNameSynonyms().contains( "2H" ) );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "yeast two hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "Y2H" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "two-hybrid" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2 hybrid" ) );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "2-hybrid" ) );
-        
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2h" ) );
+        Assert.assertTrue( y2h.getNameSynonyms().contains( "2H" ) );
+
     }
     
     @Test
