@@ -70,6 +70,29 @@ public class CvMappingRuleTest {
         Assert.assertEquals( 0, messages.size() );
     }
 
+    /**
+     * Test to check a real mapping file with more cv rules and ontologies.
+     */
+    @Test
+    public void checkCvMappingCheck() throws Exception {
+        File input = new File( CvMappingRuleTest.class.getResource( "/mz-mapping.v3.xml" ).getFile() );
+        Assert.assertNotNull(input);
+
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        Assert.assertNotNull(cvMapping);
+
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        long start = System.currentTimeMillis();
+        Collection<ValidatorMessage> messages = ruleMngr.checkCvMapping();
+        long stop = System.currentTimeMillis();
+        System.out.println("Time to check consistency of " + ruleMngr.getCvRules().size() + " CV mapping rules: " + (stop - start)/1000 + "sec.");
+        Assert.assertNotNull( messages );
+        print( messages );  // print the messages (if any): in case the next assert fails we'll have a clue what is happening
+        Assert.assertEquals( 0, messages.size() );
+    }
+
     @Test
     public void checkCvMapping_obsolete() throws Exception {
         // checks that one out of two cvterm is obsolete, so it gets removed.
