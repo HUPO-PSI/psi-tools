@@ -2,11 +2,14 @@ package psidev.psi.tools.objectRuleReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
 import psidev.psi.tools.objectRuleReader.mapping.jaxb.ObjectRuleList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.net.URL;
 
@@ -31,9 +34,25 @@ public class ObjectRuleReader {
         JAXBContext jc = JAXBContext.newInstance( "psidev.psi.tools.objectRuleReader.mapping.jaxb" );
 
         // create and return Unmarshaller
+        final Unmarshaller unmarshaller = jc.createUnmarshaller();
 
-        // TODO enable/disable validation use setSchema( s ) on Marshaller
-        return jc.createUnmarshaller();
+        SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        final URL url = this.getClass().getClassLoader().getResource("object-rule.xsd");
+        if (url == null) {
+            throw new IllegalStateException("Could not find object-rule.xsd, the jar file seems corrupted!");
+        }
+
+        Schema schema;
+        try {
+            schema = sf.newSchema(url);
+        } catch ( SAXException e ) {
+            throw new JAXBException( "Error creating schema instance from schema " + url, e );
+        }
+
+        unmarshaller.setSchema(schema);
+
+        return unmarshaller;
     }
 
     private ObjectRuleList unmarshall( URL url ) throws JAXBException, FileNotFoundException {
