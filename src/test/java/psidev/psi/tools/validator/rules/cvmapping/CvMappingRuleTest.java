@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class CvMappingRuleTest {
 
-    static InputStream oMngrConfig = CvMappingRuleTest.class.getClassLoader().getResourceAsStream("flo/ontologies-test.xml");
+    static InputStream oMngrConfig = CvMappingRuleTest.class.getClassLoader().getResourceAsStream("ontology-config.xml");
     static OntologyManager ontologyMngr;
 
     static {
@@ -74,6 +74,7 @@ public class CvMappingRuleTest {
      * Test to check a real mapping file with more cv rules and ontologies.
      */
     @Test
+    @Ignore
     public void checkCvMappingCheck() throws Exception {
         File input = new File( CvMappingRuleTest.class.getResource( "/mz-mapping.v3.xml" ).getFile() );
         Assert.assertNotNull(input);
@@ -152,9 +153,8 @@ public class CvMappingRuleTest {
 
     @Test
     public void checkCvMapping_children_issue() throws Exception {
-
-        // checks that both cvTerm in the rule are removed (obsolete and tern non existing in an ontology)
-        // and that the rule gets also removed.
+        // checks that one cvTerm in the rule is removed
+        // (term without children where we specify to use only the children)
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error1-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
@@ -170,8 +170,8 @@ public class CvMappingRuleTest {
 
     @Test
     public void checkCvMapping_unknown_terms() throws Exception {
-
-        // checks that both cvTerm in the rule are removed (they don't exist in MS) and that the rule gets also removed.
+        // checks that all 4 cvTerms in the rule are removed
+        // (they don't exist in MS) and that the rule gets also removed.
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error2-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
@@ -238,6 +238,7 @@ public class CvMappingRuleTest {
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages0 );
+        print( messages0 );
         Assert.assertEquals( 0, messages0.size() );
 
         House house = HouseFactory.buildSimpleHouse();
@@ -256,7 +257,7 @@ public class CvMappingRuleTest {
     public void check_allowChildren_1() throws Exception {
 
         // This test will check that the term pointed out by the XPath is a children of the one specified in the cvmapping.
-        // more precisely, that PSI:1000084 is a child term of PSI:1000010
+        // more precisely, that MS:1000291 is a child term of MS:1000264
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
@@ -268,7 +269,7 @@ public class CvMappingRuleTest {
         Assert.assertEquals("Ther should not be any messages from the cv rule self check.", 0, messages0.size() );
 
         House house = HouseFactory.buildSimpleHouse();
-        house.getKitchen().setNote( "PSI:1000084" ); // PSI:1000084 is a child of PSI:1000010
+        house.getKitchen().setNote( "MS:1000291" ); // MS:1000291 is a child of MS:1000264
         Collection<ValidatorMessage> messages = ruleMngr.check( house, "/house" );
 
         Assert.assertNotNull( messages );
@@ -279,7 +280,7 @@ public class CvMappingRuleTest {
     public void check_allowChildren_2() throws Exception {
 
         // This test will report an error because the term pointed out by the XPath is not a children of the one specified in the cvmapping.
-        // more precisely, that PSI:1000084 is a child term of PSI:1000010
+        // more precisely, that MS:1000291 is a child term of MS:1000264
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
@@ -288,10 +289,10 @@ public class CvMappingRuleTest {
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages0 );
-        Assert.assertEquals("Ther should not be any messages from the cv rule self check.", 0, messages0.size() );
+        Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages0.size() );
 
         House house = HouseFactory.buildSimpleHouse();
-        house.getKitchen().setNote( "PSI:1000292" ); // Mass Spectrograph: different branch than PSI:1000010 (analyser)
+        house.getKitchen().setNote( "PSI:1000292" ); // Mass Spectrograph: different branch than MS:1000264 (analyser)
         Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
         Collection<CvRule> cvRules = ruleMngr.getCvRules();
         for (CvRule cvRule : cvRules) {
@@ -317,6 +318,7 @@ public class CvMappingRuleTest {
 
         Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
         Assert.assertNotNull( messages0 );
+        print( messages0 );
         Assert.assertEquals("There should not be any messages from the cv rule self check.", 0, messages0.size() );
 
         House house = new House();

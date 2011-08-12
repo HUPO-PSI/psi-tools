@@ -12,7 +12,7 @@
         <CvMappingRule id="R1" cvElementPath="/house/kitchen/note" requirementLevel="MAY"
                        scopePath="/house/kitchen" cvTermsCombinationLogic="OR">
 
-            <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
+            <CvTerm termAccession="MS:1000264" useTerm="false" termName="Sample Description" allowChildren="true"
                     cvIdentifierRef="MS" isRepeatable="false" />
 
             <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object" allowChildren="true"

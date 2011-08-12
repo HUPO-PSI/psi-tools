@@ -6,9 +6,7 @@
            modelName="bla">
 
     <CvReferenceList cvSourceVersion="0.9">
-        <CvReference cvName="PSI-MI" cvIdentifier="MI"/>
         <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
-        <CvReference cvName="PSI-MOD" cvIdentifier="MOD"/>
     </CvReferenceList>
 
     <CvMappingRuleList>

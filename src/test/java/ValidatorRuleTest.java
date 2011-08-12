@@ -28,7 +28,7 @@ public class ValidatorRuleTest {
     @Test
     public void check_RuleObject_Loading_FromValidatorResource_ok() throws Exception {
 
-        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
+        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "ontology-config.xml" ).getFile() );
         File objectRules = new File( ValidatorRuleTest.class.getResource("/xmlRuleSets/object-rules.xml").getFile() );
 
 
@@ -50,7 +50,7 @@ public class ValidatorRuleTest {
 
     @Test
     public void check_RuleObject_Loading_InstantiatedOntologyManager_ok() throws Exception {
-        OntologyManager ontologyManager = new OntologyManager(ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).openStream());
+        OntologyManager ontologyManager = new OntologyManager(ValidatorRuleTest.class.getResource( "ontology-config.xml" ).openStream());
 
         SPEValidator validator = new SPEValidator( ontologyManager, null, null);
 
@@ -65,7 +65,7 @@ public class ValidatorRuleTest {
     @Test
     public void check_RuleObject_Loading_FromValidatorResource_With_several_imports() throws Exception {
 
-        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
+        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "ontology-config.xml" ).getFile() );
         File objectRules = new File( ValidatorRuleTest.class.getResource("/xmlRuleSets/object-rules-4.xml").getFile() );
 
 
@@ -88,7 +88,7 @@ public class ValidatorRuleTest {
     @Test
     public void check_RuleObject_Loading_FromValidatorResource_With_several_imports_one_exclusion() throws Exception {
 
-        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
+        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "ontology-config.xml" ).getFile() );
         File objectRules = new File( ValidatorRuleTest.class.getResource("/xmlRuleSets/object-rules-5.xml").getFile() );
 
 
@@ -102,7 +102,7 @@ public class ValidatorRuleTest {
     @Test
     public void check_RuleObject_Loading_FromValidatorResource_With_several_imports_one_exclusion_one_included() throws Exception {
 
-        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "/flo/ontologies.xml" ).getFile() );
+        File ontologyFile = new File( ValidatorRuleTest.class.getResource( "ontology-config.xml" ).getFile() );
         File objectRules = new File( ValidatorRuleTest.class.getResource("/xmlRuleSets/object-rules-6.xml").getFile() );
 
 

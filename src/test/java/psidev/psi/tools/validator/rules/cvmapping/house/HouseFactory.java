@@ -13,7 +13,7 @@ public class HouseFactory {
         House house = new House();
 
         Kitchen kitchen = new Kitchen( new Sink( false, 5.0f ), new Bin( 60.0f ) );
-        kitchen.setNote( "PSI:1000010" );
+        kitchen.setNote( "MS:1000264" );
         house.setKitchen( kitchen );
 
         BathRoom br = new BathRoom( "light blue" );

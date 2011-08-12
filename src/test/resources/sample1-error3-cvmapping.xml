@@ -15,7 +15,7 @@
                        scopePath="/a"
                        cvTermsCombinationLogic="OR">
             <!-- fine term -->
-            <CvTerm termAccession="PSI:1000010" useTerm="false" termName="Sample Description" allowChildren="true"
+            <CvTerm termAccession="MS:1000264" useTerm="false" termName="Sample Description" allowChildren="true"
                     cvIdentifierRef="MS"/>
             <!-- term not allowing itself to be used or any of its children -->
             <CvTerm termAccession="PSI:1000264" useTerm="false" termName="Ion Trap" allowChildren="false"
