@@ -24,19 +24,15 @@ import java.util.Set;
  */
 public class LocalOntologyTest {
 
-    private OntologyManager manager;
+    private static OntologyManager manager;
 
-    @Before
-    public void setup() throws OntologyLoaderException {
-        if ( manager == null ) {
-            final InputStream config = LocalOntologyTest.class.getResourceAsStream( "/local-ontologies.xml" );
+    static {
+        final InputStream config = LocalOntologyTest.class.getResourceAsStream( "/local-ontologies.xml" );
+        try {
             manager = new OntologyManager( config );
+        } catch (OntologyLoaderException e) {
+            e.printStackTrace();
         }
-    }
-
-    @After
-    public void cleanup() throws Exception {
-        manager = null;
     }
 
     ////////////

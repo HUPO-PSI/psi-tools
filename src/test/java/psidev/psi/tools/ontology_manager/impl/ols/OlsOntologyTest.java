@@ -26,19 +26,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class OlsOntologyTest {
 
-    private OntologyManager manager;
+    private static OntologyManager manager;
 
-    @Before
-    public void setup() throws OntologyLoaderException {
-        if ( manager == null ) {
-            final InputStream config = OlsOntologyTest.class.getResourceAsStream( "/ols-ontologies.xml" );
+    static {
+        final InputStream config = OlsOntologyTest.class.getResourceAsStream( "/ols-ontologies.xml" );
+        try {
             manager = new OntologyManager( config );
+        } catch (OntologyLoaderException e) {
+            e.printStackTrace();
         }
-    }
-
-    @After
-    public void cleanup() throws Exception {
-        manager = null;
     }
 
     ////////////

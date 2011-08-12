@@ -2,6 +2,7 @@ package psidev.psi.tools.ontology_manager;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import psidev.psi.tools.ontology_manager.impl.local.LocalOntology;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
@@ -23,11 +24,11 @@ public class OntologyManagerTest {
 
     private OntologyManager om;
     private File ontologyDirectory;
+    private final String ontoConfig = "ontologies.xml";
 
     @Before
     public void setup() throws OntologyLoaderException, IOException {
         ontologyDirectory = new File(getTargetDirectory(), "downloaded-ontologies");
-        final String ontoConfig = "ontologies.xml";
         InputStream is = OntologyManager.class.getClassLoader().getResourceAsStream( ontoConfig );
         Assert.assertNotNull( "Could not read ontology configuration file: " + ontoConfig, is );
         om = new OntologyManager();
@@ -58,6 +59,7 @@ public class OntologyManagerTest {
     }
 
     @Test
+    @Ignore
     public void isUpToDate() {
         try {
             Assert.assertTrue(om.isUpToDate());
@@ -70,7 +72,7 @@ public class OntologyManagerTest {
     @Test
     public void ontologyLoading() {
         Collection<String> ontologyIDs = om.getOntologyIDs();
-        Assert.assertEquals( "ontologies.xml specifies only 2 ontologies.", 3, ontologyIDs.size() );
+        Assert.assertEquals( ontoConfig + " specifies only 3 ontologies.", 3, ontologyIDs.size() );
         Assert.assertTrue( ontologyIDs.contains( "MI" ) );
         Assert.assertTrue( ontologyIDs.contains( "MOD" ) );
         Assert.assertTrue( ontologyIDs.contains( "MS" ) );

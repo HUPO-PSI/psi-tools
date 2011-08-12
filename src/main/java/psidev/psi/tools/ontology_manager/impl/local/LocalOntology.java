@@ -58,34 +58,52 @@ public class LocalOntology implements OntologyAccess {
         // first check the format
         if ( "OBO".equals( format ) ) {
             if ( uri == null ) {
-                throw new IllegalArgumentException( "The given CvSource doesn't have a URL" );
+                throw new IllegalArgumentException( "The given CvSource doesn't have a URI" );
             } else {
-                URL url;
-                try {
-                    url = uri.toURL();
-                } catch ( MalformedURLException e ) {
-                    throw new IllegalArgumentException( "The given CvSource doesn't have a valid URL: " + uri );
-                }
-
-                // Compute the MD5 signature of the file to load
-                this.md5Signature = computeMD5SignatureFor(url);
-
-                // Get the size of the file to load
-                this.contentSize = getSizeOfFile(url);
-
-                // We need to store the url to know if an update has been done later
-                this.fileUrl = url;
 
                 // parse the URL and load the ontology
                 OboLoader loader = new OboLoader( getOntologyDirectory() );
-                try {
-                    if ( log.isDebugEnabled() ) {
-                        log.debug( "Parsing URL: " + url );
+
+
+                // if we have a local file, we don't have to load from a URL
+                // to specify a local file with a URI you have to follow the following syntax:
+                //    [scheme:][//authority][path][?query][#fragment]
+                // where authority, query and fragment are empty! An example:
+                //    file:///C:/tmp/psi-mi.obo
+                // note:    ^ = empty path     ^ = no query and no fragment
+
+                if ( uri.getScheme().equalsIgnoreCase("file") ) {
+                    File file = new File(uri);
+                    if ( !file.exists() ) {
+                        throw new IllegalArgumentException("Could not find the file for URI: " + uri + " - Perhaps the syntax of the URI is wrong!");
+                    }
+                    ontology = loader.parseOboFile(file);
+                } else {
+                    URL url;
+                    try {
+                        url = uri.toURL();
+                    } catch ( MalformedURLException e ) {
+                        throw new IllegalArgumentException( "The given CvSource doesn't have a valid URI: " + uri );
                     }
 
-                    ontology = loader.parseOboFile( url );
-                } catch ( OntologyLoaderException e ) {
-                    throw new OntologyLoaderException( "OboFile parser failed with Exception: ", e );
+                    // Compute the MD5 signature of the file to load
+                    this.md5Signature = computeMD5SignatureFor(url);
+
+                    // Get the size of the file to load
+                    this.contentSize = getSizeOfFile(url);
+
+                    // We need to store the url to know if an update has been done later
+                    this.fileUrl = url;
+
+                    try {
+                        if ( log.isDebugEnabled() ) {
+                            log.debug( "Parsing URL: " + url );
+                        }
+
+                        ontology = loader.parseOboFile( url );
+                    } catch ( OntologyLoaderException e ) {
+                        throw new OntologyLoaderException( "OboFile parser failed with Exception: ", e );
+                    }
                 }
             }
         } else {
