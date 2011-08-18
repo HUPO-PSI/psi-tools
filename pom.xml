@@ -11,7 +11,7 @@
     <groupId>psidev.psi.tools</groupId>
     <artifactId>validator</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.2</version>
 
     <name>PSI :: Tools :: Generic Schema Validator</name>
     <description>
@@ -19,28 +19,28 @@
     </description>
 
     <scm>
-        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/trunk</connection>
-        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/trunk</developerConnection>
-        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/trunk</url>
+        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/tags/validator-2.0.2</connection>
+        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/tags/validator-2.0.2</developerConnection>
+        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/validator/tags/validator-2.0.2</url>
     </scm>
 
     <dependencies>
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>cv-rule-reader</artifactId>
-            <version>2.0.2-SNAPSHOT</version>
+            <version>2.0.2</version>
         </dependency>
 
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>object-rule-reader</artifactId>
-            <version>2.0.2-SNAPSHOT</version>
+            <version>2.0.2</version>
         </dependency>
 
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>ontology-manager</artifactId>
-            <version>2.0.2-SNAPSHOT</version>
+            <version>2.0.2</version>
         </dependency>
 
         <!-- Tests -->
