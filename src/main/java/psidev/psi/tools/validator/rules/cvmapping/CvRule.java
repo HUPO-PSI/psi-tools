@@ -25,10 +25,6 @@ public interface CvRule extends Rule {
 
     public Collection<ValidatorMessage> check( Object object, String xPath ) throws ValidatorException;
 
-    public String getId();
-    
-    public String getName();
-
     public String getElementPath();
 
     public String getScopePath();
