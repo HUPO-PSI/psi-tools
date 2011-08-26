@@ -21,6 +21,10 @@ public class Rule4 extends ObjectRule<Object> {
         super(ontologyManager);
     }
 
+    public String getId() {
+        return "test-rule-4";
+    }
+
     @Override
     public boolean canCheck(Object t) {
         if (t instanceof Object){
