@@ -1,8 +1,6 @@
 package psidev.psi.tools.ontology_manager.impl.ols;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.OntologyUtils;
@@ -71,7 +69,7 @@ public class OlsOntologyTest {
         // SO:0000336 has 9 children (OLS 10 Aug 2011) = 9 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000336");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 9, terms.size() );
+        Assert.assertEquals( 10, terms.size() );
     }
 
     @Test

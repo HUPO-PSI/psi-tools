@@ -10,6 +10,7 @@ import psidev.psi.tools.ontology_manager.impl.local.LocalOntology;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.ontology_manager.impl.ols.OlsOntology;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
+import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.io.File;
 import java.io.InputStream;
@@ -28,7 +29,7 @@ import java.util.Set;
  * @Samuel Kerrien (skerrien@ebi.ac.uk)
  * @since 2.0.0
  */
-public class OntologyManager {
+public class OntologyManager extends OntologyManagerTemplate<OntologyTermI, OntologyAccess> {
 
     public static final Log log = LogFactory.getLog( OntologyManager.class );
 
