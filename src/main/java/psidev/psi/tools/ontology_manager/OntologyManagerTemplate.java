@@ -6,9 +6,7 @@ import psidev.psi.tools.ontologyCfgReader.mapping.jaxb.CvSource;
 import psidev.psi.tools.ontologyCfgReader.mapping.jaxb.CvSourceList;
 import psidev.psi.tools.ontologyConfigReader.OntologyConfigReader;
 import psidev.psi.tools.ontologyConfigReader.OntologyConfigReaderException;
-import psidev.psi.tools.ontology_manager.impl.local.LocalOntology;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
-import psidev.psi.tools.ontology_manager.impl.ols.OlsOntology;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccessTemplate;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
@@ -30,7 +28,7 @@ import java.util.Set;
  * @since <pre>01/11/11</pre>
  */
 
-public class OntologyManagerTemplate<T extends OntologyTermI, A extends OntologyAccessTemplate<T>> {
+public abstract class OntologyManagerTemplate<T extends OntologyTermI, A extends OntologyAccessTemplate<T>> {
 
     public static final Log log = LogFactory.getLog(OntologyManager.class);
 
@@ -41,16 +39,6 @@ public class OntologyManagerTemplate<T extends OntologyTermI, A extends Ontology
     protected Map<String, A> ontologies;
 
     public static final String CLASSPATH_PREFIX = "classpath:";
-
-    /**
-     * Keywords that when specified in the cvSource's source gets converted in a specific implementation of OntologyAccess.
-     */
-    protected static final Map<String, Class> keyword2class = new HashMap<String, Class>();
-
-    static {
-        keyword2class.put( "ols", OlsOntology.class );
-        keyword2class.put( "file", LocalOntology.class );
-    }
 
     ////////////////////
     // Constructors
@@ -191,14 +179,7 @@ public class OntologyManagerTemplate<T extends OntologyTermI, A extends Ontology
                 Class loader;
                 try {
                     final String lcLoaderClass = loaderClass.toLowerCase();
-                    if ( keyword2class.containsKey( lcLoaderClass ) ) {
-                        loader = keyword2class.get( lcLoaderClass );
-                        if ( log.isDebugEnabled() ) {
-                            log.debug( "the source '" + loaderClass + "' was converted to Class: " + loader );
-                        }
-                    } else {
-                        loader = Class.forName( loaderClass );
-                    }
+                    loader = findLoader(loaderClass, lcLoaderClass);
                     Constructor c = loader.getConstructor();
                     A oa = ( A ) c.newInstance();
                     oa.setOntologyDirectory( OntologyManagerContext.getInstance().getOntologyDirectory() );
@@ -210,6 +191,8 @@ public class OntologyManagerTemplate<T extends OntologyTermI, A extends Ontology
             }
         }
     }
+
+    protected abstract Class findLoader(String loaderClass, String lcLoaderClass) throws ClassNotFoundException ;
 
     /**
      *
