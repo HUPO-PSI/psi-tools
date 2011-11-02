@@ -17,6 +17,10 @@ import java.io.File;
 /**
  * Wrapper class that hides the way OLS handles OBO files.
  *
+ * NOTE : the OboLoader class is now extending AbstractOboLoader. Nothing has changed in the methods of this class which is still using OntologyTermI and Ontology.
+ * As we needed some flexibility when using different extension of the basic OntologyTermI, we created a template for OboLoader and for retrocompatibility,
+ * this class has been kept and extends AbstractOboLoader<OntologyTermI, Ontology>.
+ *
  * @author Samuel Kerrien
  * @version $Id: OboLoader.java 656 2007-06-29 11:18:19 +0100 (Fri, 29 Jun 2007) skerrien $
  * @since <pre>30-Sep-2005</pre>

@@ -18,6 +18,10 @@ import java.util.*;
 /**
  * Abstract OBO loader
  *
+ * NOTE : OnoLoader was the original class but did not offer flexibility for using different extensions of OntologyTermI.
+ * That is why this template abtract class has been created. The template could have been simpler (AbstractOboLoader<T extends OntologyTermI> instead of AbstractOboLoader<T extends OntologyTermI, O extends OntologyTemplate<T>>) but we needed an absolute retrocompatibility
+ * with the OboLoader class which returns an Ontology and not OntologyTemplate<OntologyTerm>.
+ *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>01/11/11</pre>

@@ -9,6 +9,9 @@ import java.util.*;
 /**
  * Implementation of OntologyTemplate
  *
+ * NOTE : OntologyImpl was the original class but did not offer flexibility for using different extensions of OntologyTermI.
+ * That is why this template abstract class has been created.
+ *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>01/11/11</pre>

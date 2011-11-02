@@ -6,7 +6,10 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * Template for Ontology
+ * Template for Ontology.
+ *
+ * NOTE : Ontology was the original interface but did not offer flexibility for using different extensions of OntologyTermI.
+ * That is why this template interface has been created.
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

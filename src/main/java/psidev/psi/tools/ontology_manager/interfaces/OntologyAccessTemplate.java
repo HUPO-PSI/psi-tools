@@ -9,6 +9,9 @@ import java.util.Set;
 /**
  * A template for ontology access
  *
+ * NOTE : OntologyAccess was the original interface. This interface had been created to add more flexibility when we want to use
+ * extensions of OntologyTermI
+ *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>01/11/11</pre>

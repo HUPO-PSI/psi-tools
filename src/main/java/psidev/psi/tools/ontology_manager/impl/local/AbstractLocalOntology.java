@@ -22,6 +22,11 @@ import java.util.Set;
 /**
  * Abstract local ontology
  *
+ * NOTE : LocalOntology was the original class but did not offer flexibility for using different extensions of OntologyTermI.
+ * That is why this template abstract class has been created. The template could have been simpler
+ * (AbstractLocalOntology<T extends OntologyTermI> instead of AbstractLocalOntology<T extends OntologyTermI, A extends OntologyTemplate<T> , O extends AbstractOboLoader<T, A>>)
+ * but we needed an absolute retrocompatibility with the LocalOntology class which used Ontology and OboLoader but not OntologyTemplate<OntologyTerm> and AbstractOboLoader<OntologyTerm></>.
+ *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>01/11/11</pre>

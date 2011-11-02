@@ -8,6 +8,11 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 /**
+ *
+ * NOTE : the OlsOntology class is now extending AbstractOlsOntology. Nothing has changed in the methods of this class which is still using OntologyTermI.
+ * As we needed some flexibility when using different extension of the basic OntologyTermI, we created a template for OlsOntology and for retrocompatibility,
+ * this interface has been kept and extends OlsOntology<OntologyTermI>
+ *
  * Author: Florian Reisinger
  * Date: 07-Aug-2007
  */
