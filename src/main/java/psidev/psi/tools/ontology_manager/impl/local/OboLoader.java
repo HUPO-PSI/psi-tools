@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
-import uk.ac.ebi.ook.loader.parser.OBOFormatParser;
+import uk.ac.ebi.ols.loader.parser.OBOFormatParser;
 
 import java.io.File;
 

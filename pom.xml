@@ -25,6 +25,28 @@
         <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-manager/trunk</url>
     </scm>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packageSpace>uk.ac.ebi.ontology_lookup.ontologyquery</packageSpace>
+                    <sourceDirectory>src/wsdl</sourceDirectory>
+                    <outputDirectory>target/generated-sources/wsdl2java</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>psidev.psi.tools</groupId>
@@ -50,7 +72,7 @@
         <dependency>
             <groupId>uk.ac.ebi</groupId>
             <artifactId>ols</artifactId>
-            <version>1.14.1</version>
+            <version>1.18</version>
         </dependency>
         <dependency>
             <groupId>proteomics</groupId>
@@ -58,12 +80,41 @@
             <version>1.5</version>
         </dependency>
 
-        <!-- 3rd party -->
+        <!-- OLS webservice -->
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis-ant</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.2</version>
+        </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
+            <version>1.0.4</version>
         </dependency>
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis-jaxrpc</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- 3rd party -->
+
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

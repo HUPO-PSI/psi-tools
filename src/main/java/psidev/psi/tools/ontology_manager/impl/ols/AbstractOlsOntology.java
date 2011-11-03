@@ -4,12 +4,10 @@ import com.opensymphony.oscache.base.NeedsRefreshException;
 import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.tools.ontology_manager.client.OlsClient;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccessTemplate;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
-import uk.ac.ebi.ook.web.services.Query;
-import uk.ac.ebi.ook.web.services.QueryService;
-import uk.ac.ebi.ook.web.services.QueryServiceLocator;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +36,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     protected GeneralCacheAdministrator admin; // the cache
     protected static final String cacheConfig = "olsontology-oscache.properties";
     protected boolean useTermSynonyms = true; // flag whether term synonyms should be recorded
-    protected Query query;
+    protected OlsClient olsClient;
     protected String ontologyID;
     protected Set<String> rootAccs;
 
@@ -68,8 +66,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         // preparing OLS access
         log.info( "Creating new OLS query client." );
         try {
-            QueryService locator = new QueryServiceLocator();
-            query = locator.getOntologyQuery();
+            olsClient = new OlsClient();
         } catch ( Exception e ) {
             log.error( "Exception setting up OLS query client!", e );
             throw new OntologyLoaderException( "Exception setting up OLS query client!", e );
@@ -122,7 +119,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     public void loadOntology( String ontologyID, String name, String version, String format, URI uri ) {
         this.ontologyID = ontologyID;
         try {
-            Map roots = query.getRootTerms( ontologyID );
+            Map roots = olsClient.getRootTerms( ontologyID );
             rootAccs = new HashSet<String>();
             rootAccs.addAll( roots.keySet() );
         } catch ( RemoteException e ) {
@@ -180,7 +177,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
 
         String termName;
         try {
-            termName = query.getTermById( accession, ontologyID );
+            termName = olsClient.getTermById(accession, ontologyID);
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
@@ -241,13 +238,14 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
 
     private Map getTermMetadataUncached(String termAccession){
         if (termAccession == null) { return null; }
+
         final Map metadata;
         try {
-            metadata = query.getTermMetadata( termAccession, ontologyID );
+            metadata = olsClient.getTermMetadata(termAccession, ontologyID);
 
             return metadata;
 
-        } catch ( RemoteException e ) {
+        } catch ( Exception e ) {
             if ( log.isWarnEnabled() ) {
                 log.warn( "Error while loading term synonyms from OLS for term: " + termAccession, e );
             }
@@ -334,7 +332,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     public boolean isObsoleteUncached( T term ) {
         boolean retVal;
         try {
-            retVal = query.isObsolete( term.getTermAccession(), ontologyID );
+            retVal = olsClient.isObsolete( term.getTermAccession(), ontologyID );
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
@@ -389,7 +387,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         if (term == null) { return null; }
         Map results;
         try {
-            results = query.getTermParents( term.getTermAccession(), ontologyID );
+            results = olsClient.getTermParents( term.getTermAccession(), ontologyID );
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
@@ -480,10 +478,10 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
      */
     public Set<T> getChildrenUncached( T term, int level ) {
         if (term == null) { return null; }
-        int[] relationshipTypes = {1, 2, 3, 4};
+        int[] relationshipTypes = new int[] {1, 2, 3, 4};
         Map results;
         try {
-            results = query.getTermChildren( term.getTermAccession(), ontologyID, level, relationshipTypes );
+            results = olsClient.getTermChildren( term.getTermAccession(), ontologyID, level, relationshipTypes );
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
@@ -590,7 +588,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         Set<String> terms = new HashSet<String>();
         try {
             if ( useTerm ) {
-                String result = query.getTermById( id, ontologyID );
+                String result = olsClient.getTermById( id, ontologyID );
                 // check if the id returns a valid term name - if not, the id is not valid for this ontology
                 if ( result.equalsIgnoreCase( id ) ) { // OLS returns the (unchanged) id if no matching term is found
                     log.warn( "The Term ID '" + id + "' was not found in ontology '" + ontologyID + "'." );
@@ -601,13 +599,9 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
                 }
             }
             if ( allowChildren ) { // get all children
-                int[] relationshipTypes = new int[4];
-                relationshipTypes[0] = 1;
-                relationshipTypes[1] = 2;
-                relationshipTypes[2] = 3;
-                relationshipTypes[3] = 4;
+                int[] relationshipTypes = new int []  {1, 2, 3, 4};
 
-                Map resultMap = query.getTermChildren( id, ontologyID, -1, relationshipTypes );
+                Map resultMap = olsClient.getTermChildren( id, ontologyID, -1, relationshipTypes );
 //                Map resultMap = query.getTermChildren(id, ontologyID, -1, null );
                 if ( resultMap == null ) { // should not happen, but just in case ...
                 } else {
@@ -628,7 +622,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         Set<String> terms = new HashSet<String>();
         try {
             if ( useTerm ) {
-                String result = query.getTermById( id, ontologyID );
+                String result = olsClient.getTermById( id, ontologyID );
                 // check if the id returns a valid term name - if not, the id is not valid for this ontology
                 if ( result.equalsIgnoreCase( id ) ) { // OLS returns the (unchanged) id if no matching term is found
                     log.warn( "The Term ID '" + id + "' was not found in ontology '" + ontologyID + "'." );
@@ -688,13 +682,13 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         boolean result;
         try {
             // OLS does return false if the term does not exist! -> check the existence of the term first
-            String s = query.getTermById( id, ontologyID );
+            String s = olsClient.getTermById( id, ontologyID );
             if ( s.equalsIgnoreCase( id ) ) {
                 // term not in database (if instead of the term name the accession is returned)
                 throw new IllegalStateException( "Checking obsolete on term '" + id
                         + "' which does not exist in '" + ontologyID + "'!" );
             }
-            result = query.isObsolete( id, ontologyID );
+            result = olsClient.isObsolete( id, ontologyID );
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
@@ -738,7 +732,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     protected String getTermNameByIDUncached( String id ) {
         String result;
         try {
-            result = query.getTermById( id, ontologyID );
+            result = olsClient.getTermById( id, ontologyID );
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to query OLS for: "
                     + id + " in ontology: " + ontologyID );
@@ -783,7 +777,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     protected Set<String> getDirectParentsIDsUncached( String id ) {
         Set<String> result;
         try {
-            result = ( query.getTermParents( id, ontologyID ) ).keySet();
+            result = ( olsClient.getTermParents( id, ontologyID ) ).keySet();
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
@@ -842,7 +836,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     @Deprecated
     protected Set<String> getChildTermsUncached( String id ) throws RemoteException {
         Map<String, String> result;
-        result = query.getTermChildren( id, ontologyID, 1, null );
+        result = olsClient.getTermChildren( id, ontologyID, 1, null );
         return result.keySet();
     }
 
@@ -911,7 +905,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
 
         try {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String dateString = query.getOntologyLoadDate(ontologyID);
+            String dateString = olsClient.getOntologyLoadDate(ontologyID);
             Date lastUpdate = dateFormat.parse(dateString);
 
             if (lastOntologyUpload.after(lastUpdate)){

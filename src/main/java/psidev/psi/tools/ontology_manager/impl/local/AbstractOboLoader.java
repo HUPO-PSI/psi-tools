@@ -4,11 +4,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.ontology_manager.OntologyManagerContext;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
-import uk.ac.ebi.ook.loader.impl.AbstractLoader;
-import uk.ac.ebi.ook.loader.parser.OBOFormatParser;
-import uk.ac.ebi.ook.model.interfaces.TermRelationship;
-import uk.ac.ebi.ook.model.ojb.TermBean;
-import uk.ac.ebi.ook.model.ojb.TermSynonymBean;
+import uk.ac.ebi.ols.loader.impl.BaseAbstractLoader;
+import uk.ac.ebi.ols.loader.parser.OBOFormatParser;
+import uk.ac.ebi.ols.model.interfaces.Term;
+import uk.ac.ebi.ols.model.interfaces.TermRelationship;
+import uk.ac.ebi.ols.model.interfaces.TermSynonym;
 
 import java.io.*;
 import java.net.URL;
@@ -27,7 +27,7 @@ import java.util.*;
  * @since <pre>01/11/11</pre>
  */
 
-public abstract class AbstractOboLoader<T extends OntologyTermI, O extends OntologyTemplate<T>> extends AbstractLoader {
+public abstract class AbstractOboLoader<T extends OntologyTermI, O extends OntologyTemplate<T>> extends BaseAbstractLoader {
 
 
     /**
@@ -49,7 +49,7 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
         try {
             Vector v = new Vector();
             v.add( ( String ) params );
-            ( ( OBOFormatParser ) parser ).configure( v );
+            ( (OBOFormatParser) parser ).configure( v );
             parser.parseFile();
 
         } catch ( Exception e ) {
@@ -74,13 +74,13 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
 
         // 1. convert and index all terms (note: at this stage we don't handle the hierarchy)
         for ( Iterator iterator = ontBean.getTerms().iterator(); iterator.hasNext(); ) {
-            TermBean term = ( TermBean ) iterator.next();
+            Term term = ( Term ) iterator.next();
 
             // convert term into a OboTerm
             T ontologyTerm = createNewOntologyTerm( term.getIdentifier(), term.getName() );
-            final Collection<TermSynonymBean> synonyms = (Collection<TermSynonymBean>) term.getSynonyms();
+            final Collection<TermSynonym> synonyms = term.getSynonyms();
             if( synonyms != null ) {
-                for ( TermSynonymBean synonym : synonyms ) {
+                for ( TermSynonym synonym : synonyms ) {
                     ontologyTerm.getNameSynonyms().add( synonym.getSynonym() );
                 }
             }
@@ -94,7 +94,7 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
 
         // 2. build hierarchy based on the relations of the Terms
         for ( Iterator iterator = ontBean.getTerms().iterator(); iterator.hasNext(); ) {
-            TermBean term = ( TermBean ) iterator.next();
+            Term term = ( Term ) iterator.next();
 
             if ( term.getRelationships() != null ) {
                 for ( Iterator iterator1 = term.getRelationships().iterator(); iterator1.hasNext(); ) {
