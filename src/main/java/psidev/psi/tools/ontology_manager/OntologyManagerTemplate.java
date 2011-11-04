@@ -179,7 +179,7 @@ public abstract class OntologyManagerTemplate<T extends OntologyTermI, A extends
                 Class loader;
                 try {
                     final String lcLoaderClass = loaderClass.toLowerCase();
-                    loader = findLoader(loaderClass, lcLoaderClass);
+                    loader = findLoader(loaderClass, lcLoaderClass, id);
                     Constructor c = loader.getConstructor();
                     A oa = ( A ) c.newInstance();
                     oa.setOntologyDirectory( OntologyManagerContext.getInstance().getOntologyDirectory() );
@@ -192,7 +192,7 @@ public abstract class OntologyManagerTemplate<T extends OntologyTermI, A extends
         }
     }
 
-    protected abstract Class findLoader(String loaderClass, String lcLoaderClass) throws ClassNotFoundException ;
+    protected abstract Class findLoader(String loaderClass, String lcLoaderClass, String ontologyId) throws ClassNotFoundException ;
 
     /**
      *

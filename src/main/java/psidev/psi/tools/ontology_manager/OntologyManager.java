@@ -55,7 +55,7 @@ public class OntologyManager extends OntologyManagerTemplate<OntologyTermI, Onto
         super(configFile);
     }
 
-    protected Class findLoader(String loaderClass, String lcLoaderClass) throws ClassNotFoundException {
+    protected Class findLoader(String loaderClass, String lcLoaderClass, String ontologyId) throws ClassNotFoundException {
         Class loader;
         if ( keyword2class.containsKey( lcLoaderClass ) ) {
             loader = keyword2class.get( lcLoaderClass );
@@ -65,6 +65,7 @@ public class OntologyManager extends OntologyManagerTemplate<OntologyTermI, Onto
         } else {
             loader = Class.forName( loaderClass );
         }
+
         return loader;
     }
 }
