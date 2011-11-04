@@ -53,6 +53,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     protected final byte IS_OBSOLETE = 8;
     protected final byte GET_TERM_FOR_ACCESSION = 9;
     protected final byte GET_METADATA_FOR_ACCESSION = 10;
+    protected final byte GET_XREF_FOR_ACCESSION = 11;
 
     public AbstractOlsOntology() throws OntologyLoaderException {
         log.info( "Creating new OlsOntology..." );
@@ -203,26 +204,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter
         final String myKey = GET_METADATA_FOR_ACCESSION + '_' + ontologyID + '_' + term.getTermAccession();
-        Map metadata;
-
-        try {
-            metadata = (Map) getFromCache(myKey);
-            if ( log.isDebugEnabled() ) log.debug( "Using cached terms for key: " + myKey );
-        } catch (NeedsRefreshException e) {
-            boolean updated = false;
-            // if not found in cache, use uncached method and store result in cache
-            try {
-                metadata = this.getTermMetadataUncached( term.getTermAccession() );
-                if ( log.isDebugEnabled() ) log.debug( "Storing uncached terms for key: " + myKey );
-                putInCache( myKey, metadata );
-                updated = true;
-            } finally {
-                if ( !updated ) {
-                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
-                    cancelUpdate( myKey );
-                }
-            }
-        }
+        Map metadata = getAllTermSynonyms(term.getTermAccession());
 
         for ( Object k : metadata.keySet() ) {
             final String key = (String) k;
@@ -244,6 +226,82 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
             metadata = olsClient.getTermMetadata(termAccession, ontologyID);
 
             return metadata;
+
+        } catch ( Exception e ) {
+            if ( log.isWarnEnabled() ) {
+                log.warn( "Error while loading term synonyms from OLS for term: " + termAccession, e );
+            }
+        }
+
+        return null;
+    }
+
+    public Map getAllTermSynonyms( String termAccession ) {
+        if (termAccession == null) { return null; }
+        // create a unique string for this query
+        // generate from from method specific ID, the ontology ID and the input parameter
+        final String myKey = GET_METADATA_FOR_ACCESSION + '_' + ontologyID + '_' + termAccession;
+        Map metadata;
+
+        try {
+            metadata = (Map) getFromCache(myKey);
+            if ( log.isDebugEnabled() ) log.debug( "Using cached terms for key: " + myKey );
+        } catch (NeedsRefreshException e) {
+            boolean updated = false;
+            // if not found in cache, use uncached method and store result in cache
+            try {
+                metadata = this.getTermMetadataUncached( termAccession );
+                if ( log.isDebugEnabled() ) log.debug( "Storing uncached terms for key: " + myKey );
+                putInCache( myKey, metadata );
+                updated = true;
+            } finally {
+                if ( !updated ) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    cancelUpdate( myKey );
+                }
+            }
+        }
+
+        return metadata;
+    }
+
+    private Map getAllTermXrefs( String termAccession ) {
+        if (termAccession == null) { return null; }
+        // create a unique string for this query
+        // generate from from method specific ID, the ontology ID and the input parameter
+        final String myKey = GET_XREF_FOR_ACCESSION + '_' + ontologyID + '_' + termAccession;
+        Map xrefs;
+
+        try {
+            xrefs = (Map) getFromCache(myKey);
+            if ( log.isDebugEnabled() ) log.debug( "Using cached terms for key: " + myKey );
+        } catch (NeedsRefreshException e) {
+            boolean updated = false;
+            // if not found in cache, use uncached method and store result in cache
+            try {
+                xrefs = this.getAllTermXrefsUncached(termAccession);
+                if ( log.isDebugEnabled() ) log.debug( "Storing uncached terms for key: " + myKey );
+                putInCache( myKey, xrefs );
+                updated = true;
+            } finally {
+                if ( !updated ) {
+                    // It is essential that cancelUpdate is called if the cached content could not be rebuilt
+                    cancelUpdate( myKey );
+                }
+            }
+        }
+
+        return xrefs;
+    }
+
+    private Map getAllTermXrefsUncached(String termAccession){
+        if (termAccession == null) { return null; }
+
+        final Map xrefs;
+        try {
+            xrefs = olsClient.getTermXrefs(termAccession, ontologyID);
+
+            return xrefs;
 
         } catch ( Exception e ) {
             if ( log.isWarnEnabled() ) {

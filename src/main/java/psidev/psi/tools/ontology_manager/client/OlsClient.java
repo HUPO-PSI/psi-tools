@@ -59,6 +59,18 @@ public class OlsClient {
         }
     }
 
+    public Map getTermXrefs(String termAccession, String ontologyId) throws RemoteException{
+        final Map metadata;
+        try {
+            metadata = getQuery().getTermXrefs(termAccession, ontologyId);
+
+            return metadata;
+
+        } catch ( Exception e ) {
+            throw new RemoteException("RemoteException while trying to connect to OLS.", e);
+        }
+    }
+
     public Map getRootTerms(String ontologyId) throws RemoteException{
 
         try {
