@@ -265,7 +265,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         return metadata;
     }
 
-    private Map getAllTermXrefs( String termAccession ) {
+    public Map getAllTermXrefs( String termAccession ) {
         if (termAccession == null) { return null; }
         // create a unique string for this query
         // generate from from method specific ID, the ontology ID and the input parameter

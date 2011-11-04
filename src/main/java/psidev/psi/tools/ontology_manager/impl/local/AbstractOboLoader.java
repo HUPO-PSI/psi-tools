@@ -65,7 +65,7 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
     // User's methods
 
     protected abstract O createNewOntology();
-    protected abstract T createNewOntologyTerm(String identifier, String name);
+    protected abstract T createNewOntologyTerm(Term t);
 
 
     protected O buildOntology() {
@@ -77,7 +77,7 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
             Term term = ( Term ) iterator.next();
 
             // convert term into a OboTerm
-            T ontologyTerm = createNewOntologyTerm( term.getIdentifier(), term.getName() );
+            T ontologyTerm = createNewOntologyTerm( term );
             final Collection<TermSynonym> synonyms = term.getSynonyms();
             if( synonyms != null ) {
                 for ( TermSynonym synonym : synonyms ) {
@@ -91,7 +91,12 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
                 ontology.addObsoleteTerm( ontologyTerm );
             }
         }
+        buildTermRelationships(ontology);
 
+        return ontology;
+    }
+
+    protected void buildTermRelationships(O ontology) {
         // 2. build hierarchy based on the relations of the Terms
         for ( Iterator iterator = ontBean.getTerms().iterator(); iterator.hasNext(); ) {
             Term term = ( Term ) iterator.next();
@@ -105,8 +110,6 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
                 }
             }
         }
-
-        return ontology;
     }
 
     /**

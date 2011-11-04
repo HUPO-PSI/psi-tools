@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 import uk.ac.ebi.ols.loader.parser.OBOFormatParser;
+import uk.ac.ebi.ols.model.interfaces.Term;
 
 import java.io.File;
 
@@ -57,7 +58,7 @@ public class OboLoader extends AbstractOboLoader<OntologyTermI, Ontology> {
     }
 
     @Override
-    protected OntologyTermI createNewOntologyTerm(String identifier, String name) {
-        return new OntologyTermImpl( identifier, name );
+    protected OntologyTermI createNewOntologyTerm(Term t) {
+        return new OntologyTermImpl( t.getIdentifier(), t.getName() );
     }
 }
