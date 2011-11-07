@@ -28,7 +28,7 @@ public class LocalOntology extends AbstractLocalOntology<OntologyTermI, Ontology
 
     @Override
     protected OboLoader createNewOBOLoader(File ontologyDirectory) throws OntologyLoaderException {
-        return new OboLoader( getOntologyDirectory() );
+        return new OboLoader( ontologyDirectory );
     }
 
 }
