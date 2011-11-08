@@ -9,6 +9,7 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +56,22 @@ public class OntologyManager extends OntologyManagerTemplate<OntologyTermI, Onto
         super(configFile);
     }
 
-    protected Class findLoader(String loaderClass, String lcLoaderClass, String ontologyId) throws ClassNotFoundException {
+    @Override
+    protected OntologyAccess findOntologyAccess(String sourceURI, String ontologyId, String ontologyName, String ontologyVersion, String format, String loaderClass) throws ClassNotFoundException {
+        Class loader;
+        try {
+            final String lcLoaderClass = loaderClass.toLowerCase();
+            loader = findLoader(loaderClass, lcLoaderClass);
+            Constructor c = loader.getConstructor();
+            OntologyAccess oa = ( OntologyAccess ) c.newInstance();
+            return oa;
+        } catch ( Exception e ) {
+            throw new ClassNotFoundException( "Failed loading ontology source: " + loaderClass, e );
+        }
+    }
+
+
+    protected Class findLoader(String loaderClass, String lcLoaderClass) throws ClassNotFoundException {
         Class loader;
         if ( keyword2class.containsKey( lcLoaderClass ) ) {
             loader = keyword2class.get( lcLoaderClass );

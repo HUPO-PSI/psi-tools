@@ -12,7 +12,6 @@ import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -176,12 +175,9 @@ public abstract class OntologyManagerTemplate<T extends OntologyTermI, A extends
                             + ", version=" + version + ", uri=" + uri + " using source: " + loaderClass );
                 }
 
-                Class loader;
+                A oa;
                 try {
-                    final String lcLoaderClass = loaderClass.toLowerCase();
-                    loader = findLoader(loaderClass, lcLoaderClass, id);
-                    Constructor c = loader.getConstructor();
-                    A oa = ( A ) c.newInstance();
+                    oa = findOntologyAccess(sourceUri, id, name, version, format, loaderClass);
                     oa.setOntologyDirectory( OntologyManagerContext.getInstance().getOntologyDirectory() );
                     oa.loadOntology( id, name, version, format, uri );
                     ontologies.put( id, oa );
@@ -192,7 +188,7 @@ public abstract class OntologyManagerTemplate<T extends OntologyTermI, A extends
         }
     }
 
-    protected abstract Class findLoader(String loaderClass, String lcLoaderClass, String ontologyId) throws ClassNotFoundException ;
+    protected abstract A findOntologyAccess(String sourceURI, String ontologyId, String ontologyName, String ontologyVersion, String format, String loaderClass) throws ClassNotFoundException;
 
     /**
      *
