@@ -153,85 +153,30 @@
         </dependency>
     </dependencies>
 
-    <repositories>
+        <repositories>
         <repository>
-            <id>maven repository</id>
-            <name>Maven central repository</name>
-            <url>http://download.java.net/maven/1/</url>
-            <layout>legacy</layout>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>ebi-repo</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>ebi-repo-snapshots</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>pride-proteomics-repo</id>
-            <name>The PRIDE proteomics repository</name>
-            <url>http://pride-proteome.sourceforge.net/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>codehaus</id>
-            <url>http://repository.codehaus.org/</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
+            <id>intact.nexus</id>
+            <name>IntAct Nexus</name>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
-            <id>java.net</id>
-            <name>java.net Maven Repository</name>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
+            <id>intact.nexus</id>
+            <name>IntAct Nexus</name>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
         </pluginRepository>
     </pluginRepositories>
 
     <distributionManagement>
         <repository>
             <id>ebi-repo</id>
-            <name>EBI Repository</name>
             <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
         </repository>
 
         <snapshotRepository>
-            <uniqueVersion>false</uniqueVersion>
             <id>ebi-repo-snapshots</id>
-            <name>EBI Snapshots Repository</name>
             <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
