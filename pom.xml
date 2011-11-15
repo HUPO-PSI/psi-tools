@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -24,9 +24,21 @@
         <module>ontology-manager</module>
         <module>validator</module>
         <module>xxindex</module>
-		<module>master-pom</module>
+        <module>master-pom</module>
         <module>ontology-config-reader</module>
         <module>object-rule-reader</module>
     </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>ebi-repo</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>ebi-repo-snapshots</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
