@@ -16,6 +16,8 @@ import psidev.psi.tools.validator.util.XpathValidator;
 import psidev.psi.tools.validator.xpath.XPathHelper;
 import psidev.psi.tools.validator.xpath.XPathResult;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -219,7 +221,71 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             }
         } // else
 
+
+        // if there are no messages yet, then there were no problems with the validation
+        // (e.g. this rule could not detect any problems with the element)
+        // We can (depending on the settings) report that the validation of this element
+        // accounting to the definition of this rule was successful.
+        if (Validator.isValidationSuccessReporting() && messages.isEmpty()) {
+            String identifier = getBestIdentifier(object);
+            Context context = new Context("Checked element identifier: " + identifier);
+
+            ValidatorMessage successMsg = new ValidatorMessage("Element OK.", MessageLevel.INFO, context, this);
+            messages.add(successMsg);
+        }
         return messages;
+    }
+
+    /**
+     * Method to try to retrieve the best identifier for the provided Object.
+     * This will look for a 'getId' or 'getName' method and try to invoke it
+     * on the object to retrieve the identifier.
+     * If no id is found the name is returned. If no name is found either,
+     * simply the canonical class name is returned.
+     * Note: the 'best' identifier is not an Object ID in terms of Java objects,
+     * but rather an identifier in the sense of the XML based element represented
+     * by this object.
+     *
+     * @param o the object to inspect for an identifier.
+     * @return the best identifier describing this object.
+     */
+    private String getBestIdentifier(Object o) {
+        if (o == null) { return null; }
+
+        Class oClass = o.getClass();
+        Method[] methods = oClass.getMethods();
+        String identifier = null; // placeholder for the identifier we want to find
+        for (Method method : methods) {
+            // we are interested in an ID, so if we find one, overwrite whatever we may have and stop the search
+            if (method.getName().equalsIgnoreCase("getId")) {
+                try {
+                    identifier = (String)method.invoke(o);
+                } catch (Exception e) {
+                    log.debug("Could not invoke getId method for object of type: " + oClass.getCanonicalName(), e);
+                }
+                if (identifier != null) {
+                    // we have found an id for the object, so we can stop the search
+                    // there is a slight chance the the name if returned instead of the id (in the case, where
+                    // the getId method invocation fails, but a previous getName invocation succeeded)
+                    // however, we ignore this case
+                    break;
+                }
+            } else if (method.getName().equalsIgnoreCase("getName")) {
+                // if we have not found an id yet, assume the name as identifier, if there is one
+                // (until it is overwritten by the real id, if we can find one)
+                try {
+                    identifier = (String)method.invoke(o);
+                } catch (Exception e) {
+                    log.debug("Could not invoke getName method for object of type: " + oClass.getCanonicalName(), e);
+                }
+            } // else go on searching
+        }
+
+        if (identifier == null) {
+            identifier = oClass.getCanonicalName();
+        }
+        // return whatever identifier we could find
+        return identifier;
     }
 
     /**

@@ -39,6 +39,52 @@ public abstract class Validator {
      */
     public static final Log log = LogFactory.getLog( Validator.class );
 
+    private static final Properties validationProps = loadValidatonProperties();
+
+    private static Properties loadValidatonProperties() {
+
+        //check to see if we have a project-specific configuration file
+        URL resource = Validator.class.getClassLoader().getResource("validation.properties");
+        //if not, use default config
+        if (resource == null) {
+            resource = Validator.class.getClassLoader().getResource("config" + System.getProperty("file.separator") + "defaultValidation.properties");
+        }
+        if (resource == null) {
+            log.error("Could not find properties file!");
+            throw new IllegalStateException("Could not find properties file!");
+        }
+        log.info("Validation configuration file: " + resource.toString());
+
+        Properties props = new Properties();
+        try {
+            props.load(resource.openStream());
+        } catch (IOException e) {
+            log.error("Could not load properties file: " + resource.toString());
+            throw new IllegalStateException("Could not load properties file: " + resource.toString());
+        }
+
+        return props;
+    }
+
+    private static boolean validationSuccessReporting = loadValidationSuccessReporting();
+
+    public static boolean loadValidationSuccessReporting() {
+        String propValue = null;
+        if (validationProps != null) {
+            propValue = validationProps.getProperty("validation.success.reporting");
+        }
+
+        return propValue != null && propValue.equalsIgnoreCase("true");
+    }
+
+    public static boolean isValidationSuccessReporting() {
+        return validationSuccessReporting;
+    }
+
+    public static void setValidationSuccessReporting(boolean validationSuccessReporting) {
+        Validator.validationSuccessReporting = validationSuccessReporting;
+    }
+
     /**
      * User preferences.
      * <p/>

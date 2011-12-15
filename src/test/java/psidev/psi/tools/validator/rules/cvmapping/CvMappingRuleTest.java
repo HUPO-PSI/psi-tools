@@ -9,6 +9,7 @@ import psidev.psi.tools.cvrReader.mapping.jaxb.CvMapping;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.validator.MessageLevel;
+import psidev.psi.tools.validator.Validator;
 import psidev.psi.tools.validator.ValidatorException;
 import psidev.psi.tools.validator.ValidatorMessage;
 import psidev.psi.tools.validator.rules.cvmapping.house.Bike;
@@ -72,9 +73,9 @@ public class CvMappingRuleTest {
 
     /**
      * Test to check a real mapping file with more cv rules and ontologies.
+     * @throws Exception in case of any problems during execution.
      */
     @Test
-    @Ignore
     public void checkCvMappingCheck() throws Exception {
         File input = new File( CvMappingRuleTest.class.getResource( "/mz-mapping.v3.xml" ).getFile() );
         Assert.assertNotNull(input);
@@ -227,6 +228,41 @@ public class CvMappingRuleTest {
         Assert.assertNotNull( messages );
         print( messages );
         Assert.assertEquals( 0, messages.size() );
+    }
+
+    @Test
+    public void check_PositiveMessage() throws Exception {
+
+        File input = new File( CvMappingRuleTest.class.getResource( "/sample1-house-cvmapping.xml" ).getFile() );
+        CvRuleReader reader = new CvRuleReader();
+        CvMapping cvMapping = reader.read( input );
+        CvRuleManager ruleMngr = new CvRuleManager( ontologyMngr, cvMapping );
+
+        Collection<ValidatorMessage> messages0 = ruleMngr.checkCvMapping();
+        Assert.assertNotNull( messages0 );
+        Assert.assertEquals( 0, messages0.size() );
+
+        House house = HouseFactory.buildSimpleHouse();
+        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<CvRule> cvRules = ruleMngr.getCvRules();
+        for (CvRule cvRule : cvRules) {
+            messages.addAll(cvRule.check(house, "/house"));
+        }
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals( 0, messages.size() );
+
+        // now run the check again, this time with reporting of successful validation
+        messages = new ArrayList<ValidatorMessage>();
+        Validator.setValidationSuccessReporting(true);  // switch on success reporting
+        for (CvRule cvRule : cvRules) {
+            messages.addAll(cvRule.check(house, "/house"));
+        }
+        Validator.setValidationSuccessReporting(false); // reset to default
+        Assert.assertNotNull( messages );
+        print( messages );
+        Assert.assertEquals( 1, messages.size() );
+
     }
 
     @Test

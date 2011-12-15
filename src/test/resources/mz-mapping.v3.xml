@@ -6,8 +6,8 @@
 
     <CvReferenceList cvSourceVersion="0.9">
         <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
-        <CvReference cvName="Gene Ontology" cvIdentifier="GO"/>
-        <CvReference cvName="Phenotypic qualities (properties)"  cvIdentifier="PATO"/>
+        <!--<CvReference cvName="Gene Ontology" cvIdentifier="GO"/>-->
+        <!--<CvReference cvName="Phenotypic qualities (properties)"  cvIdentifier="PATO"/>-->
         <CvReference cvName="Brenda Tissue Ontology"  cvIdentifier="BTO"/>
     </CvReferenceList>
 
@@ -34,8 +34,8 @@
                        cvTermsCombinationLogic="OR"
                        scopePath="/mzML/sampleList/sample"  requirementLevel="MAY">
             <CvTerm termAccession="MS:1000548" useTerm="false" termName="sample attribute"  allowChildren="true" isRepeatable="true" cvIdentifierRef="MS" />
-            <CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object"  allowChildren="true" isRepeatable="true" cvIdentifierRef="PATO"></CvTerm>
-            <CvTerm termAccession="GO:0005575" useTerm="false" termName="cellular_component"  allowChildren="true" isRepeatable="true" cvIdentifierRef="GO"></CvTerm>
+            <!--<CvTerm termAccession="PATO:0001241" useTerm="false" termName="quality of an object"  allowChildren="true" isRepeatable="true" cvIdentifierRef="PATO"></CvTerm>-->
+            <!--<CvTerm termAccession="GO:0005575" useTerm="false" termName="cellular_component"  allowChildren="true" isRepeatable="true" cvIdentifierRef="GO"></CvTerm>-->
             <CvTerm termAccession="BTO:0000000" useTerm="false" termName="brenda source tissue ontology"  allowChildren="true" isRepeatable="true" cvIdentifierRef="BTO"/>
         </CvMappingRule>
         <CvMappingRule id="R5" cvElementPath="/mzML/sampleList/sample/cvParam/@unitAccession" cvTermsCombinationLogic="OR"  scopePath="/mzML/sampleList/sample"  requirementLevel="MAY">
