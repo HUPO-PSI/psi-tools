@@ -33,6 +33,11 @@ public class CvMappingReaderTest {
             "        <CvMappingRule id=\"R1\" name=\"sample rule 1\" scopePath=\"/a/b/c/d/e\" cvElementPath=\"/a/b/c\" cvTermsCombinationLogic=\"AND\" requirementLevel=\"SHOULD\">\n" +
             "            <CvTerm cvIdentifierRef=\"A\" termAccession=\"XX:0001\" termName=\"lala\" useTermName=\"false\" useTerm=\"true\" allowChildren=\"false\" isRepeatable=\"true\"/>\n" +
             "            <CvTerm cvIdentifierRef=\"B\" termAccession=\"YY:0001\" termName=\"foo\" useTermName=\"true\" useTerm=\"false\" allowChildren=\"true\" isRepeatable=\"false\"/>\n" +
+            "            <Description>some description</Description>\n" +
+            "            <HowToFixTips>" +
+            "                <Tip>tip one</Tip>" +
+            "                <Tip>tip two</Tip>" +
+            "            </HowToFixTips>" +
             "        </CvMappingRule>\n" +
             "        <CvMappingRule id=\"R2\" name=\"sample rule 2\" scopePath=\"/a/b/c/d/e\" cvElementPath=\"/a/b/c\" cvTermsCombinationLogic=\"AND\" requirementLevel=\"SHOULD\">\n" +
             "            <CvTerm cvIdentifierRef=\"A\" termAccession=\"XX:0001\" termName=\"lala\" useTermName=\"false\" useTerm=\"true\" allowChildren=\"false\" isRepeatable=\"true\"/>\n" +

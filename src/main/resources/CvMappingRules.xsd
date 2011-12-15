@@ -62,7 +62,7 @@
 						<xs:documentation>One or more terms from a CVsource that are allowed to be associated with the given element of the model. </xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="description" type="xs:string" minOccurs="0">
+				<xs:element name="Description" type="xs:string" minOccurs="0">
 					<xs:annotation>
 						<xs:documentation>
 							An end user friendly description of the aim and purpose of this rule. This could also be used 
@@ -71,7 +71,7 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="howToFixTips" minOccurs="0"/>
+				<xs:element ref="HowToFixTips" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attribute name="scopePath" type="xs:string" use="required">
 				<xs:annotation>
@@ -164,13 +164,13 @@
 			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="howToFixTips">
+	<xs:element name="HowToFixTips">
 		<xs:annotation>
 			<xs:documentation>A list of one or more short tips that could help fixing the problem that might have caused this rule to break.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="tip" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+				<xs:element name="Tip" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
