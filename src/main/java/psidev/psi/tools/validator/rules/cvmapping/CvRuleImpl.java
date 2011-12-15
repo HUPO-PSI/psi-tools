@@ -230,7 +230,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             String identifier = getBestIdentifier(object);
             Context context = new Context("Checked element identifier: " + identifier);
 
-            ValidatorMessage successMsg = new ValidatorMessage("Element OK.", MessageLevel.INFO, context, this);
+            ValidatorMessage successMsg = new ValidatorMessage("Element OK.", MessageLevel.SUCCESS, context, this);
             messages.add(successMsg);
         }
         return messages;

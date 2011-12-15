@@ -22,6 +22,11 @@ public enum MessageLevel {
     //      cf. http://logging.apache.org/log4j/docs/api/org/apache/log4j/Level.html
 
     /**
+     * The SUCCESS level designates the success of a single rule check.
+     */
+    SUCCESS( "SUCCESS" ),
+
+    /**
      * The DEBUG Level designates fine-grained informational events that are most useful to debug an application.
      */
     DEBUG( "DEBUG" ),
@@ -58,6 +63,8 @@ public enum MessageLevel {
     public static MessageLevel forName( String level ) {
         if ( INFO.name.equalsIgnoreCase( level ) ) {
             return INFO;
+        } else if ( SUCCESS.name.equalsIgnoreCase( level ) ) {
+            return SUCCESS;
         } else if ( DEBUG.name.equalsIgnoreCase( level ) ) {
             return DEBUG;
         } else if ( WARN.name.equalsIgnoreCase( level ) ) {
