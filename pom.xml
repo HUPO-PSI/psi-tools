@@ -29,9 +29,14 @@
         <plugins>
             <!-- Conversion of XML Schema into Java source code using JAXB-XJC -->
             <plugin>
-                <groupId>com.sun.tools.xjc.maven2</groupId>
-                <artifactId>maven-jaxb-plugin</artifactId>
-                <version>1.0</version>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.7.4</version>
+                <configuration>
+                    <schemaDirectory>${project.basedir}/src/main/resources/</schemaDirectory>
+                    <bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
+                    <extension>true</extension>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -39,14 +44,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <generatePackage>psidev.psi.tools.cvrReader.mapping.jaxb</generatePackage>
-                    <includeSchemas>
-                        <includeSchema>CvMappingRules.xsd</includeSchema>
-                    </includeSchemas>
-                    <strict>true</strict>
-                    <verbose>true</verbose>
-                </configuration>
             </plugin>
 
             <!-- Assembly -->
