@@ -47,7 +47,7 @@ public abstract class Validator {
         URL resource = Validator.class.getClassLoader().getResource("validation.properties");
         //if not, use default config
         if (resource == null) {
-            resource = Validator.class.getClassLoader().getResource("config" + System.getProperty("file.separator") + "defaultValidation.properties");
+            resource = Validator.class.getClassLoader().getResource("config/defaultValidation.properties");
         }
         if (resource == null) {
             log.error("Could not find properties file!");
