@@ -86,6 +86,8 @@ public abstract class AbstractLocalOntology<T extends OntologyTermI, A extends O
                         throw new IllegalArgumentException("Could not find the file for URI: " + uri + " - Perhaps the syntax of the URI is wrong!");
                     }
                     ontology = loader.parseOboFile(file);
+                } else if (uri.getScheme().equalsIgnoreCase("jar")){
+                    ontology = loader.parseOboFileFromJar(uri.toString());
                 } else {
                     URL url;
                     try {

@@ -1,7 +1,7 @@
 package psidev.psi.tools.ontology_manager.client;
 
-import uk.ac.ebi.ontology_lookup.ontologyquery.Query;
-import uk.ac.ebi.ontology_lookup.ontologyquery.QueryServiceLocator;
+import uk.ac.ebi.ols.soap.Query;
+import uk.ac.ebi.ols.soap.QueryServiceLocator;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;

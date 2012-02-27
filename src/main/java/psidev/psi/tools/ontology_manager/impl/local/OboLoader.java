@@ -10,14 +10,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
-import uk.ac.ebi.ols.loader.parser.OBOFormatParser;
+import uk.ac.ebi.ols.loader.parser.OBO2FormatParser;
 import uk.ac.ebi.ols.model.interfaces.Term;
 
 import java.io.File;
 
 /**
  * Wrapper class that hides the way OLS handles OBO files.
- *
+ * <p/>
  * NOTE : the OboLoader class is now extending AbstractOboLoader. Nothing has changed in the methods of this class which is still using OntologyTermI and Ontology.
  * As we needed some flexibility when using different extension of the basic OntologyTermI, we created a template for OboLoader and for retrocompatibility,
  * this class has been kept and extends AbstractOboLoader<OntologyTermI, Ontology>.
@@ -31,22 +31,27 @@ public class OboLoader extends AbstractOboLoader<OntologyTermI, Ontology> {
     /**
      * Sets up a logger for that class.
      */
-    public static final Log log = LogFactory.getLog( OboLoader.class );
+    public static final Log log = LogFactory.getLog(OboLoader.class);
 
-    public OboLoader( File ontologyDirectory ) {
+    public OboLoader(File ontologyDirectory) {
         super(ontologyDirectory);
     }
 
     /////////////////////////////
     // AbstractLoader's methods
 
-    protected void configure() {
+    protected void configure(String filePath) {
         /**
          * ensure we get the right logger
          */
-        logger = Logger.getLogger( OboLoader.class );
+        logger = Logger.getLogger(OboLoader.class);
 
-        parser = new OBOFormatParser();
+        try {
+            parser = new OBO2FormatParser(filePath);
+        } catch (Exception e) {
+            logger.fatal("Parse failed: " + e.getMessage(), e);
+        }
+
         ONTOLOGY_DEFINITION = "PSI MI";
         FULL_NAME = "PSI Molecular Interactions";
         SHORT_NAME = "PSI-MI";
@@ -59,6 +64,6 @@ public class OboLoader extends AbstractOboLoader<OntologyTermI, Ontology> {
 
     @Override
     protected OntologyTermI createNewOntologyTerm(Term t) {
-        return new OntologyTermImpl( t.getIdentifier(), t.getName() );
+        return new OntologyTermImpl(t.getIdentifier(), t.getName());
     }
 }

@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.tools.ontology_manager.OntologyManagerContext;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
-import uk.ac.ebi.ols.loader.impl.BaseAbstractLoader;
+import uk.ac.ebi.ols.loader.impl.BaseOBO2AbstractLoader;
 import uk.ac.ebi.ols.loader.parser.OBOFormatParser;
 import uk.ac.ebi.ols.model.interfaces.Term;
 import uk.ac.ebi.ols.model.interfaces.TermRelationship;
@@ -27,7 +27,7 @@ import java.util.*;
  * @since <pre>01/11/11</pre>
  */
 
-public abstract class AbstractOboLoader<T extends OntologyTermI, O extends OntologyTemplate<T>> extends BaseAbstractLoader {
+public abstract class AbstractOboLoader<T extends OntologyTermI, O extends OntologyTemplate<T>> extends BaseOBO2AbstractLoader {
 
 
     /**
@@ -43,23 +43,7 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
     /////////////////////////////
     // AbstractLoader's methods
 
-    protected abstract void configure();
-
-    protected void parse( Object params ) {
-        try {
-            Vector v = new Vector();
-            v.add( ( String ) params );
-            ( (OBOFormatParser) parser ).configure( v );
-            parser.parseFile();
-
-        } catch ( Exception e ) {
-            logger.fatal( "Parse failed: " + e.getMessage(), e );
-        }
-    }
-
-    protected void printUsage() {
-        // done to comply to AbstractLoader requirements
-    }
+    protected abstract void configure(String filePath);
 
     //////////////////////////////
     // User's methods
@@ -128,11 +112,30 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
             throw new IllegalArgumentException( file.getAbsolutePath() + " could not be read." );
         }
 
-        //setup vars
-        configure();
+        //setup vars and parse file
+        configure(file.getAbsolutePath());
 
-        //parse obo file
-        parse( file.getAbsolutePath() );
+        //process into relations
+        process();
+
+        return buildOntology();
+    }
+
+    /**
+     * Parse the given OBO file and build a representation of the DAG into an IntactOntology.
+     *
+     * @param jarURI the input file URI within a jar. It is assumed that the resource has already been obtained
+     * using classloader.getResource() and the jarURI is not null
+     * @return a non null IntactOntology.
+     */
+    public O parseOboFileFromJar( String jarURI ) {
+
+        if (jarURI == null){
+            throw new IllegalArgumentException("Resource URI for OBOO file cannot be null");
+        }
+
+        //setup vars and parse file
+        configure(jarURI);
 
         //process into relations
         process();
