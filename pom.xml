@@ -5,7 +5,7 @@
     <parent>
         <groupId>psidev.psi.tools</groupId>
         <artifactId>master-pom</artifactId>
-        <version>4-SNAPSHOT</version>
+        <version>4</version>
     </parent>
 
     <groupId>psidev.psi.tools</groupId>
