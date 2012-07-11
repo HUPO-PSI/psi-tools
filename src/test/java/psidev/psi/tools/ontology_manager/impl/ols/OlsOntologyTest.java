@@ -69,7 +69,7 @@ public class OlsOntologyTest {
         // SO:0000336 has 9 children (OLS 10 Aug 2011) = 9 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000336");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 10, terms.size() );
+        Assert.assertEquals( 11, terms.size() );
     }
 
     @Test
@@ -190,9 +190,10 @@ public class OlsOntologyTest {
 
         final Set<OntologyTermI> children = mi.getDirectChildren( term );
         Assert.assertNotNull( children );
-        Assert.assertEquals( 2, children.size() );
+        Assert.assertEquals( 3, children.size() );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0605", "enzymatic footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0602", "chemical footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1191", "ultraviolet (uv) footprinting" ) ) );
     }
 
     @Test
@@ -215,13 +216,17 @@ public class OlsOntologyTest {
 
         final Set<OntologyTermI> children = mi.getAllChildren( term );
         Assert.assertNotNull( children );
-        Assert.assertEquals( children.toString(), 7, children.size() );
+        Assert.assertEquals( children.toString(), 11, children.size() );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0901", "isotope label footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0602", "chemical footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0603", "dimethylsulphate footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0604", "potassium permanganate footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0605", "enzymatic footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0606", "DNase I footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1191", "ultraviolet (uv) footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1190", "hydroxy radical footprinting" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1189", "methylation interference assay" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1183", "nuclease footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0814", "protease accessibility laddering" ) ) );
     }
 
