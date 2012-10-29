@@ -572,7 +572,6 @@ public class CvMappingRuleTest {
         Assert.assertEquals( 3, messages.size() );
     }
 
-    @Ignore // that's a stupid test, one cannot have both terms is there's only a single color by bike !
     @Test
     public void check_and_operator() throws Exception {
         File input = new File( CvMappingRuleTest.class.getResource( "/sample9-house-cvmapping.xml" ).getFile() );
@@ -589,8 +588,14 @@ public class CvMappingRuleTest {
         messages = ruleMngr.check( house, "/house" );
 
         Assert.assertNotNull( messages );
-        print( messages );
-        Assert.assertEquals( 0, messages.size() );
+//        print( messages );
+        Assert.assertEquals( 1, messages.size() ); // there should be one error, since not all terms of the rule are present
+
+        // now we add the missing term and check again
+        // (we change one of the existing terms to the missing term)
+        house.getGarage().getBikes().iterator().next().setColor("affinity techniques");
+        messages = ruleMngr.check( house, "/house" ); // run the check again
+        Assert.assertEquals( 0, messages.size() ); // there should be no errors any more
     }
 
     @Test( expected = ValidatorException.class )

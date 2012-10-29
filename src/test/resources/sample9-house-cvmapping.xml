@@ -15,9 +15,9 @@
              6 bikes and check on their individual color
           -->        
         <CvMappingRule id="R1" cvElementPath="/house/garage/bikes/@color" cvTermsCombinationLogic="AND"
-                       scopePath="/house/garage/bikes" requirementLevel="MUST" >
+                       scopePath="/house/garage" requirementLevel="MUST" >
             <CvTerm termAccession="MI:0300" useTermName="true" useTerm="true" termName="alias type"
-                    allowChildren="false" cvIdentifierRef="MI" isRepeatable="false" />
+                    allowChildren="false" cvIdentifierRef="MI" isRepeatable="true" />
             <CvTerm termAccession="MI:0400" useTermName="true" useTerm="true" termName="affinity techniques"
                     allowChildren="false" cvIdentifierRef="MI" isRepeatable="false" />
         </CvMappingRule>
