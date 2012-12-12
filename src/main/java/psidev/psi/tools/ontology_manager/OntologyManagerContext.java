@@ -33,6 +33,10 @@ public class OntologyManagerContext {
         return instance.get();
     }
 
+    public static void removeInstance() {
+        instance.remove();
+    }
+
     private OntologyManagerContext() {
         // initialize here default configuration
         storeOntologiesLocally = false;
