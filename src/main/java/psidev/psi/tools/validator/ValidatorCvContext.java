@@ -54,6 +54,10 @@ public class ValidatorCvContext {
         return instance.get();
     }
 
+    public static void removeInstance() {
+        instance.remove();
+    }
+
     private ValidatorCvContext() {
         notRecognisedTerms = new HashMap<String, Set<String>>();
         recognisedTerms    = new HashMap<String, Set<String>>();
