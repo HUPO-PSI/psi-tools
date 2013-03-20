@@ -293,7 +293,7 @@ public class CvRuleManager {
     ///////////////
     // utilities
 
-    private void addRules(List<CvMappingRule> cvMappingRules) {
+    protected void addRules(List<CvMappingRule> cvMappingRules) {
         if (rules == null) {
             rules = new ArrayList<CvRule>();
         }
