@@ -43,6 +43,10 @@ public class XPathResult {
         return pointer.getNode();
     }
 
+    public Object getRootNode() {
+        return pointer.getRootNode();
+    }
+
     /**
      * TODO document that method.
      * @return TODO
