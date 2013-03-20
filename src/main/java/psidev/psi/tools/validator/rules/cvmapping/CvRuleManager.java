@@ -60,6 +60,10 @@ public class CvRuleManager {
         return rules;
     }
 
+    public OntologyManager getOntologyMngr() {
+        return ontologyMngr;
+    }
+
     //////////////////////
     // Rule
 
