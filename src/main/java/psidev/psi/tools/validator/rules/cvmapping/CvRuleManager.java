@@ -304,6 +304,24 @@ public class CvRuleManager {
         }
     }
 
+    protected void addCvRule(CvRule rule){
+        if (rules == null) {
+            rules = new ArrayList<CvRule>();
+        }
+        if (rule != null){
+            this.rules.add(rule);
+        }
+    }
+
+    protected void addCvRules(List<CvRule> rules){
+        if (rules == null) {
+            rules = new ArrayList<CvRule>();
+        }
+        if (rules != null){
+            this.rules.addAll(rules);
+        }
+    }
+
     protected String printSimpleCvTerm( CvTerm cv ) {
         StringBuilder sb = new StringBuilder( 64 );
         sb.append( '\'' ).append( cv.getTermName() ).append( '\'' ).append( ' ' );
