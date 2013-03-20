@@ -16,7 +16,6 @@ import psidev.psi.tools.validator.util.XpathValidator;
 import psidev.psi.tools.validator.xpath.XPathHelper;
 import psidev.psi.tools.validator.xpath.XPathResult;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -165,7 +164,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         } catch ( JXPathException e ) {
             messages.add( buildMessage( scopeXpath, level,
-                                        "Skip this rule as the XPath expression could not be compiled: '" + scopeXpath + "'" ) );
+                                        "Skip this rule as the XPath expression could not be compiled: '" + scopeXpath + "'" , object) );
             return messages;
         }
 
@@ -342,7 +341,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         } catch ( JXPathException e ) {
             messages.add( buildMessage( valueXpath, level,
-                                        "Skip this rule as the XPath expression could not be compiled: '" + valueXpath + "'" ) );
+                                        "Skip this rule as the XPath expression could not be compiled: '" + valueXpath + "'", objectToCheck ) );
             return;
         }
 
@@ -368,7 +367,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                     }
                 }
 
-                messages.add( buildMessage( elementXpath, level, sb.toString() ) );
+                messages.add( buildMessage( elementXpath, level, sb.toString(), objectToCheck ) );
             }
 
         } else {
@@ -406,7 +405,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append( count )
                             .append( " times in elements pointed out by the XPath expression: " )
                             .append( getElementPath() );
-                    messages.add( buildMessage( getElementPath(), level, sb.toString() ) );
+                    messages.add( buildMessage( getElementPath(), level, sb.toString(), objectToCheck ) );
                 }
             } //for
 
@@ -450,7 +449,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(":\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
                     
-                    messages.add( buildMessage( elementXpath, level, sb.toString() ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), objectToCheck ) );
                 }
 
             } else if ( "AND".equalsIgnoreCase( operator ) ) {
@@ -484,7 +483,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
 
-                    messages.add( buildMessage( elementXpath, level, sb.toString() ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), objectToCheck ) );
                 }
 
             } else if ( "XOR".equalsIgnoreCase( operator ) ) {
@@ -512,7 +511,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(getCVTerms().size())
                             .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
-                    messages.add( buildMessage( elementXpath, level, sb.toString() ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), objectToCheck ) );
                 }
             } else {
                 // This should not happened as the incoming data are validated by XML schema ... so just in case ...
@@ -676,6 +675,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                                      convertCvMappingLevel( level ),
                                      new Context( xpath ),
                                      rule );
+    }
+
+    public ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Rule rule, Object o ) {
+        return buildMessage(xpath, level, message, rule);
     }
 
     public MessageLevel convertCvMappingLevel( Recommendation level ) {
@@ -856,6 +859,10 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
     private ValidatorMessage buildMessage( String xpath, Recommendation level, String message ) {
         return buildMessage( xpath, level, message, this );
+    }
+
+    protected ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Object objectToCheck ) {
+        return buildMessage( xpath, level, message, this, objectToCheck );
     }
 
     private String printCvTerm( CvTerm cv ) {
