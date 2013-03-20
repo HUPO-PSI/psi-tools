@@ -154,7 +154,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         if ( log.isDebugEnabled() ) log.debug( "Xpath to fetch objects to check on: " + scopeXpath );
 
         // get the elements to check
-        List<XPathResult> results;
+        List<XPathResult> results = Collections.EMPTY_LIST;
         try {
             results = XPathHelper.evaluateXPath( scopeXpath, object );
             if ( log.isDebugEnabled() ) {
@@ -164,7 +164,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         } catch ( JXPathException e ) {
             messages.add( buildMessage( scopeXpath, level,
-                                        "Skip this rule as the XPath expression could not be compiled: '" + scopeXpath + "'" , object) );
+                                        "Skip this rule as the XPath expression could not be compiled: '" + scopeXpath + "'", results, object) );
             return messages;
         }
 
@@ -212,7 +212,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             for ( XPathResult result : results ) {
                 Object objectToCheck = result.getResult();
 
-                checkSingleObject( objectToCheck, elementXpath, valueXpath, messages, level );
+                checkSingleObject( objectToCheck, elementXpath, valueXpath, messages, level, object );
 
                 if( status.equals( MappingRuleStatus.INVALID_XPATH ) ) {
                     return messages;
@@ -295,18 +295,20 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
      * @param valueXpath    the Xpath expression allowing to fetch the values on the objectToCheck.
      * @param messages      list of message that eventually will be returned to the user.
      * @param level         level of the messages to generate
+     * @param o             the parent object on what the rule is applied to
      * @throws ValidatorException if the provided Xpath could not be compiled.
      */
     private void checkSingleObject( Object objectToCheck,
                                     String elementXpath,
                                     String valueXpath,
                                     Collection<ValidatorMessage> messages,
-                                    Recommendation level ) throws ValidatorException {
+                                    Recommendation level,
+                                    Object o) throws ValidatorException {
         
         String resultClassName = objectToCheck.getClass().getSimpleName();
 
         // 1. from the objectToCheck retrieve the values to be checked against the CvTerms of the rule
-        List<XPathResult> valueResults;
+        List<XPathResult> valueResults = Collections.EMPTY_LIST;
         try {
             valueResults = XPathHelper.evaluateXPath( valueXpath, objectToCheck );
 
@@ -341,7 +343,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
         } catch ( JXPathException e ) {
             messages.add( buildMessage( valueXpath, level,
-                                        "Skip this rule as the XPath expression could not be compiled: '" + valueXpath + "'", objectToCheck ) );
+                                        "Skip this rule as the XPath expression could not be compiled: '" + valueXpath + "'", valueResults, o ) );
             return;
         }
 
@@ -367,7 +369,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                     }
                 }
 
-                messages.add( buildMessage( elementXpath, level, sb.toString(), objectToCheck ) );
+                messages.add( buildMessage( elementXpath, level, sb.toString(), null, objectToCheck ) );
             }
 
         } else {
@@ -405,7 +407,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append( count )
                             .append( " times in elements pointed out by the XPath expression: " )
                             .append( getElementPath() );
-                    messages.add( buildMessage( getElementPath(), level, sb.toString(), objectToCheck ) );
+                    messages.add( buildMessage( getElementPath(), level, sb.toString(), valueResults, objectToCheck ) );
                 }
             } //for
 
@@ -449,7 +451,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(":\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
                     
-                    messages.add( buildMessage( elementXpath, level, sb.toString(), objectToCheck ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, objectToCheck ) );
                 }
 
             } else if ( "AND".equalsIgnoreCase( operator ) ) {
@@ -483,7 +485,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
 
-                    messages.add( buildMessage( elementXpath, level, sb.toString(), objectToCheck ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, objectToCheck ) );
                 }
 
             } else if ( "XOR".equalsIgnoreCase( operator ) ) {
@@ -511,7 +513,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(getCVTerms().size())
                             .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
-                    messages.add( buildMessage( elementXpath, level, sb.toString(), objectToCheck ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, objectToCheck ) );
                 }
             } else {
                 // This should not happened as the incoming data are validated by XML schema ... so just in case ...
@@ -677,7 +679,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                                      rule );
     }
 
-    public ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Rule rule, Object o ) {
+    public ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Rule rule, List<XPathResult> results, Object o) {
         return buildMessage(xpath, level, message, rule);
     }
 
@@ -861,8 +863,8 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
         return buildMessage( xpath, level, message, this );
     }
 
-    protected ValidatorMessage buildMessage( String xpath, Recommendation level, String message, Object objectToCheck ) {
-        return buildMessage( xpath, level, message, this, objectToCheck );
+    protected ValidatorMessage buildMessage( String xpath, Recommendation level, String message, List<XPathResult> pathResults, Object o ) {
+        return buildMessage( xpath, level, message, this, pathResults, o );
     }
 
     private String printCvTerm( CvTerm cv ) {
