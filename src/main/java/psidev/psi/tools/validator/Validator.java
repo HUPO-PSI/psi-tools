@@ -208,6 +208,12 @@ public abstract class Validator {
         this.cvRuleManager = new CvRuleManager(manager, cvMappingRules);
     }
 
+    protected void setCvRuleManager(CvRuleManager manager){
+        if (manager != null){
+            this.cvRuleManager = manager;
+        }
+    }
+
     /**
      * Set a cvMapping file and build the corresponding cvRuleManager.
      *
