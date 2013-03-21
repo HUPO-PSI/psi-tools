@@ -39,9 +39,9 @@ public abstract class Validator {
      */
     public static final Log log = LogFactory.getLog( Validator.class );
 
-    private static final Properties validationProps = loadValidatonProperties();
+    private static final Properties validationProps = loadValidationProperties();
 
-    private static Properties loadValidatonProperties() {
+    private static Properties loadValidationProperties() {
 
         //check to see if we have a project-specific configuration file
         URL resource = Validator.class.getClassLoader().getResource("validation.properties");
