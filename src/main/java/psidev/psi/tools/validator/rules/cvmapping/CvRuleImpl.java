@@ -369,7 +369,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                     }
                 }
 
-                messages.add( buildMessage( elementXpath, level, sb.toString(), null, objectToCheck ) );
+                messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, o ) );
             }
 
         } else {
@@ -407,7 +407,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append( count )
                             .append( " times in elements pointed out by the XPath expression: " )
                             .append( getElementPath() );
-                    messages.add( buildMessage( getElementPath(), level, sb.toString(), valueResults, objectToCheck ) );
+                    messages.add( buildMessage( getElementPath(), level, sb.toString(), valueResults, o ) );
                 }
             } //for
 
@@ -451,7 +451,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(":\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
                     
-                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, objectToCheck ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, o ) );
                 }
 
             } else if ( "AND".equalsIgnoreCase( operator ) ) {
@@ -485,7 +485,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
 
-                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, objectToCheck ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, o ) );
                 }
 
             } else if ( "XOR".equalsIgnoreCase( operator ) ) {
@@ -513,7 +513,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                             .append(getCVTerms().size())
                             .append(" CvTerm(s):\n")
                             .append( listCvTerms( "  - ", getCVTerms() ) );
-                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, objectToCheck ) );
+                    messages.add( buildMessage( elementXpath, level, sb.toString(), valueResults, o ) );
                 }
             } else {
                 // This should not happened as the incoming data are validated by XML schema ... so just in case ...
