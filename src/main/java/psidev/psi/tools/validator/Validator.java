@@ -204,6 +204,10 @@ public abstract class Validator {
         return cvRuleManager;
     }
 
+    protected void instantiateCvRuleManager(OntologyManager manager, CvMapping cvMappingRules){
+        this.cvRuleManager = new CvRuleManager(manager, cvMappingRules);
+    }
+
     /**
      * Set a cvMapping file and build the corresponding cvRuleManager.
      *
@@ -212,7 +216,7 @@ public abstract class Validator {
      */
     public void setCvMappingRules( InputStream cvIs ) throws CvRuleReaderException {
         CvRuleReader reader = new CvRuleReader();
-        cvRuleManager = new CvRuleManager( ontologyMngr, reader.read( cvIs ) );
+        instantiateCvRuleManager( ontologyMngr, reader.read( cvIs ) );
     }
 
     /**
@@ -224,7 +228,7 @@ public abstract class Validator {
     public void setCvMappingRules( OntologyManager ontologymanager, CvMapping cvMapping ) {
 
         if (cvMapping != null && ontologymanager != null){
-            this.cvRuleManager = new CvRuleManager(ontologymanager, cvMapping);
+            instantiateCvRuleManager(ontologymanager, cvMapping);
         }
         else if (ontologymanager == null){
             throw new IllegalArgumentException("The OntologyManager is null, we can't create a new CvRuleManager.");
