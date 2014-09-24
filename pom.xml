@@ -20,9 +20,9 @@
     </description>
 
     <scm>
-        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-config-reader/trunk</connection>
-        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-config-reader/trunk</developerConnection>
-        <url>https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/ontology-config-reader/trunk</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-config-reader/trunk</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-config-reader/trunk</developerConnection>
+        <url>https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-config-reader/trunk</url>
     </scm>
 
     <build>
