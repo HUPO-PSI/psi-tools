@@ -14,9 +14,9 @@
     <description>Base build file</description>
 
     <scm>
-        <connection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/current</connection>
-        <developerConnection>scm:svn:https://psidev.svn.sourceforge.net/svnroot/psidev/psi/tools/current</developerConnection>
-        <url>http://svn.sourceforge.net/viewcvs.cgi/psidev/psi/tools/current</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/psidev/svn/psi/tools/current</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/psidev/svn/psi/tools/current</developerConnection>
+        <url>http://svn.code.sf.net/p/psidev/svn/psi/tools/current/</url>
     </scm>
 
     <modules>
@@ -40,7 +40,5 @@
             <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-
-
 
 </project>
