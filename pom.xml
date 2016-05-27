@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>psidev.psi.tools</groupId>
         <artifactId>master-pom</artifactId>
@@ -8,50 +8,20 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>psidev.psi.tools</groupId>
     <artifactId>ontology-manager</artifactId>
-    <packaging>jar</packaging>
     <version>2.0.6-SNAPSHOT</version>
-
+    <packaging>jar</packaging>
     <name>PSI :: Tools :: Ontology Manager</name>
 
     <description>
         The library intends to provide a generic framework for Ontology access and handling.
     </description>
 
-    <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-manager/trunk</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-manager/trunk</developerConnection>
-        <url>https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-manager/trunk</url>
-    </scm>
-
-    <!--<build>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>axistools-maven-plugin</artifactId>-->
-                <!--<version>1.3</version>-->
-                <!--<executions>-->
-                           <!--<execution>-->
-                        <!--<goals>-->
-                            <!--<goal>wsdl2java</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-                <!--<configuration>-->
-                    <!--<packageSpace>uk.ac.ebi.ontology_lookup.ontologyquery</packageSpace>-->
-                    <!--<sourceDirectory>src/wsdl</sourceDirectory>-->
-                    <!--<outputDirectory>target/generated-sources/wsdl2java</outputDirectory>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
-    <!--</build>-->
-
     <dependencies>
         <dependency>
             <groupId>psidev.psi.tools</groupId>
             <artifactId>ontology-config-reader</artifactId>
-            <version>2.0.6-SNAPSHOT</version>
+            <version>2.0.5</version>
         </dependency>
 
         <!-- Tests -->
@@ -72,15 +42,20 @@
                     <artifactId>ojdbc14</artifactId>
                     <groupId>oracle</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>uk.ac.ebi.ols</artifactId>
+                    <groupId>ols-client</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <!-- OLS webservice -->
         <dependency>
-            <groupId>uk.ac.ebi.ols</groupId>
+            <groupId>uk.ac.ebi.pride.utilities</groupId>
             <artifactId>ols-client</artifactId>
-            <version>1.18</version>
+            <version>2.4-SNAPSHOT-IntAct</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
@@ -109,7 +84,6 @@
         </dependency>
 
         <!-- 3rd party -->
-
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -128,6 +102,13 @@
             <version>2.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- caching -->
         <dependency>
             <groupId>opensymphony</groupId>
@@ -138,10 +119,34 @@
 
     <repositories>
         <repository>
-            <id>intact.nexus</id>
-            <name>IntAct Nexus</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
+            <id>nexus-ebi-repo-old</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
+        </repository>
+        <repository>
+            <id>nexus-ebi-release-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
+        </repository>
+        <repository>
+            <id>nexus-ebi-snapshot-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
         </repository>
     </repositories>
+
+    <!-- Overwrites the previous repositories-->
+    <distributionManagement>
+        <!-- EBI repo -->
+        <repository>
+            <id>pst-release</id>
+            <name>EBI Nexus Repository</name>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/repositories/pst-release</url>
+        </repository>
+        <!-- EBI SNAPSHOT repo -->
+        <snapshotRepository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>pst-snapshots</id>
+            <name>EBI Nexus Snapshots Repository</name>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/repositories/pst-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
