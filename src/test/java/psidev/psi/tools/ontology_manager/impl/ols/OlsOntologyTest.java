@@ -1,6 +1,7 @@
 package psidev.psi.tools.ontology_manager.impl.ols;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.OntologyUtils;
@@ -53,11 +54,6 @@ public class OlsOntologyTest {
         // neither the query term itself nor its child terms = 0 valid term
         final Set<OntologyTermI> terms4 = mod.getValidTerms( "GO:0055044", false, false );
         Assert.assertTrue( terms4.isEmpty() );
-        // empty accession = 0 valid term
-        final Set<OntologyTermI> terms5 = mod.getValidTerms( "", false, false );
-        Assert.assertTrue( terms5.isEmpty() );
-        // null accession = 0 valid term
-        
         //fails?
         Assert.assertNotNull(mod.getTermForAccession("GO:0005575"));
     }
@@ -69,7 +65,7 @@ public class OlsOntologyTest {
         // SO:0000336 has 9 children (OLS 10 Aug 2011) = 9 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000336");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 11, terms.size() );
+        Assert.assertEquals( 14, terms.size() );
     }
 
     @Test
@@ -79,12 +75,11 @@ public class OlsOntologyTest {
         Assert.assertEquals( 1, terms.size() );
         final OntologyTermI y2h = terms.iterator().next();
 
-        // OLS check: 9 synonyms (10 Aug 2011)
-        Assert.assertEquals( 9, y2h.getNameSynonyms().size() );
+        // OLS check: 8 synonyms (17 May 2016)
+        Assert.assertEquals( 8, y2h.getNameSynonyms().size() );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "classical two hybrid" ) );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "Gal4 transcription regeneration" ) );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "yeast two hybrid" ) );
-        Assert.assertTrue( y2h.getNameSynonyms().contains( "Y2H" ) );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "two-hybrid" ) );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "2 hybrid" ) );
         Assert.assertTrue( y2h.getNameSynonyms().contains( "2-hybrid" ) );
@@ -155,7 +150,7 @@ public class OlsOntologyTest {
         Assert.assertFalse(mi.isObsolete( term2 ));
     }
 
-    @Test
+    @Test(expected=IllegalStateException.class)
     public void isObsolete_unknown_accession() throws Exception {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
         final OntologyTermI term = new OntologyTermImpl( "MI:xxxx", "bogus term" );
@@ -171,7 +166,7 @@ public class OlsOntologyTest {
         Assert.assertEquals( "biophysical", term.getPreferredName() );
     }
 
-    @Test
+    @Test(expected=IllegalStateException.class)
     public void getTermForAccession_unknown_accession() throws Exception {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
         final OntologyTermI term = mi.getTermForAccession( "MI:xxxx" );
@@ -196,7 +191,7 @@ public class OlsOntologyTest {
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1191", "ultraviolet (uv) footprinting" ) ) );
     }
 
-    @Test
+    @Test(expected=IllegalStateException.class)
     public void getDirectChildren_unknown_accession() throws Exception {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
 
@@ -216,7 +211,7 @@ public class OlsOntologyTest {
 
         final Set<OntologyTermI> children = mi.getAllChildren( term );
         Assert.assertNotNull( children );
-        Assert.assertEquals( children.toString(), 11, children.size() );
+        Assert.assertEquals( children.toString(), 12, children.size() );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0901", "isotope label footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0602", "chemical footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0603", "dimethylsulphate footprinting" ) ) );
@@ -228,9 +223,10 @@ public class OlsOntologyTest {
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1189", "methylation interference assay" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1183", "nuclease footprinting" ) ) );
         Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:0814", "protease accessibility laddering" ) ) );
+        Assert.assertTrue( children.contains( new OntologyTermImpl( "MI:1352", "uracil interference assay" ) ) );
     }
 
-    @Test
+    @Test(expected=IllegalStateException.class)
     public void getAllChildren_unknown_accession() throws Exception {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
 
@@ -257,7 +253,7 @@ public class OlsOntologyTest {
         Assert.assertTrue( parents.contains( new OntologyTermImpl( "MI:0045", "experimental interaction detection" ) ) );
     }
 
-    @Test
+    @Test(expected=IllegalStateException.class)
     public void getDirectParents_unknown_accession() throws Exception {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
 
@@ -283,7 +279,7 @@ public class OlsOntologyTest {
         Assert.assertTrue( parents.contains( new OntologyTermImpl( "MI:0000", "molecular interaction" ) ) );
     }
 
-    @Test
+    @Test(expected=IllegalStateException.class)
     public void getAllParents_unknown_accession() throws Exception {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
 
