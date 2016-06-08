@@ -17,6 +17,13 @@
         The library intends to provide a generic framework for Ontology access and handling.
     </description>
 
+    <scm>
+        <connection>scm:git:https://github.com/MICommunity/ontology-manager.git</connection>
+        <developerConnection>scm:git:https://github.com/MICommunity/ontology-manager.git</developerConnection>
+        <url>https://github.com/MICommunity/ontology-manager</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>psidev.psi.tools</groupId>
