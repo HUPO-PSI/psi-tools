@@ -176,6 +176,10 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         // if we don't even have a valid input, there is no point in trying to query OLS
         if (accession == null) { return null; }
 
+        if(ontologyID == null){
+            ontologyID = accession.split(":")[0];
+        }
+
         String termName;
         try {
             termName = olsClient.getTermById(accession, ontologyID);
@@ -209,10 +213,12 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         for ( Object k : metadata.keySet() ) {
             final String key = (String) k;
             // That's the only way OLS provides synonyms, all keys are different so we are fishing out keywords :(
-            if( key != null && (key.contains( "synonym" ) || key.contains( "Alternate label" )) ) {
-                String value = (String) metadata.get( k );
-                if( value != null ) {
-                    term.getNameSynonyms().add(value.trim());
+            if( key != null && (key.contains( "synonym" ))) {
+                Map value = (Map) metadata.get( k );
+                for(Object synonym : value.keySet()){
+                    if( synonym != null ) {
+                        term.getNameSynonyms().add((String)synonym);
+                    }
                 }
             }
         }
@@ -536,10 +542,9 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
      */
     public Set<T> getChildrenUncached( T term, int level ) {
         if (term == null) { return null; }
-        int[] relationshipTypes = new int[] {1, 2, 3, 4};
         Map results;
         try {
-            results = olsClient.getTermChildren( term.getTermAccession(), ontologyID, level, relationshipTypes );
+            results = olsClient.getTermChildren( term.getTermAccession(), ontologyID, level);
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
         }
@@ -657,9 +662,8 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
                 }
             }
             if ( allowChildren ) { // get all children
-                int[] relationshipTypes = new int []  {1, 2, 3, 4};
 
-                Map resultMap = olsClient.getTermChildren( id, ontologyID, -1, relationshipTypes );
+                Map resultMap = olsClient.getTermChildren( id, ontologyID, -1);
 //                Map resultMap = query.getTermChildren(id, ontologyID, -1, null );
                 if ( resultMap == null ) { // should not happen, but just in case ...
                 } else {
@@ -894,7 +898,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     @Deprecated
     protected Set<String> getChildTermsUncached( String id ) throws RemoteException {
         Map<String, String> result;
-        result = olsClient.getTermChildren( id, ontologyID, 1, null );
+        result = olsClient.getTermChildren( id, ontologyID, 1 );
         return result.keySet();
     }
 

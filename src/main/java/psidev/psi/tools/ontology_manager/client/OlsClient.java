@@ -1,12 +1,17 @@
 package psidev.psi.tools.ontology_manager.client;
 
-import uk.ac.ebi.ols.soap.Query;
-import uk.ac.ebi.ols.soap.QueryServiceLocator;
+import org.hsqldb.lib.Collection;
+import uk.ac.ebi.pride.utilities.ols.web.service.client.OLSClient;
+import uk.ac.ebi.pride.utilities.ols.web.service.config.OLSWsConfigDev;
+import uk.ac.ebi.pride.utilities.ols.web.service.config.OLSWsConfigProd;
+import uk.ac.ebi.pride.utilities.ols.web.service.model.Identifier;
+import uk.ac.ebi.pride.utilities.ols.web.service.model.Term;
 
-import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,27 +26,16 @@ import java.util.Map;
 
 public class OlsClient {
 
-    private QueryServiceLocator queryService;
-    private static final String wsdlURL = "http://www.ebi.ac.uk/ontology-lookup/OntologyQuery.wsdl";
-
-    private static final String ontologyQueryURL = "http://www.ebi.ac.uk/ontology-lookup/OntologyQuery";
-    private static final String ontologyQueryName = "QueryService";
+    private OLSClient olsClient;
 
     public OlsClient() throws MalformedURLException, ServiceException {
-        queryService = new QueryServiceLocator(wsdlURL, new QName(ontologyQueryURL, ontologyQueryName));
-    }
-
-    public QueryServiceLocator getQueryService() {
-        return queryService;
-    }
-
-    public Query getQuery() throws ServiceException {
-        return queryService.getOntologyQuery();
+        this.olsClient = new OLSClient(new OLSWsConfigProd());
     }
 
     public String getTermById(String accession, String ontologyId) throws RemoteException{
         try {
-            return getQuery().getTermById(accession, ontologyId);
+            Identifier identifier = new Identifier(accession, Identifier.IdentifierType.OBO);
+            return olsClient.getTermById(identifier, ontologyId).getLabel();
         } catch ( Exception e ) {
             throw new RemoteException( "RemoteException while trying to connect to OLS." );
         }
@@ -50,8 +44,21 @@ public class OlsClient {
     public Map getTermMetadata(String termAccession, String ontologyId) throws RemoteException{
         final Map metadata;
         try {
-            metadata = getQuery().getTermMetadata(termAccession, ontologyId);
-
+            Identifier identifier = new Identifier(termAccession, Identifier.IdentifierType.OBO);
+            metadata = olsClient.getMetaData(identifier, ontologyId);
+            if (metadata != null && !metadata.isEmpty()) {
+                for (Object key : metadata.keySet()) {
+                    if (metadata.get(key) == null) {
+                        metadata.remove(key);
+                    }
+                    if (metadata.get(key) instanceof String && metadata.get(key).equals("")) {
+                        metadata.remove(key);
+                    }
+                    if (metadata.get(key) instanceof Collection && ((Collection) metadata.get(key)).isEmpty()) {
+                        metadata.remove(key);
+                    }
+                }
+            }
             return metadata;
 
         } catch ( Exception e ) {
@@ -62,7 +69,8 @@ public class OlsClient {
     public Map getTermXrefs(String termAccession, String ontologyId) throws RemoteException{
         final Map metadata;
         try {
-            metadata = getQuery().getTermXrefs(termAccession, ontologyId);
+            Identifier identifier = new Identifier(termAccession, Identifier.IdentifierType.OBO);
+            metadata = olsClient.getTermXrefs(identifier, ontologyId);
 
             return metadata;
 
@@ -72,10 +80,12 @@ public class OlsClient {
     }
 
     public Map getRootTerms(String ontologyId) throws RemoteException{
-
+        HashMap roots = new HashMap();
         try {
-            Map roots = getQuery().getRootTerms(ontologyId);
-
+            List<Term> result = olsClient.getRootTerms(ontologyId);
+            for(Term term : result){
+                roots.put(term.getTermOBOId().getIdentifier(), term);
+            }
             return roots;
         } catch ( Exception e ) {
             throw new RemoteException( "RemoteException while trying to connect to OLS." );
@@ -85,44 +95,48 @@ public class OlsClient {
     public boolean isObsolete(String termAccession, String ontologyId) throws RemoteException{
         boolean retVal;
         try {
-            retVal = getQuery().isObsolete(termAccession, ontologyId);
+            retVal = olsClient.isObsolete(termAccession, ontologyId);
         } catch ( Exception e ) {
             throw new RemoteException( "RemoteException while trying to connect to OLS." );
         }
         return retVal;
     }
 
-    public Map getTermParents(String termAccession, String ontologyId) throws RemoteException{
+    public Map getTermParents(String termAccession, String ontologyId) throws RemoteException {
 
-        final Map metadata;
+        final Map metadata = new HashMap();
         try {
-            metadata = getQuery().getTermParents(termAccession, ontologyId);
-
+            Identifier identifier = new Identifier(termAccession, Identifier.IdentifierType.OBO);
+            for (Term term : olsClient.getTermParents(identifier, ontologyId, 1)) {
+                metadata.put(term.getTermOBOId().getIdentifier(), term.getLabel());
+            }
             return metadata;
 
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             throw new RemoteException("RemoteException while trying to connect to OLS.", e);
         }
     }
 
-    public Map getTermChildren(String termAccession, String ontologyId, int level, int[] relationships) throws RemoteException{
+    public Map getTermChildren(String termAccession, String ontologyId, int level) throws RemoteException {
 
-        final Map metadata;
+        final Map metadata = new HashMap();
         try {
-            metadata = getQuery().getTermChildren(termAccession, ontologyId, level, relationships);
+            Identifier identifier = new Identifier(termAccession, Identifier.IdentifierType.OBO);
+            for (Term term : olsClient.getTermChildren(identifier, ontologyId, level)) {
+                metadata.put(term.getTermOBOId().getIdentifier(), term.getLabel());
+            }
 
             return metadata;
 
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             throw new RemoteException("RemoteException while trying to connect to OLS.", e);
         }
     }
 
     public String getOntologyLoadDate(String ontologyId) throws RemoteException{
         try {
-            String dateString = getQuery().getOntologyLoadDate(ontologyId);
 
-            return dateString;
+            return olsClient.getOntology(ontologyId).getLoadedDate();
 
         } catch (Exception e) {
             throw new RemoteException("We can't access the date of the last ontology update.", e);
