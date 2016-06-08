@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ontology-manager</artifactId>
-    <version>2.0.6-SNAPSHOT</version>
+    <version>2.0.6</version>
     <packaging>jar</packaging>
     <name>PSI :: Tools :: Ontology Manager</name>
 
@@ -20,7 +20,8 @@
         <connection>scm:git:https://github.com/MICommunity/ontology-manager.git</connection>
         <developerConnection>scm:git:https://github.com/MICommunity/ontology-manager.git</developerConnection>
         <url>https://github.com/MICommunity/ontology-manager</url>
-    </scm>
+      <tag>ontology-manager-2.0.6</tag>
+  </scm>
 
     <build>
         <plugins>
