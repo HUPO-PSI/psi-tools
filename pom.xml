@@ -37,7 +37,7 @@
                             <featureBranchPrefix>feature-</featureBranchPrefix>
                             <releaseBranchPrefix>release-</releaseBranchPrefix>
                             <hotfixBranchPrefix>hotfix-</hotfixBranchPrefix>
-                            <versionTagPrefix>blither-</versionTagPrefix>
+                            <versionTagPrefix>${project.artifactId}-</versionTagPrefix>
                         </flowInitContext>
                     <!-- see goals wiki page for configuration options -->
                 </configuration>
