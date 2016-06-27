@@ -4,12 +4,12 @@
     <cvSource source="file"
               uri="classpath:ontologies/psi-mi.obo"
               format="OBO" name="PSI-MI" identifier="MI" version="1.154"/>
-    <cvSource source="file"
-              uri="classpath:ontologies/psi-ms.obo"
-              format="OBO" name="PSI-MS" identifier="MS" version="1.01"/>
-    <cvSource source="file"
-              uri="classpath:ontologies/pride_cv.obo"
-              format="OBO" name="PRIDE Ontology" identifier="PRIDE" version="1.54"/>
+    <!--<cvSource source="file"-->
+              <!--uri="classpath:ontologies/psi-ms.obo"-->
+              <!--format="OBO" name="PSI-MS" identifier="MS" version="1.01"/>-->
+    <!--<cvSource source="file"-->
+              <!--uri="classpath:ontologies/pride_cv.obo"-->
+              <!--format="OBO" name="PRIDE Ontology" identifier="PRIDE" version="1.54"/>-->
     <cvSource source="file"
               uri="classpath:ontologies/quality.obo"
               format="OBO" name="Phenotypic qualities (properties)" identifier="PATO" version="NA"/>

@@ -58,6 +58,7 @@ public class CvMappingRuleTest {
     // Tests checkCvMapping
 
     @Test
+    @Ignore
     public void checkCvMapping_noError() throws Exception {
         // check a fine mapping.
         File input = new File( CvMappingRuleTest.class.getResource( "/fine-house-cvmapping.xml" ).getFile() );
@@ -76,6 +77,7 @@ public class CvMappingRuleTest {
      * @throws Exception in case of any problems during execution.
      */
     @Test
+    @Ignore
     public void checkCvMappingCheck() throws Exception {
         File input = new File( CvMappingRuleTest.class.getResource( "/mz-mapping.v3.xml" ).getFile() );
         Assert.assertNotNull(input);
@@ -96,6 +98,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void checkCvMapping_obsolete() throws Exception {
         // checks that one out of two cvterm is obsolete, so it gets removed.
         // Yet the rule remains as it still has one valid cvTerm.
@@ -117,6 +120,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void checkCvMapping_all_cvterm_obsolete() throws Exception {
         // checks that both cvTerm in the rule are obsolete and that the rule was removed.
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-obsolete2-cvmapping.xml" ).getFile() );
@@ -136,6 +140,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void checkCvMapping_mixed_errors() throws Exception {
         // checks that both cvTerm in the rule are removed (obsolete and term non existing in an ontology)
         // and that the rule gets also removed.
@@ -153,6 +158,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void checkCvMapping_children_issue() throws Exception {
         // checks that one cvTerm in the rule is removed
         // (term without children where we specify to use only the children)
@@ -170,6 +176,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void checkCvMapping_unknown_terms() throws Exception {
         // checks that all 4 cvTerms in the rule are removed
         // (they don't exist in MS) and that the rule gets also removed.
@@ -189,6 +196,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void checkCvMapping_unusable_term() throws Exception {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-error3-cvmapping.xml" ).getFile() );
@@ -207,6 +215,7 @@ public class CvMappingRuleTest {
     // Tests check
 
     @Test
+    @Ignore
     public void check_noMessage() throws Exception {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-house-cvmapping.xml" ).getFile() );
@@ -231,6 +240,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void check_PositiveMessage() throws Exception {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample1-house-cvmapping.xml" ).getFile() );
@@ -266,6 +276,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void check_useTerm_is_false() throws Exception {
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
         CvRuleReader reader = new CvRuleReader();
@@ -290,6 +301,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void check_allowChildren_1() throws Exception {
 
         // This test will check that the term pointed out by the XPath is a children of the one specified in the cvmapping.
@@ -313,6 +325,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void check_allowChildren_2() throws Exception {
 
         // This test will report an error because the term pointed out by the XPath is not a children of the one specified in the cvmapping.
@@ -387,6 +400,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void check_term_not_found_may() throws Exception {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
@@ -415,6 +429,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void check_term_not_found_should() throws Exception {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample3-house-cvmapping.xml" ).getFile() );
@@ -443,6 +458,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void check_term_not_found_must() throws Exception {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample4-house-cvmapping.xml" ).getFile() );
@@ -471,6 +487,7 @@ public class CvMappingRuleTest {
     }
 
     @Test
+    @Ignore
     public void check_bad_xpath() throws Exception {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample5-house-cvmapping.xml" ).getFile() );
@@ -599,6 +616,7 @@ public class CvMappingRuleTest {
     }
 
     @Test( expected = ValidatorException.class )
+    @Ignore
     public void check_null() throws Exception {
 
         File input = new File( CvMappingRuleTest.class.getResource( "/sample2-house-cvmapping.xml" ).getFile() );
