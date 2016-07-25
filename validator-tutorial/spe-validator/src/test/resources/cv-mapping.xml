@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CvMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/CvMapping.xsd"
+           modelName="SPE" modelVersion="1.0" modelURI="spe">
+
+    <CvReferenceList>
+        <CvReference cvName="Protein Modification" cvIdentifier="MOD"/>
+        <CvReference cvName="Molecule Type" cvIdentifier="SPE"/>
+    </CvReferenceList>
+
+    <CvMappingRuleList>
+
+        <CvMappingRule id="R1" name="Molecule's modification check"
+                       cvElementPath="/experiment/molecules/modifications/@id"
+                       scopePath="/experiment/molecules"
+                       cvTermsCombinationLogic="OR"
+                       requirementLevel="SHOULD" >
+
+            <CvTerm termAccession="MOD:01157"
+                    useTermName="false"
+                    useTerm="true"
+                    termName="protein modification categorized by amino acid modified"
+                    allowChildren="true"
+                    cvIdentifierRef="MOD"
+                    isRepeatable="true" />
+        </CvMappingRule>
+
+        <CvMappingRule id="R2" name="Molecule's type check"
+                       cvElementPath="/experiment/molecules/type/@id"
+                       scopePath="/experiment/molecules"
+                       cvTermsCombinationLogic="OR"
+                       requirementLevel="MUST" >
+
+            <CvTerm termAccession="SPE:0326"
+                    useTermName="false"
+                    useTerm="true"
+                    termName="protein"
+                    allowChildren="false"
+                    cvIdentifierRef="SPE"
+                    isRepeatable="false" />
+
+            <CvTerm termAccession="SPE:0318"
+                    useTermName="false"
+                    useTerm="true"
+                    termName="nucleic acid"
+                    allowChildren="true"
+                    cvIdentifierRef="SPE"
+                    isRepeatable="false" />
+        </CvMappingRule>
+
+    </CvMappingRuleList>
+</CvMapping>
+
+
+        

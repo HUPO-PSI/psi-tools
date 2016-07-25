@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cvSourceList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/CvSourceList.xsd">
+
+    <cvSource source="FILE" uri="classpath:molecule-type.obo"
+              format="OBO" name="Molecule Type" identifier="SPE" version="1.0"/>
+
+    <cvSource source="OLS" uri="" format="OBO" name="PSI-MOD" identifier="MOD" version="1.260"/>
+
+</cvSourceList>

@@ -1,0 +1,184 @@
+format-version: 1.2
+date: 28:05:2008 16:09
+saved-by: luisa
+auto-generated-by: OBO-Edit 1.101
+default-namespace: SPE
+
+[Term]
+id: SPE:0250
+name: gene
+def: "Functional section of DNA encoding a biomolecule product." [PMID:14755292, SO:0000704]
+is_a: SPE:0319 ! deoxyribonucleic acid
+
+[Term]
+id: SPE:0313
+name: biomolecule type
+def: "Molecular species involved in the interaction." [PMID:14755292]
+synonym: "participant type" EXACT []
+
+[Term]
+id: SPE:0314
+name: complex
+def: "Set of interacting molecules form a functional complex." [PMID:14755292]
+is_a: SPE:0313 ! biomolecule type
+
+[Term]
+id: SPE:0315
+name: protein complex
+def: "A stable set of interacting proteins that can be copurified and operate as a functional unit." [PMID:14755292]
+is_a: SPE:0314 ! complex
+
+[Term]
+id: SPE:0316
+name: ribonucleoprotein complex
+def: "A macromolecular complex containing both protein and RNA molecules." [GO:0030529, PMID:14755292]
+synonym: "protein rna complex" EXACT []
+synonym: "ribonucleoprot compl" EXACT []
+is_a: SPE:0314 ! complex
+
+[Term]
+id: SPE:0318
+name: nucleic acid
+def: "Linear polymers of nucleotides, linked by 3',5' phosphodiester linkages." [PMID:14755292, SO:0000348]
+is_a: SPE:0383 ! biopolymer
+
+[Term]
+id: SPE:0319
+name: deoxyribonucleic acid
+def: "Polymer formed by the deoxyribose sugar group, and the nucleotides bases adenine, guanine, thymine and cytosine." [PMID:14755292, SO:0000352]
+synonym: "deoxyribonucleic acid" EXACT []
+synonym: "DNA" EXACT []
+synonym: "dna" EXACT []
+is_a: SPE:0318 ! nucleic acid
+
+[Term]
+id: SPE:0320
+name: ribonucleic acid
+def: "Polymer formed by ribose sugar group, and the bases of the nucleotides adenine, guanine, uracil and cytosine." [PMID:14755292, SO:0000356]
+synonym: "RNA" EXACT []
+synonym: "rna" EXACT []
+is_a: SPE:0318 ! nucleic acid
+
+[Term]
+id: SPE:0321
+name: catalytic rna
+def: "Species of RNA that catalyses cleavage or trans-esterification of the phosphodiester link." [PMID:14755292]
+synonym: "catalytic ribonucleic acid" EXACT []
+synonym: "catalytic RNA" EXACT []
+synonym: "crna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0322
+name: guide rna
+def: "Small RNA molecules that hybridize to specific mRNAs and direct their RNA editing." [PMID:14755292]
+synonym: "grna" EXACT []
+synonym: "guide RNA" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0323
+name: heterogeneous nuclear rna
+def: "A heterogeneous mixture of RNA molecules with a rapid turnover rate that occurs in cell nuclei during protein synthesis; it is the form of RNA synthesized in eukaryotes by RNA polymerase II, which is translated into protein." [PMID:14755292]
+synonym: "heterogeneous nuclear ribonucleic acid" EXACT []
+synonym: "heterogeneous nuclear RNA" EXACT []
+synonym: "hnrna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0324
+name: messenger rna
+def: "Single-stranded RNA molecule that specifies the amino acid sequence of one or more polypeptide chains." [PMID:14755292]
+synonym: "mRNA" EXACT []
+synonym: "mrna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0325
+name: transfer rna
+def: "The low molecular weight RNAs that specifically bind amino acids by aminoacetylation to form aminoacyl tRNA and which possess a special nucleotide triplet, the anticodon." [PMID:14755292]
+synonym: "transfer ribonucleic acid" EXACT []
+synonym: "transfer RNA" EXACT []
+synonym: "tRNA" EXACT []
+synonym: "trna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0326
+name: protein
+def: "A linear polymer of amino acids joined by peptide bonds in a specific sequence." [PMID:14755292, SO:0000358]
+is_a: SPE:0383 ! biopolymer
+
+[Term]
+id: SPE:0327
+name: peptide
+def: "Chains of amino acids joined by peptide bonds. Distinction between peptides, oligopeptides and polypeptides is arbitrarily by length; a polypeptide is perhaps more than 15 residues." [PMID:14755292]
+synonym: "oligopeptide" EXACT []
+synonym: "polypeptide" EXACT []
+is_a: SPE:0383 ! biopolymer
+
+[Term]
+id: SPE:0328
+name: small molecule
+def: "Molecule not part of or directly encoded by the genome, encompasses any constitutionally or isotopically distinct atom, molecule, ion, ion pair, radical, radical ion, complex, conformer, etc., identifiable as a separately distinguishable entity." [PMID:14755292]
+is_a: SPE:0313 ! biomolecule type
+
+[Term]
+id: SPE:0383
+name: biopolymer
+def: "Molecule consisting of a specific sequence of amino acidic or nucleotidic monomers strung together through chemical bonds." [PMID:14577292]
+is_a: SPE:0313 ! biomolecule type
+
+[Term]
+id: SPE:0607
+name: small nuclear rna
+def: "These RNA molecules are relatively short (less than 200 nucleotides each), and there are five of them (U1, U2, U4, U5, and U6) involved in the major form of pre-mRNA splicing. Known as snRNAs (small nuclear RNAs), each is complexed with at least seven protein subunits to form a snRNP (small nuclear ribonucleoprotein). These snRNPs form the core of the spliceosome." [PMID:14755292]
+synonym: "snRNA" EXACT []
+synonym: "snrna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0608
+name: ribosomal rna
+def: "RNA that is transcribed from the DNA of the nucleolus and is found, together with characteristic proteins, in the ribosomes." [PMID:14755292]
+synonym: "rRNA" EXACT []
+synonym: "rrna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0609
+name: small nucleolar rna
+def: "The small nucleolar RNAs, are stable RNA contained in the nucleoli and these RNAs exist as snoRNA: protein complexes called snoRNPs (also called 'snorps'). The snoRNPs function is in the maturation of ribosomal RNA and other RNAs, by: creating two types of modified nucleotides, (2'-O-methylated nucleotides and pseudouridine), and mediating endonucleolytic cleavages of pre-rRNA." [PMID:14755292]
+synonym: "snoRNA" EXACT []
+synonym: "snorna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0610
+name: small interfering rna
+def: "Ribonucleic acid used in RNAi study. These RNA have the reverse complementary sequence of a target gene's mRNA transcript and inhibit its expression." [PMID:10542148]
+synonym: "dicer RNA" EXACT []
+synonym: "micro RNA" EXACT []
+synonym: "siRNA" EXACT []
+synonym: "sirna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0611
+name: signal recognition particle rna
+def: "Small (300 nucleotides) stable RNAs transcribed by RNA pol III that are part of the signal-recognition particle (SRP). This particle comprises one RNA and six proteins bound to the RNA. SRP function is to assist secretory proteins sorting in the endoplasmic reticulum (ER). SRP is a cytosolic particle that transiently binds to the ER signal sequence of a nascent protein, to the large ribosomal unit, and to the SRP receptor in the ER membrane." [PMID:14755292]
+synonym: "srpRNA" EXACT []
+synonym: "srprna" EXACT []
+is_a: SPE:0320 ! ribonucleic acid
+
+[Term]
+id: SPE:0904
+name: polysaccharide
+def: "A polysaccharide is a complex polymer of carbohydrate monormers. They are polymers made up of many monosaccharides joined together by glycosidic bonds. They are therefore very large, often branched, macromolecules." [PMID:14755292]
+is_a: SPE:0383 ! biopolymer
+
+[Typedef]
+id: part_of
+name: part of
+is_transitive: true
+
