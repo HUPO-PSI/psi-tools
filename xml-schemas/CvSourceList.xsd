@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2006 rel. 3 U (http://www.altova.com) by Samuel Kerrien (EBI) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="cvSourceList">
+		<xs:annotation>
+			<xs:documentation>Document related to a given data exchange schema or model, it describes all the associations between the specific schema contexts and the appropriate CV terms.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="cvSource" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>All sources of controlled vocabularies required by the model must be listed here.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="listVersion" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>Version number of the list of CvSourceList instance XML file.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cvSource">
+		<xs:complexType>
+			<xs:attribute name="source" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Physical source of the CV file or term information. The keywords 'OLS' or 'file'  should be used in this attribute and coupled with the appropriate URI.  A fully qualified class name is also allowed when it implements the ontology loader interface and has a public default constructor.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Name of the CV as in the PSI CV resource.  </xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="identifier" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Internal identifier for the CV source to be cross-referenced in the CVTerm instances.  </xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="uri" type="xs:anyURI" use="required">
+				<xs:annotation>
+					<xs:documentation>Universal identifier of the CV resource.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="format" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>To describe the CvFomart use consistently the upper case of the acronymes of the CV language, e.g. 'OBO', 'OWL', or the 'plain text' keyword when applicable.  </xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="version" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>Version number of the CV file when available (e.g. the data-version tag in OBO 1.2 format).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
