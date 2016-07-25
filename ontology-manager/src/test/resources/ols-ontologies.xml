@@ -1,0 +1,28 @@
+<cvSourceList>
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+              uri=""
+              format="OBO"
+              name="GO"
+              identifier="GO"
+              version=""/>
+
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+              uri=""
+              format="OBO"
+              name="PSI-MI"
+              identifier="MI"
+              version="2.5"/>
+
+    <cvSource source="OLS"
+              uri=""
+              format="OBO"
+              name="PSI-MOD"
+              identifier="MOD"
+              version="current"/>
+    <cvSource source="OLS"
+              uri=""
+              format="OBO"
+              name="Sequence Ontology"
+              identifier="SO"
+              version="current"/>
+</cvSourceList>

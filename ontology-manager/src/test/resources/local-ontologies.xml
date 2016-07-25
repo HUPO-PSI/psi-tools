@@ -1,0 +1,22 @@
+<cvSourceList>
+    <cvSource source="File"
+              uri="classpath:psi-mod.obo"
+              format="OBO"
+              name="PSI-MOD"
+              identifier="MOD"
+              version=""/>
+
+    <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="classpath:psi-mi25.obo"
+              format="OBO"
+              name="PSI-MI"
+              identifier="MI"
+              version="2.5"/>
+
+    <cvSource source="file"
+              uri="classpath:so.obo"
+              format="OBO"
+              name="Sequence Ontology"
+              identifier="SO"
+              version="1.230"/>
+</cvSourceList>
