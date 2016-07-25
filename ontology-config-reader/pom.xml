@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>psidev.psi.tools</groupId>
+        <artifactId>master-pom</artifactId>
+        <version>4</version>
+    </parent>
+
+    <groupId>psidev.psi.tools</groupId>
+    <artifactId>ontology-config-reader</artifactId>
+    <packaging>jar</packaging>
+    <version>2.0.6-SNAPSHOT</version>
+
+    <name>PSI :: Tools :: Ontology Config Reader</name>
+
+    <description>
+        The library provides an ontology configuration reader.
+    </description>
+
+    <scm>
+        <connection>scm:svn:https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-config-reader/trunk</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-config-reader/trunk</developerConnection>
+        <url>https://svn.code.sf.net/p/psidev/svn/psi/tools/ontology-config-reader/trunk</url>
+    </scm>
+
+    <build>
+        <plugins>
+            <!-- Conversion of XML Schema into Java source code using JAXB-XJC -->
+            <plugin>
+                <groupId>com.sun.tools.xjc.maven2</groupId>
+                <artifactId>maven-jaxb-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generatePackage>psidev.psi.tools.ontologyCfgReader.mapping.jaxb</generatePackage>
+                    <includeSchemas>
+                        <includeSchema>CvSourceList.xsd</includeSchema>
+                    </includeSchemas>
+                    <strict>true</strict>
+                    <verbose>true</verbose>
+                </configuration>
+            </plugin>
+
+            <!-- Assembly -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptor>${descriptor}</descriptor>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.3.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- 3rd party -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+        <!-- JAXB related deps -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.1</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>intact.nexus</id>
+            <name>IntAct Nexus</name>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+    
+</project>
