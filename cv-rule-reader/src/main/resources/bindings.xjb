@@ -1,0 +1,14 @@
+<bindings
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://java.sun.com/xml/ns/jaxb"
+        xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+        version="2.1">
+
+
+    <bindings schemaLocation="CvMappingRules.xsd" node="/xs:schema">
+        <schemaBindings>
+            <package name="psidev.psi.tools.cvrReader.mapping.jaxb"/>
+        </schemaBindings>
+    </bindings>
+
+</bindings>
