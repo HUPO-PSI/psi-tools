@@ -1,0 +1,130 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>psidev.psi.tools</groupId>
+        <artifactId>master-pom</artifactId>
+        <version>4</version>
+    </parent>
+
+    <artifactId>validator</artifactId>
+    <packaging>jar</packaging>
+    <version>2.0.6</version>
+
+    <name>PSI :: Tools :: Generic Schema Validator</name>
+    <description>
+        The library intends to provide a generic framework for validating XML Schema both at the syntactic and semantic level.
+    </description>
+
+    <scm>
+        <connection>scm:git:https://github.com/MICommunity/psi-validator.git</connection>
+        <developerConnection>scm:git:https://github.com/MICommunity/psi-validator.git</developerConnection>
+        <url>https://github.com/MICommunity/psi-validator</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m5.1</version>
+                <configuration>
+                        <flowInitContext>
+                            <masterBranchName>master</masterBranchName>
+                            <developBranchName>develop</developBranchName>
+                            <featureBranchPrefix>feature-</featureBranchPrefix>
+                            <releaseBranchPrefix>release-</releaseBranchPrefix>
+                            <hotfixBranchPrefix>hotfix-</hotfixBranchPrefix>
+                            <versionTagPrefix>${project.artifactId}-</versionTagPrefix>
+                        </flowInitContext>
+                    <!-- see goals wiki page for configuration options -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>psidev.psi.tools</groupId>
+            <artifactId>cv-rule-reader</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>psidev.psi.tools</groupId>
+            <artifactId>object-rule-reader</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>psidev.psi.tools</groupId>
+            <artifactId>ontology-manager</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.3.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- 3rd party -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1</version>
+            </dependency>
+            <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>nexus-ebi-repo-old</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
+        </repository>
+        <repository>
+            <id>nexus-ebi-release-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
+        </repository>
+        <repository>
+            <id>nexus-ebi-snapshot-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
+        </repository>
+    </repositories>
+
+    <!-- Overwrites the previous repositories-->
+    <distributionManagement>
+        <!-- EBI repo -->
+        <repository>
+            <id>pst-release</id>
+            <name>EBI Nexus Repository</name>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/repositories/pst-release</url>
+        </repository>
+        <!-- EBI SNAPSHOT repo -->
+        <snapshotRepository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>pst-snapshots</id>
+            <name>EBI Nexus Snapshots Repository</name>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/repositories/pst-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+    
+</project>

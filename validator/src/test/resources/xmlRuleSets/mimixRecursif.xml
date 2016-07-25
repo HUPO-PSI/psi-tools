@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objectRuleList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/object-rule.xsd">
+
+    <importRuleList>
+        <import rules="/xmlRuleSets/imex.xml"/>
+        <import rules="/xmlRuleSets/mimix.xml"/>
+    </importRuleList>
+    <rule class="psidev.psi.tools.validator.rules.objectRules.mimix.Rule4"/>
+</objectRuleList>

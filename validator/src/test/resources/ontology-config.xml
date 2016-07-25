@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cvSourceList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/CvSourceList.xsd">
+    <cvSource source="file"
+              uri="classpath:ontologies/psi-mi.obo"
+              format="OBO" name="PSI-MI" identifier="MI" version="1.154"/>
+    <!--<cvSource source="file"-->
+              <!--uri="classpath:ontologies/psi-ms.obo"-->
+              <!--format="OBO" name="PSI-MS" identifier="MS" version="1.01"/>-->
+    <!--<cvSource source="file"-->
+              <!--uri="classpath:ontologies/pride_cv.obo"-->
+              <!--format="OBO" name="PRIDE Ontology" identifier="PRIDE" version="1.54"/>-->
+    <cvSource source="file"
+              uri="classpath:ontologies/quality.obo"
+              format="OBO" name="Phenotypic qualities (properties)" identifier="PATO" version="NA"/>
+    <cvSource source="file"
+              uri="classpath:ontologies/psi-mod.obo"
+              format="OBO" name="PSI-MOD" identifier="MOD" version="1.260"/>
+    <cvSource source="file"
+              uri="classpath:ontologies/BrendaTissue.obo"
+              format="OBO" name="Brenda Tissue Ontology" identifier="BTO" version=""/>
+
+    <!-- ignored because OBO file is too large for simple test -->
+    <!--<cvSource source="file"-->
+              <!--uri="classpath:ontologies/gene_ontology.obo"-->
+              <!--format="OBO" name="GO" identifier="GO" version="1.1708"/>-->
+
+    <!-- alternative way to specify local file -->
+    <!--<cvSource source="file"-->
+              <!--uri="file:///C:/tmp/BrendaTissue.obo"-->
+              <!--format="OBO" name="Brenda Tissue Ontology" identifier="BTO" version=""/>-->
+</cvSourceList>

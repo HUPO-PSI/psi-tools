@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CvMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/CvMapping.xsd"
+           modelName=""
+           modelVersion=""
+           modelURI="">
+
+    <CvReferenceList cvSourceVersion="0.9">
+        <CvReference cvName="Protein Modification" cvIdentifier="MOD"/>
+    </CvReferenceList>
+
+    <CvMappingRuleList>
+
+        <CvMappingRule id="R1" cvElementPath="/protein/modifications/@accession" cvTermsCombinationLogic="OR"
+                       scopePath="/protein" requirementLevel="SHOULD" >
+            <CvTerm termAccession="MOD:00001" useTermName="false" useTerm="true" termName="blablabla"
+                    allowChildren="false" cvIdentifierRef="MOD" isRepeatable="false" />
+            <!--<CvTerm termAccession="GO:0030141" useTermName="false" useTerm="true" termName="secretory granule" allowChildren="false" cvIdentifierRef="GO" isRepeatable="false" />-->
+        </CvMappingRule>
+    </CvMappingRuleList>
+</CvMapping>
