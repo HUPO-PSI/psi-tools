@@ -1,7 +1,6 @@
 package psidev.psi.tools.ontology_manager.impl.ols;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.OntologyUtils;
@@ -62,10 +61,10 @@ public class OlsOntologyTest {
     public void getValidTerms_so() throws OntologyLoaderException {
         final OntologyAccess mod = manager.getOntologyAccess( "SO" );
 //        OntologyTermI parent = mod.getTermForAccession("SO:0000001"); // no good for testing!
-        // SO:0000336 has 9 children (OLS 10 Aug 2011) = 9 valid terms
+        // SO:0000336 has 9 children (OLS 27 Jul 2016) = 28 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000336");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 14, terms.size() );
+        Assert.assertEquals( 28, terms.size() );
     }
 
     @Test
@@ -87,16 +86,16 @@ public class OlsOntologyTest {
         Assert.assertTrue( y2h.getNameSynonyms().contains( "2H" ) );
 
     }
-    
+
     @Test
     public void getMiTermSynonyms0217() throws OntologyLoaderException {
         final OntologyAccess mi = manager.getOntologyAccess( "MI" );
         final Set<OntologyTermI> terms = mi.getValidTerms( "MI:0217", false, true );
         Assert.assertEquals( 1, terms.size() );
-        
+
         final OntologyTermI phosphorylation = mi.getTermForAccession("MI:0217");
         assertEquals(1, phosphorylation.getNameSynonyms().size());
-        
+
         // different approach
         Collection<String> names;
         names = OntologyUtils.getTermNames(terms);
@@ -109,17 +108,17 @@ public class OlsOntologyTest {
         OntologyAccess mi = manager.getOntologyAccess( "MI" );
         Set<OntologyTermI> terms = mi.getValidTerms( "MI:0190", true, false );
         Assert.assertFalse(terms.isEmpty());
-        
+
         // different approach
         Collection<String> names;
         names = OntologyUtils.getTermNames(terms);
         // preferred name
         assertTrue(names.contains("phosphorylation reaction"));
-        
+
         // how about synonym?
         assertTrue(names.contains("phosphorylation"));
     }
-    
+
     @Test
     public void getModTermSynonyms() throws OntologyLoaderException {
         final OntologyAccess mod = manager.getOntologyAccess( "MOD" );
