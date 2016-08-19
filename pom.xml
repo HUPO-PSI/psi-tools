@@ -45,9 +45,9 @@
 
 
     <scm>
-        <connection>scm:git:https://github.com/MICommunity/psi-tools.git</connection>
-        <developerConnection>scm:git:https://github.com/MICommunity/psi-tools.git</developerConnection>
-        <url>https://github.com/MICommunity/psi-tools.git</url>
+        <connection>scm:git:https://github.com/HUPO-PSI/psi-tools.git</connection>
+        <developerConnection>scm:git:https://github.com/HUPO-PSI/psi-tools.git</developerConnection>
+        <url>https://github.com/HUPO-PSI/psi-tools.git</url>
     </scm>
 
     <modules>
