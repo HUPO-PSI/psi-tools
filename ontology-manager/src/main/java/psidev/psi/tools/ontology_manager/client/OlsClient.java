@@ -2,7 +2,6 @@ package psidev.psi.tools.ontology_manager.client;
 
 import org.hsqldb.lib.Collection;
 import uk.ac.ebi.pride.utilities.ols.web.service.client.OLSClient;
-import uk.ac.ebi.pride.utilities.ols.web.service.config.OLSWsConfigDev;
 import uk.ac.ebi.pride.utilities.ols.web.service.config.OLSWsConfigProd;
 import uk.ac.ebi.pride.utilities.ols.web.service.model.Identifier;
 import uk.ac.ebi.pride.utilities.ols.web.service.model.Term;
