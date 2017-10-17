@@ -158,7 +158,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
                 validTerms.add( term );
             }
             if ( allowChildren ) {
-                validTerms.addAll( getChildren( term, -1 ) );
+                validTerms.addAll( getAllChildren( term ) );
             }
         }
         return validTerms;
