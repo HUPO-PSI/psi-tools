@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <ols.client.version>2.10</ols.client.version>
+        <ols.client.version>2.11</ols.client.version>
     </properties>
 
     <dependencies>
