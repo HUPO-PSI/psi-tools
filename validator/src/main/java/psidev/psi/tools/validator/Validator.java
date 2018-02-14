@@ -456,7 +456,7 @@ public abstract class Validator {
                         is.close();
                     }
                     else{
-                        log.warn(" The file to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
+                        log.warn(" The file (" + urlName + ") to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
                     }
                 }
                 else if (typeOfImport.toLowerCase().equals(LOCAL_FILE)){
@@ -465,7 +465,7 @@ public abstract class Validator {
                         isImportDone = true;
                     }
                     else {
-                        log.warn(" The file to import is a local file (" + typeOfImport + ") but was not found. Try to read the url on internet.");
+                        log.warn(" The file (" + urlName + ") to import is a local file (" + typeOfImport + ") but was not found. Try to read the url on internet.");
                     }
                 }
                 else if (typeOfImport.toLowerCase().equals(FILE)){
@@ -473,12 +473,12 @@ public abstract class Validator {
                     isImportDone = true;
                 }
                 else {
-                    log.warn(" The type of the file to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
+                    log.warn(" The type of the file (" + urlName + ") to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
                             " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
                 }
             }
             else {
-                log.warn(" The type of the file to import " + typeOfImport + " is not precised. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
+                log.warn(" The type of the file (" + urlName + ") to import " + typeOfImport + " is not precised. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
                         " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
             }
 
