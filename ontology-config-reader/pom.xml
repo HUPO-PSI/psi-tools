@@ -4,7 +4,7 @@
     <parent>
         <groupId>psidev.psi.tools</groupId>
         <artifactId>master-pom</artifactId>
-        <version>2.0.10-SNAPSHOT</version>
+        <version>2.0.11-SNAPSHOT</version>
     </parent>
 
     <artifactId>ontology-config-reader</artifactId>
