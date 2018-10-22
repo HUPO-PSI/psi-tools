@@ -6,8 +6,6 @@ import uk.ac.ebi.pride.utilities.ols.web.service.config.OLSWsConfigProd;
 import uk.ac.ebi.pride.utilities.ols.web.service.model.Identifier;
 import uk.ac.ebi.pride.utilities.ols.web.service.model.Term;
 
-import javax.xml.rpc.ServiceException;
-import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +25,7 @@ public class OlsClient {
 
     private OLSClient olsClient;
 
-    public OlsClient() throws MalformedURLException, ServiceException {
+    public OlsClient()  {
         this.olsClient = new OLSClient(new OLSWsConfigProd());
     }
 

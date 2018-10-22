@@ -64,7 +64,7 @@ public class OlsOntologyTest {
         // SO:0000336 has 9 children (OLS 27 Jul 2016) = 28 valid terms
         OntologyTermI parent = mod.getTermForAccession("SO:0000336");
         Set<OntologyTermI> terms = mod.getAllChildren(parent);
-        Assert.assertEquals( 28, terms.size() );
+        Assert.assertEquals( 37, terms.size() );
     }
 
     @Test

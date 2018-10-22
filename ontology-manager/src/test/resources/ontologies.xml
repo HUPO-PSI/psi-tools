@@ -7,7 +7,7 @@
               version="1.154"/>
 
     <cvSource source="File"
-              uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mod.obo"
+              uri="https://raw.githubusercontent.com/HUPO-PSI/psi-mod-CV/master/PSI-MOD.obo"
               format="OBO"
               name="PSI-MOD"
               identifier="MOD"
