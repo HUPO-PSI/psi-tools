@@ -22,13 +22,13 @@ public class OntologyConfigReaderTest {
     public static final String SAMPLE_ONTOLOGY_CONFIG =
             "<cvSourceList>\n" +
             "    <cvSource source=\"psidev.psi.tools.ontology_manager.impl.ols.OlsOntology\"\n" +
-            "              uri=\"http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mi.obo\"\n" +
+            "              uri=\"https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo\"\n" +
             "              format=\"OBO\" " +
             "              name=\"PSI-MI\" " +
             "              identifier=\"MI\" " +
             "              version=\"1.154\"/>\n" +
             "    <cvSource source=\"OLS\"\n" +
-            "              uri=\"http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mod.obo\"\n" +
+            "              uri=\"https://raw.githubusercontent.com/HUPO-PSI/psi-mod-CV/master/PSI-MOD.obo\"\n" +
             "              format=\"OBO\" " +
             "              name=\"PSI-MOD\" " +
             "              identifier=\"MOD\" " +
@@ -103,7 +103,7 @@ public class OntologyConfigReaderTest {
         Assert.assertEquals( "MI", source.getIdentifier());
         Assert.assertEquals( "PSI-MI", source.getName());
         Assert.assertEquals( "psidev.psi.tools.ontology_manager.impl.ols.OlsOntology", source.getSource());
-        Assert.assertEquals( "http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/protein/psi-mi.obo", source.getUri());
+        Assert.assertEquals( "https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo", source.getUri());
         Assert.assertEquals( "1.154", source.getVersion());
     }
 }

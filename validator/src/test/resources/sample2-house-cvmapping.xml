@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CvMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="http://www.psidev.info/files/validator/CvMapping.xsd" modelName="MIF.xsd"
-           modelVersion="2.53" modelURI="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+           modelVersion="2.53" modelURI="net:sf:psidev:mi https://raw.githubusercontent.com/HUPO-PSI/miXML/master/2.5/src/MIF253.xsd">
     
     <CvReferenceList cvSourceVersion="0.9">
         <CvReference cvName="PSI-MS" cvIdentifier="MS"/>
