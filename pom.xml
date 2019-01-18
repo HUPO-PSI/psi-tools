@@ -50,6 +50,10 @@
         <url>https://github.com/HUPO-PSI/psi-tools.git</url>
     </scm>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <modules>
         <module>cv-rule-reader</module>
         <module>ontology-manager</module>
