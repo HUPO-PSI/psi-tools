@@ -98,22 +98,22 @@ public abstract class Validator {
      * The set of rules specific to that Validator.
      * List of ObjectRuleS
      */
-    private Set<ObjectRule> rules = new HashSet<ObjectRule> ();
+    private Set<ObjectRule> rules = new HashSet<>();
 
     /**
      * The map containing the set of Rules excluded by each imported object rule file
      */
-    private Map<String, Set<String>> excludedRules = new HashMap<String, Set<String>>();
+    private Map<String, Set<String>> excludedRules = new HashMap<>();
 
     /**
      * The list contains all the excluded rules (recursively) for one import. It will be cleaned at each time we start the first import
      */
-    private Stack<Set<String>> stackOfExcludedRulesPerImport = new Stack<Set<String>>();
+    private Stack<Set<String>> stackOfExcludedRulesPerImport = new Stack<>();
 
     /**
      * Contains the URL for the rules to import
      */
-    private HashMap<String, String> urlsForTheImportedRules = new HashMap<String, String>();
+    private HashMap<String, String> urlsForTheImportedRules = new HashMap<>();
 
     /**
      * The type of the file to import in the object-rule config file is a resource
@@ -401,7 +401,7 @@ public abstract class Validator {
             Exclude exclusion = importedRules.getExclude();
 
             if (exclusion.getRule() != null){
-                Set<String> excludedRulesDuringImport = new HashSet<String>();
+                Set<String> excludedRulesDuringImport = new HashSet<>();
 
                 if (!this.stackOfExcludedRulesPerImport.isEmpty()){
                     excludedRulesDuringImport.addAll(this.stackOfExcludedRulesPerImport.peek());
@@ -445,36 +445,36 @@ public abstract class Validator {
 
             if (typeOfImport != null){
 
-                if (typeOfImport.toLowerCase().equals(RESOURCE)){
-                    //URL url = Validator.class.getClassLoader().getResource( urlName );
-                    URL url = this.getClass().getClassLoader().getResource( urlName );
+                switch (typeOfImport.toLowerCase()) {
+                    case RESOURCE:
+                        //URL url = Validator.class.getClassLoader().getResource( urlName );
+                        URL url = this.getClass().getClassLoader().getResource(urlName);
 
-                    if (url != null){
-                        InputStream is = url.openStream();
-                        setObjectRules(is);
+                        if (url != null) {
+                            InputStream is = url.openStream();
+                            setObjectRules(is);
+                            isImportDone = true;
+                            is.close();
+                        } else {
+                            log.warn(" The file (" + urlName + ") to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
+                        }
+                        break;
+                    case LOCAL_FILE:
+                        if (isALocalFile(urlName)) {
+                            loadLocalFileFrom(urlName);
+                            isImportDone = true;
+                        } else {
+                            log.warn(" The file (" + urlName + ") to import is a local file (" + typeOfImport + ") but was not found. Try to read the url on internet.");
+                        }
+                        break;
+                    case FILE:
+                        loadFileFrom(urlName);
                         isImportDone = true;
-                        is.close();
-                    }
-                    else{
-                        log.warn(" The file (" + urlName + ") to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
-                    }
-                }
-                else if (typeOfImport.toLowerCase().equals(LOCAL_FILE)){
-                    if (isALocalFile(urlName)){
-                        loadLocalFileFrom(urlName);
-                        isImportDone = true;
-                    }
-                    else {
-                        log.warn(" The file (" + urlName + ") to import is a local file (" + typeOfImport + ") but was not found. Try to read the url on internet.");
-                    }
-                }
-                else if (typeOfImport.toLowerCase().equals(FILE)){
-                    loadFileFrom(urlName);
-                    isImportDone = true;
-                }
-                else {
-                    log.warn(" The type of the file (" + urlName + ") to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
-                            " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
+                        break;
+                    default:
+                        log.warn(" The type of the file (" + urlName + ") to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
+                                " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
+                        break;
                 }
             }
             else {
@@ -606,7 +606,7 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> validate( Collection<?> col ) throws ValidatorException {
-        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<ValidatorMessage> messages = new ArrayList<>();
         for ( ObjectRule rule : rules ) {
             messages.addAll( validate( col, rule ) );
         }
@@ -621,7 +621,7 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> validate( Object objectToCheck ) throws ValidatorException {
-        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<ValidatorMessage> messages = new ArrayList<>();
         for ( ObjectRule rule : rules ) {
             if ( rule.canCheck( objectToCheck ) ) { // apply only if rule can handle this object
                 messages.addAll( rule.check( objectToCheck ) );
@@ -638,7 +638,7 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> validate( Object objectToCheck, ObjectRule rule ) throws ValidatorException {
-        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<ValidatorMessage> messages = new ArrayList<>();
         if ( rule.canCheck( objectToCheck ) ) { // apply only if rule can handle this object
             messages.addAll( rule.check( objectToCheck ) );
         }
@@ -654,7 +654,7 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     private Collection<ValidatorMessage> validate( Collection<?> col, ObjectRule rule ) throws ValidatorException {
-        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<ValidatorMessage> messages = new ArrayList<>();
         for ( Object aCol : col ) {
             if ( rule.canCheck( aCol ) ) { // apply only if rule can handle this object
                 messages.addAll( rule.check( aCol ) );
@@ -677,7 +677,7 @@ public abstract class Validator {
             return cvRuleManager.checkCvMapping();
         } else {
             log.warn( "The CvRuleManager has not been set up yet." );
-            return new ArrayList<ValidatorMessage>();
+            return new ArrayList<>();
         }
     }
 
@@ -690,7 +690,7 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> checkCvMapping( Collection<?> col, String xPath ) throws ValidatorException {
-        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<ValidatorMessage> messages = new ArrayList<>();
         // Run cv mapping check
         if ( cvRuleManager != null ) {
             for ( CvRule rule : cvRuleManager.getCvRules() ) {
@@ -716,7 +716,7 @@ public abstract class Validator {
      * @throws ValidatorException Exception while trying to validate the input.
      */
     public Collection<ValidatorMessage> checkCvMapping( Object o, String xPath ) throws ValidatorException {
-        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<ValidatorMessage> messages = new ArrayList<>();
         // Run cv mapping check
         if ( cvRuleManager != null ) {
             for ( CvRule rule : cvRuleManager.getCvRules() ) {

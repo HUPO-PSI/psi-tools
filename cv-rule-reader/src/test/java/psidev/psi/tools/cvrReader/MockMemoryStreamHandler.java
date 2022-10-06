@@ -36,7 +36,7 @@ public class MockMemoryStreamHandler extends URLStreamHandler {
 
     public static final String MEMORY_PROTOCOL = "memory";
 
-    private static Map<String, String> url2content = new HashMap<String, String>();
+    private static Map<String, String> url2content = new HashMap<>();
 
     public static void addContent( URL url, String content ) {
         url2content.put( url.toString(), content );
@@ -64,15 +64,12 @@ public class MockMemoryStreamHandler extends URLStreamHandler {
      */
     public static void initHandler() {
         try {
-            URL.setURLStreamHandlerFactory( new URLStreamHandlerFactory() {
-
-                public URLStreamHandler createURLStreamHandler( String protocol ) {
-                    if ( "memory".equals( protocol ) ) {
-                        return new MockMemoryStreamHandler();
-                    }
-                    return null;
+            URL.setURLStreamHandlerFactory(protocol -> {
+                if ( "memory".equals( protocol ) ) {
+                    return new MockMemoryStreamHandler();
                 }
-            } );
+                return null;
+            });
         } catch ( Throwable ex ) {
             // we just ignore this exception, because m2 does not fork properly
             // and URL does not like double handler definitions.

@@ -35,13 +35,13 @@ public class Protein {
 
     public Protein( String name, CrossReference... references ) {
         this.name = name;
-        this.references = new ArrayList<CrossReference>();
+        this.references = new ArrayList<>();
         this.references.addAll( Arrays.asList( references ) );
     }
 
     public Protein( String name, Modification... modifications ) {
         this.name = name;
-        this.modifications = new ArrayList<Modification>( );
+        this.modifications = new ArrayList<>();
         this.modifications.addAll( Arrays.asList( modifications ) );
     }
 

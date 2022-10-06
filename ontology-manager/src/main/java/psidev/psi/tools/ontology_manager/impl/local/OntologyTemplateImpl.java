@@ -27,7 +27,7 @@ public abstract class OntologyTemplateImpl<T extends OntologyTermI> implements O
     /**
      * Pool of all term contained in that ontology.
      */
-    protected Collection<T> ontologyTerms = new ArrayList<T>( 1024 );
+    protected Collection<T> ontologyTerms = new ArrayList<>(1024);
 
     // TODO introduce an interface for querying/updating the relationship
     // TODO replace the hashmap by a Lucene index -> using a different interface !!
@@ -35,17 +35,17 @@ public abstract class OntologyTemplateImpl<T extends OntologyTermI> implements O
     /**
      * Represent the relationship: child -> parents.
      */
-    protected final Map<T, Set<T>> parents = new HashMap<T, Set<T>>();
+    protected final Map<T, Set<T>> parents = new HashMap<>();
 
     /**
      * Represent the relationship: parent -> children.
      */
-    protected final Map<T, Set<T>> children = new HashMap<T, Set<T>>();
+    protected final Map<T, Set<T>> children = new HashMap<>();
 
     /**
      * Mapping of all OboTerm by their ID.
      */
-    protected Map<String, T> id2ontologyTerm = new HashMap<String, T>( 1024 );
+    protected Map<String, T> id2ontologyTerm = new HashMap<>(1024);
 
     /**
      * Collection of root terms of that ontology. A root term is defined as follow: term having no parent.
@@ -55,7 +55,7 @@ public abstract class OntologyTemplateImpl<T extends OntologyTermI> implements O
     /**
      * List of all obsolete term found while loading the ontology.
      */
-    protected Collection<T> obsoleteTerms = new ArrayList<T>();
+    protected Collection<T> obsoleteTerms = new ArrayList<>();
 
     /////////////////////////////
     // Public methods
@@ -101,11 +101,11 @@ public abstract class OntologyTemplateImpl<T extends OntologyTermI> implements O
         }
 
         if ( !children.containsKey( parent ) ) {
-            children.put( parent, new HashSet<T>() );
+            children.put( parent, new HashSet<>() );
         }
 
         if ( !parents.containsKey( child ) ) {
-            parents.put( child, new HashSet<T>() );
+            parents.put( child, new HashSet<>() );
         }
 
         children.get( parent ).add( child );
@@ -162,13 +162,11 @@ public abstract class OntologyTemplateImpl<T extends OntologyTermI> implements O
         }
 
         // it wasn't precalculated, then do it here...
-        roots = new HashSet<T>();
+        roots = new HashSet<>();
 
-        for ( Iterator<T> iterator = ontologyTerms.iterator(); iterator.hasNext(); ) {
-            T ontologyTerm = iterator.next();
-
-            if ( !hasParent( ontologyTerm ) ) {
-                roots.add( ontologyTerm );
+        for (T ontologyTerm : ontologyTerms) {
+            if (!hasParent(ontologyTerm)) {
+                roots.add(ontologyTerm);
             }
         }
 
@@ -230,7 +228,7 @@ public abstract class OntologyTemplateImpl<T extends OntologyTermI> implements O
     }
 
     public Set<T> getAllParents( T term ) {
-        Set<T> parents = new HashSet<T>();
+        Set<T> parents = new HashSet<>();
         getAllParents( term, parents );
         return parents;
     }
@@ -244,7 +242,7 @@ public abstract class OntologyTemplateImpl<T extends OntologyTermI> implements O
     }
 
     public Set<T> getAllChildren( T term ) {
-        Set<T> children = new HashSet<T>();
+        Set<T> children = new HashSet<>();
         getAllChildren( term, children );
         return children;
     }

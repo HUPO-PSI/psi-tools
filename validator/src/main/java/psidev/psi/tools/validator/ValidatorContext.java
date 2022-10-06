@@ -12,13 +12,7 @@ public class ValidatorContext {
     
     private ValidatorConfig validatorConfig;
 
-    private static ThreadLocal<ValidatorContext> instance = new
-            ThreadLocal<ValidatorContext>() {
-                @Override
-                protected ValidatorContext initialValue() {
-                    return new ValidatorContext();
-                }
-            };
+    private static ThreadLocal<ValidatorContext> instance = ThreadLocal.withInitial(() -> new ValidatorContext());
 
     private ValidatorContext(){
          this.validatorConfig = new ValidatorConfig();
