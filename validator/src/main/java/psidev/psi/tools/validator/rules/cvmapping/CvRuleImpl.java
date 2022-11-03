@@ -125,7 +125,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
             throw new ValidatorException( "Cannot validate a null object." );
         }
 
-        Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        Collection<ValidatorMessage> messages = new ArrayList<>();
         if( status.equals( MappingRuleStatus.INVALID_XPATH )) {
             // do not run the rule as it is not valid.
             return messages;
@@ -535,12 +535,12 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
                                                                               final Recommendation level ) {
 
         Map<XPathResult, Map<CvTerm, Integer>> result2termCount =
-                new HashMap<XPathResult, Map<CvTerm, Integer>>( valueResults.size() );
+                new HashMap<>(valueResults.size());
 
         // check that each match (term used in the XML) has at least one matching CV term amongst those specified.
         for ( XPathResult valueResult : valueResults ) { // for each term used in the XML
 
-            Map<CvTerm, Integer> term2count = new HashMap<CvTerm, Integer>( getCVTerms().size() );
+            Map<CvTerm, Integer> term2count = new HashMap<>(getCVTerms().size());
             result2termCount.put( valueResult, term2count );
 
             // for each XPath expression
@@ -767,7 +767,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
             CV cv = ( CV ) o;
 
-            return accession.equals(cv.accession) && !(name != null ? !name.equals(cv.name) : cv.name != null);
+            return accession.equals(cv.accession) && !(!Objects.equals(name, cv.name));
         }
 
         @Override
@@ -786,7 +786,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
      * @return
      */
     private Map<CV, Integer> calculateCvTermUsage( Map<XPathResult, Map<CvTerm, Integer>> result2termCount ) {
-        Map<CV, Integer> term2count = new HashMap<CV, Integer>();
+        Map<CV, Integer> term2count = new HashMap<>();
 
         for ( Map.Entry<XPathResult, Map<CvTerm, Integer>> e : result2termCount.entrySet() ) {
             Map<CvTerm, Integer> t2c = e.getValue();
@@ -870,13 +870,6 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
     private String printCvTerm( CvTerm cv ) {
 
         StringBuilder sb = new StringBuilder( 512 );
-//        sb.append( "CvTerm(" );
-//        sb.append( '\'' ).append( cv.getTermAccession() ).append( '\'' ).append( ',' ).append( ' ' );
-//        sb.append( '\'' ).append( cv.getTermName() ).append( '\'' ).append( ',' ).append( ' ' );
-//        sb.append( "allowChildren:" ).append( cv.isAllowChildren() ).append( ',' ).append( ' ' );
-//        sb.append( "useTerm:" ).append( cv.isUseTerm() ).append( ',' ).append( ' ' );
-//        sb.append( "repeatable:" ).append( cv.isIsRepeatable() );
-//        sb.append( ")" );
 
         if ( cv.isUseTerm() && cv.isAllowChildren() ) {
             sb.append(cv.getTermAccession()).append(" (").append(cv.getTermName()).append(")");
@@ -947,7 +940,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
     public String toString() {
 
-        StringBuffer sb = new StringBuffer( 256 );
+        StringBuilder sb = new StringBuilder( 256 );
 
         sb.append("[Rule: ID=");
         sb.append(this.getId());

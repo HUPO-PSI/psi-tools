@@ -15,11 +15,9 @@
  */
 package psidev.psi.tools.validator.schema;
 
-import junit.framework.TestCase;
 import junit.framework.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.InputStream;
 
 /**

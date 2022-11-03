@@ -3,6 +3,8 @@ package psidev.psi.tools.validator;
 import psidev.psi.tools.validator.rules.Rule;
 import psidev.psi.tools.validator.schema.SaxMessage;
 
+import java.util.Objects;
+
 /**
  * The definition of a Validator message.
  *
@@ -121,7 +123,7 @@ public class ValidatorMessage<T extends Object> {
 
         final ValidatorMessage that = (ValidatorMessage) o;
 
-        if ( context != null ? !context.equals( that.context ) : that.context != null ) {
+        if (!Objects.equals(context, that.context)) {
             return false;
         }
         if ( level != that.level ) {
@@ -130,7 +132,7 @@ public class ValidatorMessage<T extends Object> {
         if ( !message.equals( that.message ) ) {
             return false;
         }
-        if ( rule != null ? !rule.equals( that.rule ) : that.rule != null ) {
+        if (!Objects.equals(rule, that.rule)) {
             return false;
         }
 
@@ -147,7 +149,7 @@ public class ValidatorMessage<T extends Object> {
     }
 
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append( "ValidatorMessage" );
         sb.append( "{message='" ).append( message ).append( '\'' );
         sb.append( ", level=" ).append( level );

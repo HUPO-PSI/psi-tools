@@ -39,7 +39,7 @@ public class OntologyUtils {
         if ( terms == null ) {
             return Collections.EMPTY_LIST;
         }
-        Collection<String> accessions = new ArrayList<String>( terms.size() );
+        Collection<String> accessions = new ArrayList<>(terms.size());
         for ( OntologyTermI term : terms ) {
             accessions.add( term.getTermAccession() );
         }
@@ -55,7 +55,7 @@ public class OntologyUtils {
         if ( terms == null ) {
             return Collections.EMPTY_LIST;
         }
-        Collection<String> names = new ArrayList<String>( terms.size() );
+        Collection<String> names = new ArrayList<>(terms.size());
         for ( OntologyTermI term : terms ) {
             names.add( term.getPreferredName() );
             names.addAll( term.getNameSynonyms() );

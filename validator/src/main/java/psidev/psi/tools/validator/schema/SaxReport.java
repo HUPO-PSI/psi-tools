@@ -24,7 +24,7 @@ public class SaxReport {
 
     private boolean valid = true;
 
-    private List<SaxMessage> messages = new ArrayList<SaxMessage>();
+    private List<SaxMessage> messages = new ArrayList<>();
 
     public SaxReport() {
     }

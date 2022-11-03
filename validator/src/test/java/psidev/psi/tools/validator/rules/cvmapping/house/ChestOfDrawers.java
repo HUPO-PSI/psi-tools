@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @since specify the maven artifact version
  */
 public class ChestOfDrawers {
-    Collection<Drawer> drawers = new ArrayList<Drawer>( );
+    Collection<Drawer> drawers = new ArrayList<>();
 
     public Collection<Drawer> getDrawers() {
         return drawers;

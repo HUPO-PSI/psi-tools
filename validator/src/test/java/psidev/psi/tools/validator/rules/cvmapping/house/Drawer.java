@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class Drawer {
 
-    Collection<? extends Object> objects = new ArrayList<Object>( );
+    Collection<? extends Object> objects = new ArrayList<>();
 
     //////////////////
     // Constructors

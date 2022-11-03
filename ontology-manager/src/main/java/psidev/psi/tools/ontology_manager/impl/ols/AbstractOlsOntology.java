@@ -121,7 +121,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         this.ontologyID = ontologyID;
         try {
             Map roots = olsClient.getRootTerms( ontologyID );
-            rootAccs = new HashSet<String>();
+            rootAccs = new HashSet<>();
             rootAccs.addAll( roots.keySet() );
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
@@ -151,7 +151,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
      * @return a Set of OntologyTerms that are valid (in terms of the validator).
      */
     public Set<T> getValidTerms( String accession, boolean allowChildren, boolean useTerm ) {
-        Set<T> validTerms = new HashSet<T>();
+        Set<T> validTerms = new HashSet<>();
         T term = getTermForAccession( accession );
         if ( term != null ) {
             if ( useTerm ) {
@@ -506,7 +506,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
      * @return a Set of OntologyTermIs of the direct parents of the given term.
      */
     public Set<T> getAllParents( T term ) {
-        Set<T> allParents = new HashSet<T>();
+        Set<T> allParents = new HashSet<>();
         addParents( term, allParents );
         return allParents;
     }
@@ -626,7 +626,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
      * @return a Set of OntologyTermI objects representing the result contained in the Map.
      */
     private Set<T> olsMap2TermSet( Map results ) {
-        Set<T> terms = new HashSet<T>();
+        Set<T> terms = new HashSet<>();
         for ( Object o : results.keySet() ) {
             Object v = results.get( o );
             if ( o instanceof String && v instanceof String ) {
@@ -648,7 +648,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     // This has issues finding all the child terms if the tree changes relationship types -> use getValidIDs2
     @Deprecated
     public Set<String> getValidIDsOld( String id, boolean allowChildren, boolean useTerm ) {
-        Set<String> terms = new HashSet<String>();
+        Set<String> terms = new HashSet<>();
         try {
             if ( useTerm ) {
                 String result = olsClient.getTermById( id, ontologyID );
@@ -681,7 +681,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
 
     @Deprecated
     protected Set<String> getValidIDs2( String id, boolean allowChildren, boolean useTerm ) {
-        Set<String> terms = new HashSet<String>();
+        Set<String> terms = new HashSet<>();
         try {
             if ( useTerm ) {
                 String result = olsClient.getTermById( id, ontologyID );
@@ -880,7 +880,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
 
     @Deprecated
     public Set<String> getAllChildTerms( String id ) throws RemoteException {
-        Set<String> retVal = new TreeSet<String>();
+        Set<String> retVal = new TreeSet<>();
         appendChildTerms( retVal, getChildTerms( id ) );
         return retVal;
     }

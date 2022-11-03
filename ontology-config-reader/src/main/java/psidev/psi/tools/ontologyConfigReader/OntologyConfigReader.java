@@ -129,9 +129,7 @@ public class OntologyConfigReader {
     public CvSourceList read( File file ) throws OntologyConfigReaderException {
         try {
             return unmarshall( file );
-        } catch ( JAXBException e ) {
-            throw new OntologyConfigReaderException( e );
-        } catch ( FileNotFoundException e ) {
+        } catch (JAXBException | FileNotFoundException e ) {
             throw new OntologyConfigReaderException( e );
         }
     }
@@ -147,9 +145,7 @@ public class OntologyConfigReader {
     public CvSourceList read( URL url ) throws OntologyConfigReaderException {
         try {
             return unmarshall( url );
-        } catch ( JAXBException e ) {
-            throw new OntologyConfigReaderException( e );
-        } catch ( FileNotFoundException e ) {
+        } catch (JAXBException | FileNotFoundException e ) {
             throw new OntologyConfigReaderException( e );
         }
     }
