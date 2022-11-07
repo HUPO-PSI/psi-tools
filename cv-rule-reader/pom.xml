@@ -22,7 +22,7 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.7.4</version>
+                <version>0.15.1</version>
                 <configuration>
                     <schemaDirectory>${project.basedir}/src/main/resources/</schemaDirectory>
                     <bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
