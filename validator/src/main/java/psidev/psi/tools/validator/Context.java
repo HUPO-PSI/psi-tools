@@ -40,7 +40,7 @@ public class Context {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer( 128 );
+        StringBuilder sb = new StringBuilder( 128 );
         sb.append( "Context(" );
         if ( context != null ) {
             sb.append( context );

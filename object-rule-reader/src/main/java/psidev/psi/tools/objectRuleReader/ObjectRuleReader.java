@@ -129,9 +129,7 @@ public class ObjectRuleReader {
     public ObjectRuleList read( File file ) throws ObjectRuleReaderException {
         try {
             return unmarshall( file );
-        } catch ( JAXBException e ) {
-            throw new ObjectRuleReaderException( e );
-        } catch ( FileNotFoundException e ) {
+        } catch (JAXBException | FileNotFoundException e ) {
             throw new ObjectRuleReaderException( e );
         }
     }
@@ -147,9 +145,7 @@ public class ObjectRuleReader {
     public ObjectRuleList read( URL url ) throws ObjectRuleReaderException {
         try {
             return unmarshall( url );
-        } catch ( JAXBException e ) {
-            throw new ObjectRuleReaderException( e );
-        } catch ( FileNotFoundException e ) {
+        } catch (JAXBException | FileNotFoundException e ) {
             throw new ObjectRuleReaderException( e );
         }
     }

@@ -15,7 +15,7 @@ public class Garage {
     float depth;
     float width;
     Car car = null;
-    Collection<Bike> bikes = new ArrayList<Bike>();
+    Collection<Bike> bikes = new ArrayList<>();
 
     //////////////////
     // Constructors

@@ -35,6 +35,6 @@ public class Rule3 extends ObjectRule<Object> {
 
     @Override
     public Collection<ValidatorMessage> check(Object o) throws ValidatorException {
-        return new ArrayList<ValidatorMessage>();
+        return new ArrayList<>();
     }
 }

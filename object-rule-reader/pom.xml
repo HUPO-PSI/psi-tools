@@ -20,9 +20,9 @@
         <plugins>
             <!-- Conversion of XML Schema into Java source code using JAXB-XJC -->
             <plugin>
-                <groupId>com.sun.tools.xjc.maven2</groupId>
-                <artifactId>maven-jaxb-plugin</artifactId>
-                <version>1.0</version>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.15.1</version>
                 <configuration>
                     <generatePackage>psidev.psi.tools.objectRuleReader.mapping.jaxb</generatePackage>
                     <includeSchemas>
@@ -51,16 +51,23 @@
 
         <!-- JAXB related deps -->
         <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>stax</groupId>
-            <artifactId>stax</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-xjc</artifactId>
         </dependency>
 
         <!-- Tests -->

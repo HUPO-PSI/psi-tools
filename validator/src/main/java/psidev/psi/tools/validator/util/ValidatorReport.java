@@ -32,10 +32,10 @@ public class ValidatorReport {
 
     private static final String NEW_LINE = System.getProperty( "line.separator" );
 
-    Collection<CvRule> cvRulesNotChecked = new ArrayList<CvRule>();
-    Collection<CvRule> cvRulesInvalidXpath = new ArrayList<CvRule>();
-    Collection<CvRule> cvRulesValidXpath = new ArrayList<CvRule>();
-    Collection<CvRule> cvRulesValid = new ArrayList<CvRule>();
+    Collection<CvRule> cvRulesNotChecked = new ArrayList<>();
+    Collection<CvRule> cvRulesInvalidXpath = new ArrayList<>();
+    Collection<CvRule> cvRulesValidXpath = new ArrayList<>();
+    Collection<CvRule> cvRulesValid = new ArrayList<>();
 
     public ValidatorReport( Collection<CvRule> allCvRules ) {
         splitCvRulesByStatus( allCvRules );

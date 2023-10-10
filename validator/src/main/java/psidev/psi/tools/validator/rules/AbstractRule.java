@@ -38,7 +38,7 @@ public abstract class AbstractRule implements Rule {
     /**
      * A collection of tips.
      */
-    private Collection<String> howToFixTips = new ArrayList<String>( 1 );
+    private Collection<String> howToFixTips = new ArrayList<>(1);
 
     /**
      * Map of needed ontologies
@@ -101,9 +101,8 @@ public abstract class AbstractRule implements Rule {
 
         if ( howToFixTips != null && !howToFixTips.isEmpty() ) {
             sb.append( "Tip" ).append( ( howToFixTips.size() > 1 ? "s" : "" ) ).append( ':' ).append( NEW_LINE );
-            for ( Iterator<String> iterator = howToFixTips.iterator(); iterator.hasNext(); ) {
-                String tip = iterator.next();
-                sb.append( "\t* " ).append( tip ).append( NEW_LINE );
+            for (String tip : howToFixTips) {
+                sb.append("\t* ").append(tip).append(NEW_LINE);
             }
         }
 

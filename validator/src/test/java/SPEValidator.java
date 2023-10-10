@@ -52,7 +52,7 @@ public class SPEValidator extends Validator {
 
         if( experiment == null ) throw new IllegalArgumentException( "You must give a non null experiment" );
 
-        final Collection<ValidatorMessage> messages = new ArrayList<ValidatorMessage>();
+        final Collection<ValidatorMessage> messages = new ArrayList<>();
 
         // Run Object Rules
         messages.addAll( super.validate( experiment ) );
