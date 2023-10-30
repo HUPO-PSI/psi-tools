@@ -2,7 +2,7 @@ package psidev.psi.tools.ontology_manager.client;
 
 import org.hsqldb.lib.Collection;
 import uk.ac.ebi.pride.utilities.ols.web.service.client.OLSClient;
-import uk.ac.ebi.pride.utilities.ols.web.service.config.OLSWsConfig;
+import uk.ac.ebi.pride.utilities.ols.web.service.config.OLSWsConfigProd;
 import uk.ac.ebi.pride.utilities.ols.web.service.model.Identifier;
 import uk.ac.ebi.pride.utilities.ols.web.service.model.Term;
 
@@ -26,7 +26,7 @@ public class OlsClient {
     private OLSClient olsClient;
 
     public OlsClient()  {
-        this.olsClient = new OLSClient(new OLSWsConfig("www.ebi.ac.uk/ols4/"));
+        this.olsClient = new OLSClient(new OLSWsConfigProd());
     }
 
     public String getTermById(String accession, String ontologyId) throws RemoteException{
