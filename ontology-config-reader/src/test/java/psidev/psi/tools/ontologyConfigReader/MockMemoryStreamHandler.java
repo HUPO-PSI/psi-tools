@@ -64,12 +64,15 @@ public class MockMemoryStreamHandler extends URLStreamHandler {
      */
     public static void initHandler() {
         try {
-            URL.setURLStreamHandlerFactory(protocol -> {
-                if ( "memory".equals( protocol ) ) {
-                    return new MockMemoryStreamHandler();
+            URL.setURLStreamHandlerFactory( new URLStreamHandlerFactory() {
+
+                public URLStreamHandler createURLStreamHandler( String protocol ) {
+                    if ( "memory".equals( protocol ) ) {
+                        return new MockMemoryStreamHandler();
+                    }
+                    return null;
                 }
-                return null;
-            });
+            } );
         } catch ( Throwable ex ) {
             // we just ignore this exception, because m2 does not fork properly
             // and URL does not like double handler definitions.

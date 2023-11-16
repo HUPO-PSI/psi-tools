@@ -134,7 +134,7 @@ public class SaxMessage {
 
 
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuffer sb = new StringBuffer();
         sb.append( "SaxMessage" );
         sb.append( "{publicId='" ).append( publicId ).append( '\'' );
         sb.append( ", systemId='" ).append( systemId ).append( '\'' );

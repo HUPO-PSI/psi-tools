@@ -445,36 +445,36 @@ public abstract class Validator {
 
             if (typeOfImport != null){
 
-                switch (typeOfImport.toLowerCase()) {
-                    case RESOURCE:
-                        //URL url = Validator.class.getClassLoader().getResource( urlName );
-                        URL url = this.getClass().getClassLoader().getResource(urlName);
+                if (typeOfImport.toLowerCase().equals(RESOURCE)){
+                    //URL url = Validator.class.getClassLoader().getResource( urlName );
+                    URL url = this.getClass().getClassLoader().getResource( urlName );
 
-                        if (url != null) {
-                            InputStream is = url.openStream();
-                            setObjectRules(is);
-                            isImportDone = true;
-                            is.close();
-                        } else {
-                            log.warn(" The file (" + urlName + ") to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
-                        }
-                        break;
-                    case LOCAL_FILE:
-                        if (isALocalFile(urlName)) {
-                            loadLocalFileFrom(urlName);
-                            isImportDone = true;
-                        } else {
-                            log.warn(" The file (" + urlName + ") to import is a local file (" + typeOfImport + ") but was not found. Try to read the url on internet.");
-                        }
-                        break;
-                    case FILE:
-                        loadFileFrom(urlName);
+                    if (url != null){
+                        InputStream is = url.openStream();
+                        setObjectRules(is);
                         isImportDone = true;
-                        break;
-                    default:
-                        log.warn(" The type of the file (" + urlName + ") to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
-                                " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
-                        break;
+                        is.close();
+                    }
+                    else{
+                        log.warn(" The file (" + urlName + ") to import is a resource (" + typeOfImport + ") but was not found. Try to load this url as a local file and if not, try to read the url on internet.");
+                    }
+                }
+                else if (typeOfImport.toLowerCase().equals(LOCAL_FILE)){
+                    if (isALocalFile(urlName)){
+                        loadLocalFileFrom(urlName);
+                        isImportDone = true;
+                    }
+                    else {
+                        log.warn(" The file (" + urlName + ") to import is a local file (" + typeOfImport + ") but was not found. Try to read the url on internet.");
+                    }
+                }
+                else if (typeOfImport.toLowerCase().equals(FILE)){
+                    loadFileFrom(urlName);
+                    isImportDone = true;
+                }
+                else {
+                    log.warn(" The type of the file (" + urlName + ") to import " + typeOfImport + " is not known. You can choose 'resource' (resource of the validator), 'file' (local file on your machine), or 'url' (look on internet)." +
+                            " First we will try to load this file as a resource. If not found, we will look the local files and then we will try on internet.");
                 }
             }
             else {

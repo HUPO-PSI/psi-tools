@@ -17,7 +17,7 @@
 
     <properties>
         <ols.client.version>2.15-SNAPSHOT</ols.client.version>
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.13.3</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -73,62 +73,7 @@
                     <artifactId>ojdbc14</artifactId>
                     <groupId>oracle</groupId>
                 </exclusion>
-                <exclusion>
-                    <groupId>proteomics</groupId>
-                    <artifactId>proteomics-common</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>obo</groupId>
-                    <artifactId>obo</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>obo</groupId>
-                    <artifactId>bbop</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.geneontology</groupId>
-                    <artifactId>oboedit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.geneontology</groupId>
-                    <artifactId>org.geneontology</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jcvsii</groupId>
-                    <artifactId>jcvsii</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.ice</groupId>
-                    <artifactId>tar</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>proteomics</groupId>
-            <artifactId>proteomics-common</artifactId>
-            <version>1.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>obo</groupId>
-            <artifactId>obo</artifactId>
-            <version>2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>obo</groupId>
-            <artifactId>bbop</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geneontology</groupId>
-            <artifactId>org.geneontology</artifactId>
-            <version>1.101</version>
         </dependency>
 
         <!-- OLS webservice -->
@@ -148,6 +93,18 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.15</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.jms</groupId>
+                    <artifactId>jms</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
