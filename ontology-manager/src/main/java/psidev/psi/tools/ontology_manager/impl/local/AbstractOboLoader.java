@@ -56,20 +56,22 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
         O ontology = createNewOntology();
 
         // 1. convert and index all terms (note: at this stage we don't handle the hierarchy)
-        for (Term term : ontBean.getTerms()) {
+        for ( Iterator iterator = ontBean.getTerms().iterator(); iterator.hasNext(); ) {
+            Term term = ( Term ) iterator.next();
+
             // convert term into a OboTerm
-            T ontologyTerm = createNewOntologyTerm(term);
+            T ontologyTerm = createNewOntologyTerm( term );
             final Collection<TermSynonym> synonyms = term.getSynonyms();
-            if (synonyms != null) {
-                for (TermSynonym synonym : synonyms) {
-                    ontologyTerm.getNameSynonyms().add(synonym.getSynonym());
+            if( synonyms != null ) {
+                for ( TermSynonym synonym : synonyms ) {
+                    ontologyTerm.getNameSynonyms().add( synonym.getSynonym() );
                 }
             }
 
-            ontology.addTerm(ontologyTerm);
+            ontology.addTerm( ontologyTerm );
 
-            if (term.isObsolete()) {
-                ontology.addObsoleteTerm(ontologyTerm);
+            if ( term.isObsolete() ) {
+                ontology.addObsoleteTerm( ontologyTerm );
             }
         }
         buildTermRelationships(ontology);
@@ -79,11 +81,15 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
 
     protected void buildTermRelationships(O ontology) {
         // 2. build hierarchy based on the relations of the Terms
-        for (Term term : ontBean.getTerms()) {
-            if (term.getRelationships() != null) {
-                for (TermRelationship relation : term.getRelationships()) {
-                    ontology.addLink(relation.getObjectTerm().getIdentifier(),
-                            relation.getSubjectTerm().getIdentifier());
+        for ( Iterator iterator = ontBean.getTerms().iterator(); iterator.hasNext(); ) {
+            Term term = ( Term ) iterator.next();
+
+            if ( term.getRelationships() != null ) {
+                for ( Iterator iterator1 = term.getRelationships().iterator(); iterator1.hasNext(); ) {
+                    TermRelationship relation = ( TermRelationship ) iterator1.next();
+
+                    ontology.addLink( relation.getObjectTerm().getIdentifier(),
+                                      relation.getSubjectTerm().getIdentifier() );
                 }
             }
         }
@@ -139,7 +145,11 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
     private File getRegistryFile() throws OntologyLoaderException {
         File ontologyDirectory = OntologyManagerContext.getInstance().getOntologyDirectory();
 
-        File[] registry = ontologyDirectory.listFiles(pathname -> ONTOLOGY_REGISTRY_NAME.equals( pathname.getName() ));
+        File[] registry = ontologyDirectory.listFiles( new FileFilter() {
+            public boolean accept( File pathname ) {
+                return ONTOLOGY_REGISTRY_NAME.equals( pathname.getName() );
+            }
+        } );
 
         if ( registry.length == 1 ) {
             // found our file
@@ -246,7 +256,10 @@ public abstract class AbstractOboLoader<T extends OntologyTermI, O extends Ontol
                     } else {
                         log.info( "The file is empty" );
                     }
-                } catch (IOException | ClassNotFoundException e ) {
+                } catch ( IOException e ) {
+                    // optional, so just display message in the log
+                    log.error( "Error while deserializing the map", e );
+                } catch ( ClassNotFoundException e ) {
                     // optional, so just display message in the log
                     log.error( "Error while deserializing the map", e );
                 }

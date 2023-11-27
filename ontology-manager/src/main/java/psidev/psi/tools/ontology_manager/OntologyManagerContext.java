@@ -22,7 +22,12 @@ public class OntologyManagerContext {
 
 
     private static ThreadLocal<OntologyManagerContext> instance =
-            ThreadLocal.withInitial(() -> new OntologyManagerContext());
+            new ThreadLocal<OntologyManagerContext>() {
+                @Override
+                protected OntologyManagerContext initialValue() {
+                    return new OntologyManagerContext();
+                }
+            };
 
     public static OntologyManagerContext getInstance() {
         return instance.get();

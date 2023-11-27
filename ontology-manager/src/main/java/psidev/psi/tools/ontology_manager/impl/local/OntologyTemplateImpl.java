@@ -164,9 +164,11 @@ public abstract class OntologyTemplateImpl<T extends OntologyTermI> implements O
         // it wasn't precalculated, then do it here...
         roots = new HashSet<>();
 
-        for (T ontologyTerm : ontologyTerms) {
-            if (!hasParent(ontologyTerm)) {
-                roots.add(ontologyTerm);
+        for ( Iterator<T> iterator = ontologyTerms.iterator(); iterator.hasNext(); ) {
+            T ontologyTerm = iterator.next();
+
+            if ( !hasParent( ontologyTerm ) ) {
+                roots.add( ontologyTerm );
             }
         }
 

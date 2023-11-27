@@ -767,7 +767,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
             CV cv = ( CV ) o;
 
-            return accession.equals(cv.accession) && !(!Objects.equals(name, cv.name));
+            return accession.equals(cv.accession) && !(name != null ? !name.equals(cv.name) : cv.name != null);
         }
 
         @Override
@@ -940,7 +940,7 @@ public class CvRuleImpl extends AbstractRule implements CvRule {
 
     public String toString() {
 
-        StringBuilder sb = new StringBuilder( 256 );
+        StringBuffer sb = new StringBuffer( 256 );
 
         sb.append("[Rule: ID=");
         sb.append(this.getId());

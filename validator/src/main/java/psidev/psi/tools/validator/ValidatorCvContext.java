@@ -42,7 +42,13 @@ public class ValidatorCvContext {
 
     public static final Log log = LogFactory.getLog( ValidatorCvContext.class);
 
-    private static ThreadLocal<ValidatorCvContext> instance = ThreadLocal.withInitial(() -> new ValidatorCvContext());
+    private static ThreadLocal<ValidatorCvContext> instance = new
+            ThreadLocal<ValidatorCvContext>() {
+                @Override
+                protected ValidatorCvContext initialValue() {
+                    return new ValidatorCvContext();
+                }
+            };
 
     public static ValidatorCvContext getInstance() {
         return instance.get();
