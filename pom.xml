@@ -5,7 +5,7 @@
     <groupId>psidev.psi.tools</groupId>
     <artifactId>master-pom</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
 
     <name>PSI :: Tools :: Master pom</name>
 
@@ -234,10 +234,6 @@
     </dependencyManagement>
 
     <repositories>
-        <repository>
-            <id>nexus-ebi-repo-old</id>
-            <url>https://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
-        </repository>
         <repository>
             <id>nexus-ebi-release-repo</id>
             <url>https://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
