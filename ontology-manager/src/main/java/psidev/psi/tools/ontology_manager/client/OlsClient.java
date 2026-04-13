@@ -26,7 +26,7 @@ public class OlsClient {
     private OLSClient olsClient;
 
     public OlsClient()  {
-        this.olsClient = new OLSClient(new OLSWsConfigProd());
+        this.olsClient = new WrappedOlsClient(new OLSWsConfigProd());
     }
 
     public String getTermById(String accession, String ontologyId) throws RemoteException{
