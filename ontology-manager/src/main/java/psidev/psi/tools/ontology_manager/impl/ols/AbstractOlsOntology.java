@@ -178,7 +178,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         try {
             termName = olsClient.getTermById(accession, ontologyID);
         } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS.", e );
         }
 
         // check the result! ols returns the input accession if no matching entry was found
@@ -392,7 +392,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         try {
             retVal = olsClient.isObsolete( term.getTermAccession(), ontologyID );
         } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS.", e );
         }
         return retVal;
     }
@@ -447,7 +447,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         try {
             results = olsClient.getTermParents( term.getTermAccession(), ontologyID );
         } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS.", e );
         }
         // OLS returns a empty map if no parents are found for the query, so we
         // will always retrun a Set (empty or non-empty) if no exception is thrown.
@@ -537,7 +537,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         try {
             results = olsClient.getTermChildren( term.getTermAccession(), ontologyID, level);
         } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS.", e );
         }
         // OLS returns a empty map if no children are found for the query, so we
         // will always retrun a Set (empty or non-empty) if no exception is thrown.
@@ -665,7 +665,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
             }
         } catch ( RemoteException e ) {
             log.error( "RemoteException while trying to connect to OLS.", e );
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS.", e );
         }
         return terms;
     }
@@ -692,7 +692,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
             }
         } catch ( RemoteException e ) {
             log.error( "RemoteException while trying to connect to OLS.", e );
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS.", e );
         }
         return terms;
     }
@@ -743,7 +743,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
             }
             result = olsClient.isObsolete( id, ontologyID );
         } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS.", e );
         }
         return result;
     }
@@ -788,7 +788,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
             result = olsClient.getTermById( id, ontologyID );
         } catch ( RemoteException e ) {
             throw new IllegalStateException( "RemoteException while trying to query OLS for: "
-                    + id + " in ontology: " + ontologyID );
+                    + id + " in ontology: " + ontologyID, e );
         }
         return result;
     }
@@ -832,7 +832,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
         try {
             result = ( olsClient.getTermParents( id, ontologyID ) ).keySet();
         } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
+            throw new IllegalStateException( "RemoteException while trying to connect to OLS.", e );
         }
         return result;
     }

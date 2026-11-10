@@ -57,8 +57,8 @@ public class WrappedOlsClient extends OLSClient {
             String hostname = this.getConfig().getHostName().split("/")[0];
             String hostnamePath = this.getConfig().getHostName().split("/")[1];
             return new URI(this.getConfig().getProtocol(), hostname, "/" + hostnamePath + path, query, null);
-        } catch (URISyntaxException var6) {
-            throw new RestClientException("The query could not be encoded");
+        } catch (URISyntaxException e) {
+            throw new RestClientException("The query could not be encoded", e);
         }
     }
 
@@ -66,7 +66,7 @@ public class WrappedOlsClient extends OLSClient {
         try {
             return (T)this.mapper.readValue(uri.toURL(), clazz);
         } catch (IOException e) {
-            throw new RestClientException(e.getMessage());
+            throw new RestClientException("OLS request failed for " + uri + ": " + e.getMessage(), e);
         }
     }
 }

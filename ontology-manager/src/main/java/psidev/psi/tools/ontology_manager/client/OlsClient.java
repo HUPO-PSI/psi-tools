@@ -34,7 +34,7 @@ public class OlsClient {
             Identifier identifier = new Identifier(accession, Identifier.IdentifierType.OBO);
             return olsClient.getTermById(identifier, ontologyId).getLabel();
         } catch ( Exception e ) {
-            throw new RemoteException( "RemoteException while trying to connect to OLS." );
+            throw new RemoteException( "RemoteException while trying to connect to OLS.", e );
         }
     }
 
@@ -85,7 +85,7 @@ public class OlsClient {
             }
             return roots;
         } catch ( Exception e ) {
-            throw new RemoteException( "RemoteException while trying to connect to OLS." );
+            throw new RemoteException( "RemoteException while trying to connect to OLS.", e );
         }
     }
 
@@ -94,7 +94,7 @@ public class OlsClient {
         try {
             retVal = olsClient.isObsolete(termAccession, ontologyId);
         } catch ( Exception e ) {
-            throw new RemoteException( "RemoteException while trying to connect to OLS." );
+            throw new RemoteException( "RemoteException while trying to connect to OLS.", e );
         }
         return retVal;
     }
