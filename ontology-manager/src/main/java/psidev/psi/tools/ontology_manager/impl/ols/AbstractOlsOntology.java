@@ -228,12 +228,9 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
             return metadata;
 
         } catch ( Exception e ) {
-            if ( log.isWarnEnabled() ) {
-                log.warn( "Error while loading term synonyms from OLS for term: " + termAccession, e );
-            }
+            throw new IllegalStateException( "Error while loading term synonyms from OLS for term: "
+                    + termAccession + " in ontology: " + ontologyID, e );
         }
-
-        return null;
     }
 
     public Map getAllTermSynonyms( String termAccession ) {
@@ -304,12 +301,9 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
             return xrefs;
 
         } catch ( Exception e ) {
-            if ( log.isWarnEnabled() ) {
-                log.warn( "Error while loading term synonyms from OLS for term: " + termAccession, e );
-            }
+            throw new IllegalStateException( "Error while loading term cross-references from OLS for term: "
+                    + termAccession + " in ontology: " + ontologyID, e );
         }
-
-        return null;
     }
 
     /**
