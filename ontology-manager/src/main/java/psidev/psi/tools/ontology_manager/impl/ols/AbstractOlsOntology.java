@@ -38,7 +38,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
     protected boolean useTermSynonyms = true; // flag whether term synonyms should be recorded
     protected OlsClient olsClient;
     protected String ontologyID;
-    protected Set<String> rootAccs;
+    private Set<String> rootAccs;
 
     protected Date lastOntologyUpload;
 
@@ -119,13 +119,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
 
     public void loadOntology( String ontologyID, String name, String version, String format, URI uri ) {
         this.ontologyID = ontologyID;
-        try {
-            Map roots = olsClient.getRootTerms( ontologyID );
-            rootAccs = new HashSet<>();
-            rootAccs.addAll( roots.keySet() );
-        } catch ( RemoteException e ) {
-            throw new IllegalStateException( "RemoteException while trying to connect to OLS." );
-        }
+        rootAccs = null;
         log.info( "Successfully created OlsOntology from values: ontology=" + ontologyID + " name=" + name
                 + " version=" + version + " format=" + format + " location=" + uri );
     }
@@ -524,10 +518,7 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
             // if the parent is not already contained in the list: add it
             if ( !parents.contains( dp ) ) {
                 parents.add( dp );
-                // only if it is not a root term, look for more parents
-                if ( !rootAccs.contains( dp.getTermAccession() ) ) {
-                    addParents( dp, parents );
-                }
+                addParents( dp, parents );
             }
         }
     }
@@ -939,6 +930,13 @@ public abstract class AbstractOlsOntology<T extends OntologyTermI> implements On
      * put in the cache all the terms of the ontology
      */
     public void preLoadAllOntologyTerms(){
+        if (rootAccs == null) {
+            try {
+                rootAccs = new HashSet<>(olsClient.getRootTerms(ontologyID).keySet());
+            } catch (RemoteException e) {
+                throw new IllegalStateException("Failed loading root terms for ontology " + ontologyID + " from OLS.", e);
+            }
+        }
         for (String accession : this.rootAccs){
             T term = getTermForAccessionUncached(accession);
 
